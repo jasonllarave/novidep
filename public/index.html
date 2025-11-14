@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novi - colombianoviolenta.org</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <div class="robot-container" id="robot-container">
+        <div class="robot">
+            <div class="robot-head">
+                <div class="robot-eye left">
+                    <div class="robot-pupil" id="left-pupil"></div>
+                </div>
+                <div class="robot-eye right">
+                    <div class="robot-pupil" id="right-pupil"></div>
+                </div>
+                <div class="robot-mouth"></div>
+            </div>
+            <div class="robot-body"></div>
+            <div class="robot-arm left"></div>
+            <div class="robot-arm right"></div>
+        </div>
+        <div class="robot-sign">Soy Novi Estoy Para Ayudarte</div>
+    </div>
+
+    <div class="chat-container" id="chat-container">
+        <div class="chat-header">
+            <div>
+                <h2>Novi</h2>
+                <p>Asistencia para Visitas Colombianoviolenta</p>
+            </div>
+            <button class="minimize-btn" id="minimize-btn">−</button>
+        </div>
+        
+        <div class="messages-container" id="messages">
+            <div class="message bot-message">
+                Hola, soy Novi, Tu asistente virtual de Colombia Noviolenta, estoy aqui para orientarte sobre la cultura de la Noviolencia, eventos relacionados y acerca de nuestros productos.
+                ¿En qué puedo ayudarte hoy?
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typing">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        
+        <div class="input-container">
+            <div class="quick-buttons">
+                <button class="quick-button" onclick="sendQuickMessage('Boletas concierto')">Boletas concierto</button>
+                <button class="quick-button" onclick="sendQuickMessage('Compras tienda')">Compras tienda</button>
+                <button class="quick-button" onclick="sendQuickMessage('Adquirir servicios')">Adquirir servicios</button>
+                <button class="quick-button" onclick="sendQuickMessage('Voluntariado y participación')">Voluntariado y participación</button>
+                <button class="quick-button" onclick="sendQuickMessage('Donaciones')">Donaciones</button>
+                <button class="quick-button" onclick="sendQuickMessage('Cartilla')">Cartilla</button>
+            </div>
+            
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Escribe tu mensaje..." autocomplete="off">
+                <button class="send-button" id="send-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            
+            <button class="emergency-button" id="emergency-btn">
+                   🔹 Necesito ayuda urgente 🔹
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const robotContainer = document.getElementById('robot-container');
+        const chatContainer = document.getElementById('chat-container');
+        const minimizeBtn = document.getElementById('minimize-btn');
+        const messagesContainer = document.getElementById('messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const emergencyBtn = document.getElementById('emergency-btn');
+        const typingIndicator = document.getElementById('typing');
+        const leftPupil = document.getElementById('left-pupil');
+        const rightPupil = document.getElementById('right-pupil');
+
+        //  FUNCIÓN para convertir URLs en enlaces clicables
+        function formatLinks(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        }
+
+        function showChat() {
+            robotContainer.style.display = 'none';
+            chatContainer.style.display = 'flex';
+            userInput.focus();
+        }
+
+        function hideChat() {
+            chatContainer.style.display = 'none';
+            robotContainer.style.display = 'flex';
+        }
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            
+            //  Aplica formato de links SOLO a mensajes del bot
+            messageDiv.innerHTML = isUser ? content : formatLinks(content);
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function sendQuickMessage(topic) {
+            userInput.value = topic;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+
+            addMessage(message, true);
+            userInput.value = '';
+            
+            showTypingIndicator();
+            
+            // Llamada al backend
+            fetch('http://localhost:3000/api/chatbot/chatbot', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            })   
+            .then((response) => response.json())
+            .then((data) => {
+                hideTypingIndicator();
+                addMessage(data.reply); // ← Aquí los links ya salen clicables
+            })
+            .catch((error) => {
+                hideTypingIndicator();
+                addMessage("Error al comunicarse con el servidor.");
+                console.error('Error de conexión:', error);
+            });
+        }
+
+        function handleEmergency() {
+            addMessage("Necesito orientación para eventos importantes");
+            addMessage("Ofertas del día, compra productos en promoción");
+        }
+
+        // Movimiento de ojos del robot
+        function moveEyes(e) {
+            const robot = document.querySelector('.robot');
+            const rect = robot.getBoundingClientRect();
+            const robotCenterX = rect.left + rect.width / 2;
+            const robotCenterY = rect.top + rect.height / 2;
+            const angle = Math.atan2(e.clientY - robotCenterY, e.clientX - robotCenterX);
+            const distance = Math.min(Math.sqrt((e.clientX - robotCenterX) ** 2 + (e.clientY - robotCenterY) ** 2) / 10, 4);
+            const pupilX = Math.cos(angle) * distance;
+            const pupilY = Math.sin(angle) * distance;
+            leftPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+            rightPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+        }
+
+        robotContainer.addEventListener('click', showChat);
+        minimizeBtn.addEventListener('click', hideChat);
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        emergencyBtn.addEventListener('click', handleEmergency);
+        document.addEventListener('mousemove', moveEyes);
+    </script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url("./assets/image.png"); /* ruta local de ejemplo */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  pointer-events: none; /* permite interacción con elementos sobre el fondo */
+}
+.robot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.robot {
+  width: 120px;
+  height: 120px;
+  background-color: #f7e11b;
+  border-radius: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+}
+
+.robot-head {
+  width: 80px;
+  height: 50px;
+  background-color: #7bafe0ee;
+  border-radius: 15px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.robot-eye {
+  width: 15px;
+  height: 15px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 15px;
+  overflow: hidden;
+}
+
+.robot-eye.left {
+  left: 15px;
+}
+
+.robot-eye.right {
+  right: 15px;
+}
+
+.robot-pupil {
+  width: 7px;
+  height: 7px;
+  background-color: #333;
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  transition: all 0.1s ease;
+}
+
+.robot-mouth {
+  width: 30px;
+  height: 10px;
+  border-bottom: 3px solid white;
+  border-radius: 0 0 15px 15px;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.robot-body {
+  width: 70px;
+  height: 40px;
+  background-color: #e72c2c;
+  border-radius: 10px;
+}
+
+.robot-arm {
+  width: 15px;
+  height: 40px;
+  background-color: #05338f;
+  border-radius: 8px;
+  position: absolute;
+  top: 70px;
+  transition: transform 0.3s ease;
+  transform-origin: top center;
+}
+
+.robot-arm.left {
+  left: -10px;
+  transform: rotate(-20deg);
+}
+
+.robot-arm.right {
+  right: -10px;
+  transform: rotate(20deg);
+}
+
+.robot-container:hover .robot-arm.left {
+  transform: rotate(-40deg);
+}
+
+.robot-container:hover .robot-arm.right {
+  transform: rotate(40deg);
+}
+
+.robot-sign {
+  background-color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  color: #4a6baf;
+  font-size: 1.1rem;
+}
+
+.chat-container {
+  width: 90%;
+  max-width: 500px;
+  height: 80vh;
+  max-height: 700px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1001;
+}
+
+.chat-header {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 0, 0.404),
+    rgba(0, 0, 255, 0.801),
+    rgba(255, 0, 0, 0.685)
+  );
+  color: rgb(255, 255, 255);
+  padding: 20px;
+  text-align: center;
+  border-radius: 15px 15px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 7rem;
+  text-shadow: 1px 2px 3px rgb(0, 4, 250);
+}
+
+.chat-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.chat-header p {
+  margin: 5px 0 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.minimize-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.messages-container {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: rgba(91, 129, 235, 0.103);
+}
+
+.message {
+  max-width: 86%;
+  padding: 12px 15px;
+  border-radius: 18px;
+  line-height: 1.4;
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: #081447;
+  color: white;
+  border-bottom-right-radius: 5px;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background-color: #2b7be4e3;
+  color: #ffffff;
+  border-bottom-left-radius: 5px;
+  width: 97%;
+  margin-left: 1.4rem;
+}
+
+.bot-message a {
+  color: #0f0877;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.bot-message a:hover {
+  text-decoration: underline;
+}
+
+.input-container {
+  padding: 20px;
+  background-color: #050a22;
+  border-radius: 0 0 15px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+
+.quick-button {
+  background-color: #030e74;
+  box-shadow: 0 1px 1px rgb(2, 111, 255);
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.quick-button:hover {
+  background-color: #1241fc41;
+}
+
+.input-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+#user-input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s;
+}
+
+#user-input:focus {
+  border-color: #01270e;
+}
+
+.send-button {
+  background-color: #030e74;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.send-button:hover {
+  background-color: #3746cc;
+}
+
+.emergency-button {
+  background-color: #02083b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
+  max-width: 300px;
+}
+
+.emergency-button:hover {
+  background-color: #030e74;
+}
+
+.typing-indicator {
+  display: none;
+  align-self: flex-start;
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 12px 15px;
+  border-radius: 18px;
+  border-bottom-left-radius: 5px;
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #3f1103;
+  margin: 0 2px;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.robot-eye {
+  animation: pulse 2s infinite;
+}
+
+@media (max-width: 600px) {
+  .chat-container {
+    width: 95%;
+    height: 90vh;
+    border-radius: 0;
+    bottom: 0;
+    right: 0;
+  }
+
+  .chat-header {
+    border-radius: 0;
+  }
+
+  .input-container {
+    border-radius: 0;
+  }
+
+  .robot-container {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .robot {
+    width: 100px;
+    height: 100px;
+  }
+
+  .robot-head {
+    width: 70px;
+    height: 45px;
+  }
+
+  .robot-eye {
+    width: 12px;
+    height: 12px;
+    top: 12px;
+  }
+
+  .robot-eye.left {
+    left: 12px;
+  }
+
+  .robot-eye.right {
+    right: 12px;
+  }
+
+  .robot-pupil {
+    width: 5px;
+    height: 5px;
+    top: 3.5px;
+    left: 3.5px;
+  }
+
+  .robot-body {
+    width: 60px;
+    height: 35px;
+  }
+
+  .robot-arm {
+    width: 12px;
+    height: 35px;
+    top: 60px;
+  }
+
+  .robot-arm.left {
+    left: -8px;
+  }
+
+  .robot-arm.right {
+    right: -8px;
+  }
+
+  .robot-sign {
+    font-size: 0.9rem;
+    padding: 8px 15px;
+  }
+
+
+  /* === ENLACES DENTRO DE LOS MENSAJES DEL BOT === */
+.bot-message a {
+  color: #1e90ff !important;   /* azul visible */
+  text-decoration: underline !important;
+  font-weight: 500;
+  cursor: pointer;
+  word-break: break-word;
+  transition: color 0.2s ease;
+}
+
+.bot-message a:hover {
+  color: #0056b3 !important;
+  text-decoration: none !important;
+}
+
+  
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Administrativo - Novi</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+  <div id="login-section">
+    <h2>Acceso al Panel</h2>
+    <input type="text" id="username" placeholder="Usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="login-btn">Ingresar</button>
+    <p id="login-error" style="color:red; display:none;">Credenciales incorrectas</p>
+  </div>
+
+  <div id="panel-section" style="display:none;">
+    <h1>Panel Administrativo</h1>
+
+    <section>
+      <h2>Gestión de Enlaces</h2>
+      <div id="links-list"></div>
+      <input type="text" id="new-title" placeholder="Título del enlace">
+      <input type="text" id="new-url" placeholder="URL del enlace">
+      <button id="add-link">Agregar enlace</button>
+      <button id="run-crawler">Ejecutar Crawler</button>
+    </section>
+
+    <section>
+  <h2>Métricas</h2>
+  <div id="metrics"></div>
+  <canvas id="topicsChart" width="400" height="200"></canvas>
+  <button id="view-history-btn"> Consultar Historial</button>
+  <div id="history-container" style="display:none; max-height:400px; overflow-y:auto; margin-top:20px;"></div>
+</section>
+
+  </div>
+
+  <script src="./admin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="./admin.js"></script>
+</body>
+</html>

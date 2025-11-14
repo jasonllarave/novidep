@@ -1,0 +1,37 @@
+{
+  "name": "chatbot-novi",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend del Chatbot Novi con Express, MongoDB y OpenAI",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.3",
+    "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
+    "openai": "^6.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "chatbot",
+    "express",
+    "mongodb",
+    "openai",
+    "api"
+  ],
+  "author": "Practicas Profesionales",
+  "license": "ISC"
+}
