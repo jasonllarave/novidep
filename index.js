@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import chatbotRoutes from "./routes/chatbot.routes.js";
 import morgan from 'morgan';
 import connectDB from './config/database.js'; //  NUEVO
+import mongoose from 'mongoose';
 import cron from "node-cron";
 import { exec } from "child_process";
 
@@ -45,9 +46,17 @@ app.use("/api/links", linksRoutes);
 app.use("/api/metrics", metricsRoutes);
 
 app.get("/api/status", (req, res) => {
+  const state = mongoose.connection.readyState;
+  const stateMap = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
   res.json({ 
-    message: "Servidor del Chatbot activado ",
-    database: "MongoDB conectada",
+    message: "Servidor del Chatbot activado",
+    database: stateMap[state] || `unknown(${state})`,
     endpoints: {
       chat: "POST /api/chatbot/chatbot",
       history: "GET /api/chatbot/history",

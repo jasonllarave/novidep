@@ -2,7 +2,7 @@ const loginSection = document.getElementById("login-section");
 const panelSection = document.getElementById("panel-section");
 const loginBtn = document.getElementById("login-btn");
 const loginError = document.getElementById("login-error");
-const api = "http://localhost:3000/api/admin";
+const api = "/api/admin";
 
 loginBtn.addEventListener("click", async () => {
   const username = document.getElementById("username").value;
@@ -60,20 +60,31 @@ document.getElementById("run-crawler").addEventListener("click", async () => {
 });
 
 async function loadStats() {
-  const res = await fetch('http://localhost:3000/api/chatbot/stats');
+  const res = await fetch('/api/chatbot/stats');
   const data = await res.json();
   
   document.getElementById("metrics").innerHTML = `
     <p><strong>Total de mensajes:</strong> ${data.totalMessages || 0}</p>
     <p><strong>Total de sesiones:</strong> ${data.totalSessions || 0}</p>
     <p><strong>Promedio de longitud:</strong> ${data.avgResponseLength || 0}</p>
-    <h4>Top temas:</h4>
-    <ul>${data.topTopics?.length 
-      ? data.topTopics.map(t => `<li>${t._id || 'Sin clasificar'}: ${t.count}</li>`).join('') 
-      : '<li>No hay datos</li>'}</ul>
   `;
 
-  let chartInstance = null;
+  // Gráfico
+  const ctx = document.getElementById('topicsChart').getContext('2d');
+  if (window.chartInstance) window.chartInstance.destroy();
+  
+  const topics = data.topTopics || [];
+  window.chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: topics.map(t => t._id || 'Sin clasificar'),
+      datasets: [{
+        label: 'Consultas',
+        data: topics.map(t => t.count),
+        backgroundColor: '#0b63c7'
+      }]
+    }
+  });
 
 async function loadStats() {
   const res = await fetch('http://localhost:3000/api/chatbot/stats');
@@ -110,7 +121,7 @@ document.getElementById("view-history-btn").addEventListener("click", async () =
     return;
   }
   
-  const res = await fetch('http://localhost:3000/api/chatbot/history');
+  const res = await fetch('/api/chatbot/history');
   const { history } = await res.json();
   
   container.innerHTML = history.map(m => `
