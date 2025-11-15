@@ -217,14 +217,14 @@ body::before {
 
 .user-message {
   align-self: flex-end;
-  background-color: #081447;
+  background-color: #2e334d6e;
   color: white;
   border-bottom-right-radius: 5px;
 }
 
 .bot-message {
   align-self: flex-start;
-  background-color: #2b7be4e3;
+  background-color: #698bb8ce;
   color: #ffffff;
   border-bottom-left-radius: 5px;
   width: 97%;
