@@ -8,7 +8,7 @@ import cron from "node-cron";
 import { exec } from "child_process";
 
 import path from "path";
-
+import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.js";
 import linksRoutes from "./routes/links.js";
 import metricsRoutes from "./routes/metrics.js";
@@ -59,11 +59,17 @@ app.get("/api/status", (req, res) => {
 });
 
 //  Servir frontend desde carpeta "public"
-app.use(express.static(path.join(process.cwd(), "public")));
 
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public", "index.html"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "public")));
+
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
+
 
 app.use((err, req, res, next) => { 
   console.error(err.stack);
