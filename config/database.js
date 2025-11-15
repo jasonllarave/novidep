@@ -7,7 +7,7 @@ dotenv.config(); // Carga las variables desde .env
 const connectDB = async () => {
   try {
     // Si tienes la variable en el archivo .env
-    const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/chatbot_novi";
+    const mongoURI = process.env.MONGO_URI || process.env.MONGODB_URI ||"mongodb://127.0.0.1:27017/chatbot_novi";
 
     // Conexión a la base de datos
     const conn = await mongoose.connect(mongoURI, {
