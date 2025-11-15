@@ -58,6 +58,13 @@ app.get("/", (req, res) => {
   });
 });
 
+//  Servir frontend desde carpeta "public"
+app.use(express.static(path.join(process.cwd(), "public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "index.html"));
+});
+
 app.use((err, req, res, next) => { 
   console.error(err.stack);
   res.status(500).json({ error: 'Algo no funciona', details: err.message });
