@@ -225,7 +225,7 @@ body::before {
 .bot-message {
   align-self: flex-start;
   background-color: #1a3e6e46;
-  color: #ffffff;
+  color: #1a1818;
   border-bottom-left-radius: 5px;
   width: 97%;
   margin-left: 1.4rem;
