@@ -7,24 +7,7 @@
     <link rel="stylesheet" href="./index.css">
 </head>
 <body>
-    <div class="robot-container" id="robot-container">
-        <div class="robot">
-            <div class="robot-head">
-                <div class="robot-eye left">
-                    <div class="robot-pupil" id="left-pupil"></div>
-                </div>
-                <div class="robot-eye right">
-                    <div class="robot-pupil" id="right-pupil"></div>
-                </div>
-                <div class="robot-mouth"></div>
-            </div>
-            <div class="robot-body"></div>
-            <div class="robot-arm left"></div>
-            <div class="robot-arm right"></div>
-        </div>
-        <div class="robot-sign">Soy Novi Estoy Para Ayudarte</div>
-    </div>
-
+    <!-- Contenedor del chat -->
     <div class="chat-container" id="chat-container">
         <div class="chat-header">
             <div>
@@ -36,7 +19,7 @@
         
         <div class="messages-container" id="messages">
             <div class="message bot-message">
-                Hola, soy Novi, Tu asistente virtual de Colombia Noviolenta, estoy aqui para orientarte sobre la cultura de la Noviolencia, eventos relacionados y acerca de nuestros productos.
+                Hola, soy Novi, tu asistente virtual de Colombia Noviolenta. Estoy aquí para orientarte sobre la cultura de la Noviolencia, eventos relacionados y acerca de nuestros productos.
                 ¿En qué puedo ayudarte hoy?
             </div>
         </div>
@@ -73,43 +56,24 @@
         </div>
     </div>
 
-    <script >
-        const robotContainer = document.getElementById('robot-container');
-        const chatContainer = document.getElementById('chat-container');
-        const minimizeBtn = document.getElementById('minimize-btn');
+    <script>
         const messagesContainer = document.getElementById('messages');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
         const emergencyBtn = document.getElementById('emergency-btn');
         const typingIndicator = document.getElementById('typing');
-        const leftPupil = document.getElementById('left-pupil');
-        const rightPupil = document.getElementById('right-pupil');
 
-        //  FUNCIÓN para convertir URLs en enlaces clicables
+        // Convierte URLs en enlaces clicables
         function formatLinks(text) {
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-        }
-
-        function showChat() {
-            robotContainer.style.display = 'none';
-            chatContainer.style.display = 'flex';
-            userInput.focus();
-        }
-
-        function hideChat() {
-            chatContainer.style.display = 'none';
-            robotContainer.style.display = 'flex';
         }
 
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
             messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-            
-            //  Aplica formato de links SOLO a mensajes del bot
             messageDiv.innerHTML = isUser ? content : formatLinks(content);
-
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -134,10 +98,7 @@
 
             addMessage(message, true);
             userInput.value = '';
-            
             showTypingIndicator();
-            
-            // Llamada al backend
 
             const API_URL = "https://novi-drekbmcchpc0g2gr.centralus-01.azurewebsites.net";
 
@@ -149,7 +110,7 @@
             .then((response) => response.json())
             .then((data) => {
                 hideTypingIndicator();
-                addMessage(data.reply); // ← Aquí los links ya salen clicables
+                addMessage(data.reply);
             })
             .catch((error) => {
                 hideTypingIndicator();
@@ -163,28 +124,11 @@
             addMessage("Ofertas del día, compra productos en promoción");
         }
 
-        // Movimiento de ojos del robot
-        function moveEyes(e) {
-            const robot = document.querySelector('.robot');
-            const rect = robot.getBoundingClientRect();
-            const robotCenterX = rect.left + rect.width / 2;
-            const robotCenterY = rect.top + rect.height / 2;
-            const angle = Math.atan2(e.clientY - robotCenterY, e.clientX - robotCenterX);
-            const distance = Math.min(Math.sqrt((e.clientX - robotCenterX) ** 2 + (e.clientY - robotCenterY) ** 2) / 10, 4);
-            const pupilX = Math.cos(angle) * distance;
-            const pupilY = Math.sin(angle) * distance;
-            leftPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
-            rightPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
-        }
-
-        robotContainer.addEventListener('click', showChat);
-        minimizeBtn.addEventListener('click', hideChat);
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
         emergencyBtn.addEventListener('click', handleEmergency);
-        document.addEventListener('mousemove', moveEyes);
     </script>
 </body>
 </html>
