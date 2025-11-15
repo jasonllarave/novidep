@@ -44,7 +44,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/links", linksRoutes);
 app.use("/api/metrics", metricsRoutes);
 
-app.get("/", (req, res) => {
+app.get("/api/status", (req, res) => {
   res.json({ 
     message: "Servidor del Chatbot activado ",
     database: "MongoDB conectada",
@@ -61,7 +61,7 @@ app.get("/", (req, res) => {
 //  Servir frontend desde carpeta "public"
 app.use(express.static(path.join(process.cwd(), "public")));
 
-app.get("/", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 
