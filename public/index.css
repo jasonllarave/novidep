@@ -224,7 +224,7 @@ body::before {
 
 .bot-message {
   align-self: flex-start;
-  background-color: #698bb8ce;
+  background-color: #1a3f6eaf;
   color: #ffffff;
   border-bottom-left-radius: 5px;
   width: 97%;
@@ -232,7 +232,7 @@ body::before {
 }
 
 .bot-message a {
-  color: #0f0877;
+  color: #030124;
   text-decoration: none;
   font-weight: bold;
 }
