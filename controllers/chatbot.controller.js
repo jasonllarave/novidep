@@ -1,4 +1,4 @@
-// ✅ Importaciones necesarias
+//  Importaciones necesarias
 import { getChatbotResponse } from '../utils/responses.js';
 import { Message } from '../models/Message.js';
 import { 
@@ -14,7 +14,7 @@ import {
 import mongoose from 'mongoose';
 
 
-// 🧠 Procesa y guarda un mensaje individual
+//  Procesa y guarda un mensaje individual
 export const handleMessage = async (req, res) => {
   const { message, userId = 'anonymous', sessionId } = req.body;
 
@@ -23,15 +23,15 @@ export const handleMessage = async (req, res) => {
   }
 
   try {
-    // 1️⃣ Clasificar la consulta
+    // 1️ Clasificar la consulta
     const queryType = classifyQuery(message) || "unknown";
-    console.log('🧩 Tipo de consulta:', queryType);
+    console.log(' Tipo de consulta:', queryType);
 
     let response = '';
     let sources = [];
     let needsHuman = { escalate: false };
 
-    // 2️⃣ Buscar en base de conocimiento (KB)
+    // 2️ Buscar en base de conocimiento (KB)
     const kbResult = await searchKnowledgeBase(message);
 
     if (kbResult) {
@@ -46,7 +46,7 @@ export const handleMessage = async (req, res) => {
       sources.push({ type: 'knowledge_base', id: kbResult._id });
     } 
     else {
-      // 3️⃣ Buscar información específica
+      // 3️ Buscar información específica
       switch (queryType) {
         case 'productos':
           const products = await searchProducts(message);
@@ -77,7 +77,7 @@ export const handleMessage = async (req, res) => {
           break;
       }
 
-      // 4️⃣ Si no hay respuesta específica, usar IA o fallback
+      // 4 Si no hay respuesta específica, usar IA o fallback
       if (!response) {
         const context = {
           queryType,
@@ -96,13 +96,13 @@ export const handleMessage = async (req, res) => {
       }
     }
 
-    // 5️⃣ Asignar o generar una sesión si no existe
+    // 5️ Asignar o generar una sesión si no existe
     let assignedSessionId = sessionId;
     if (!assignedSessionId) {
       assignedSessionId = new mongoose.Types.ObjectId().toString();
     }
 
-    // 6️⃣ Guardar mensaje en MongoDB con todos los metadatos
+    // 6️ Guardar mensaje en MongoDB con todos los metadatos
     const newMessage = new Message({
       userId,
       userMessage: message,
@@ -114,13 +114,13 @@ export const handleMessage = async (req, res) => {
         queryType,
         sources: JSON.stringify(sources),
         escalated: needsHuman.escalate,
-        responseLength: response?.length || 0 // 👈 agregado para métricas
+        responseLength: response?.length || 0 //  agregado para métricas
       }
     });
 
     await newMessage.save();
 
-    // 7️⃣ Responder al cliente
+    // 7️ Responder al cliente
     res.json({
       reply: response,
       queryType,
@@ -131,7 +131,7 @@ export const handleMessage = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error procesando mensaje:', error);
+    console.error(' Error procesando mensaje:', error);
     res.json({
       reply: "Disculpa, tuve un problema técnico. ¿Podrías reformular tu pregunta?",
       error: true
@@ -141,7 +141,7 @@ export const handleMessage = async (req, res) => {
 
 
 
-// 📜 Historial completo
+//  Historial completo
 export const getHistory = async (req, res) => {
   try {
     const history = await Message.find().sort({ createdAt: -1 }).limit(500);
@@ -154,7 +154,7 @@ export const getHistory = async (req, res) => {
 
 
 
-// 💬 Mensajes por sesión
+//  Mensajes por sesión
 export const getSessionMessages = async (req, res) => {
   const { sessionId } = req.params;
   try {
@@ -168,7 +168,7 @@ export const getSessionMessages = async (req, res) => {
 
 
 
-// 📊 Estadísticas completas para admin panel
+//  Estadísticas completas para admin panel
 export const getStats = async (req, res) => {
   try {
     // Totales
@@ -206,14 +206,14 @@ export const getStats = async (req, res) => {
       topTopics
     });
   } catch (error) {
-    console.error('❌ Error obteniendo estadísticas:', error);
+    console.error(' Error obteniendo estadísticas:', error);
     res.status(500).json({ error: "No se pudieron obtener estadísticas" });
   }
 };
 
 
 
-// 🔍 Buscar mensajes
+//  Buscar mensajes
 export const searchMessages = async (req, res) => {
   const { query } = req.query;
   try {
@@ -232,7 +232,7 @@ export const searchMessages = async (req, res) => {
 
 
 
-// 🚪 Finalizar sesión
+//  Finalizar sesión
 export const endSession = async (req, res) => {
   const { sessionId } = req.body;
   try {

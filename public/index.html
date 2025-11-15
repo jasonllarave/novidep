@@ -138,7 +138,10 @@
             showTypingIndicator();
             
             // Llamada al backend
-            fetch('https://novi-drekbmcchpc0g2gr.centralus-01.azurewebsites.net/api/chatbot/chatbot', { 
+
+            const API_URL = "https://novi-drekbmcchpc0g2gr.centralus-01.azurewebsites.net";
+
+            fetch(`${API_URL}/api/chatbot/chatbot`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: message })
