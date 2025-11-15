@@ -61,7 +61,7 @@ app.get("/api/status", (req, res) => {
 //  Servir frontend desde carpeta "public"
 app.use(express.static(path.join(process.cwd(), "public")));
 
-app.get("*", (req, res) => {
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 
