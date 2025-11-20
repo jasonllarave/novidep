@@ -55,7 +55,7 @@
         
         <div class="messages-container" id="messages">
             <div class="message bot-message">
-                Hola, soy Novi, tu asistente virtual de Colombia Noviolenta. 💛💙❤️  
+                Hola, soy Novi, tu asistente virtual de Colombia Noviolenta.  
     Actualmente contamos con talleres, conferencias y espacios de orientación en Noviolencia.  
     ¿Te gustaría participar en nuestros eventos?  
     <br><br>
@@ -150,12 +150,12 @@ async function handleParticipationFlow(message) {
     if (msg === "no" && window.participationState === null) {
         addMessage(
             `
-            ¡Gracias por responder! 😊<br><br>
+            ¡Gracias por responder! <br><br>
             Si deseas conocer más sobre nuestras plataformas y redes, aquí te dejo algunos enlaces:<br><br>
-            <a href="https://www.colombianoviolenta.org" target="_blank">🌐 Sitio Web Oficial</a><br>
-            <a href="https://www.instagram.com/colombianoviolenta" target="_blank">📸 Instagram</a><br>
-            <a href="https://www.facebook.com/colombianoviolenta" target="_blank">📘 Facebook</a><br>
-            <a href="https://www.colombianoviolenta.org/tienda" target="_blank">🛍️ Tienda Online</a><br>
+            <a href="https://www.colombianoviolenta.org" target="_blank"> Sitio Web Oficial</a><br>
+            <a href="https://www.instagram.com/colombianoviolenta" target="_blank"> Instagram</a><br>
+            <a href="https://www.facebook.com/colombianoviolenta" target="_blank"> Facebook</a><br>
+            <a href="https://www.colombianoviolenta.org/tienda" target="_blank"> Tienda Online</a><br>
             `,
             false
         );
@@ -164,7 +164,7 @@ async function handleParticipationFlow(message) {
 
     // → RESPUESTA "SÍ"
     if ((msg === "si" || msg === "sí") && window.participationState === null) {
-        addMessage("¡Excelente! 🙌 Por favor escribe tu nombre completo:", false);
+        addMessage("¡Excelente!  Por favor escribe tu nombre completo:", false);
         window.participationState = "name";
         return true;
     }
@@ -172,7 +172,7 @@ async function handleParticipationFlow(message) {
     // → CAPTURAR NOMBRE
     if (window.participationState === "name") {
         window.tempName = message;
-        addMessage("Perfecto 👍 Ahora escribe tu número de contacto:", false);
+        addMessage("Perfecto  Ahora escribe tu número de contacto:", false);
         window.participationState = "phone";
         return true;
     }
@@ -271,7 +271,7 @@ async function sendAuthorization() {
     const data = await res.json();
 
     if (data.success) {
-        addMessage("¡Gracias! 🙌 Tus datos fueron registrados. Muy pronto nos pondremos en contacto contigo.", false);
+        addMessage("¡Gracias!  Tus datos fueron registrados. Muy pronto nos pondremos en contacto contigo.", false);
     } else {
         addMessage("Hubo un error guardando tu registro. Intenta nuevamente más tarde.", false);
     }
