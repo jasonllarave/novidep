@@ -3,7 +3,6 @@ const panelSection = document.getElementById("panel-section");
 const loginBtn = document.getElementById("login-btn");
 const loginError = document.getElementById("login-error");
 const api = "/api/admin";
-
 loginBtn.addEventListener("click", async () => {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;

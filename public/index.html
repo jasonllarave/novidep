@@ -55,8 +55,11 @@
         
         <div class="messages-container" id="messages">
             <div class="message bot-message">
-                Hola, soy Novi, tu asistente virtual de Colombia Noviolenta. Estoy aquí para orientarte sobre la cultura de la Noviolencia, eventos relacionados y acerca de nuestros productos.
-                ¿En qué puedo ayudarte hoy?
+                Hola, soy Novi, tu asistente virtual de Colombia Noviolenta. 💛💙❤️  
+    Actualmente contamos con talleres, conferencias y espacios de orientación en Noviolencia.  
+    ¿Te gustaría participar en nuestros eventos?  
+    <br><br>
+    Responde <strong>sí</strong> o <strong>no</strong>.
             </div>
         </div>
         
@@ -129,36 +132,164 @@
             sendMessage();
         }
 
+
+
+
+
+ 
+        // ======== MANEJO DE FLUJO DE PARTICIPACIÓN ========
+
+window.participationState = null;
+window.tempName = null;
+window.tempPhone = null;
+
+async function handleParticipationFlow(message) {
+    const msg = message.toLowerCase();
+
+    // → RESPUESTA "NO"
+    if (msg === "no" && window.participationState === null) {
+        addMessage(
+            `
+            ¡Gracias por responder! 😊<br><br>
+            Si deseas conocer más sobre nuestras plataformas y redes, aquí te dejo algunos enlaces:<br><br>
+            <a href="https://www.colombianoviolenta.org" target="_blank">🌐 Sitio Web Oficial</a><br>
+            <a href="https://www.instagram.com/colombianoviolenta" target="_blank">📸 Instagram</a><br>
+            <a href="https://www.facebook.com/colombianoviolenta" target="_blank">📘 Facebook</a><br>
+            <a href="https://www.colombianoviolenta.org/tienda" target="_blank">🛍️ Tienda Online</a><br>
+            `,
+            false
+        );
+        return true; // indica que ya manejamos el flujo
+    }
+
+    // → RESPUESTA "SÍ"
+    if ((msg === "si" || msg === "sí") && window.participationState === null) {
+        addMessage("¡Excelente! 🙌 Por favor escribe tu nombre completo:", false);
+        window.participationState = "name";
+        return true;
+    }
+
+    // → CAPTURAR NOMBRE
+    if (window.participationState === "name") {
+        window.tempName = message;
+        addMessage("Perfecto 👍 Ahora escribe tu número de contacto:", false);
+        window.participationState = "phone";
+        return true;
+    }
+
+    // → CAPTURAR TELÉFONO
+    if (window.participationState === "phone") {
+        window.tempPhone = message;
+
+        addMessage(
+            `
+            <div>
+                Para continuar, por favor autoriza el uso de tus datos:<br><br>
+                <label style="display:flex;align-items:center;gap:10px;">
+                    <input type="checkbox" id="authCheck"> Autorizo el uso de mis datos
+                </label>
+                <button onclick="sendAuthorization()" 
+                    style="margin-top:10px;background:#003cff;color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;">
+                    Enviar
+                </button>
+            </div>
+            `,
+            false
+        );
+
+        window.participationState = "authorize";
+        return true;
+    }
+
+    return false; // no pertenece al flujo
+}
+
+
+
+
+
+
+
         function sendMessage() {
-            const message = userInput.value.trim();
-            if (message === '') return;
+    const message = userInput.value.trim();
+    if (message === '') return;
 
-            addMessage(message, true);
-            userInput.value = '';
-            showTypingIndicator();
+    addMessage(message, true);
+    userInput.value = '';
 
-            const API_URL = "https://novi-drekbmcchpc0g2gr.centralus-01.azurewebsites.net";
+    // Primero revisar si el mensaje pertenece al flujo de participación
+    handleParticipationFlow(message).then((handled) => {
+        if (handled) return;
 
-            fetch(`${API_URL}/api/chatbot/chatbot`, { 
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message })
-            })   
-            .then((response) => response.json())
-            .then((data) => {
-                hideTypingIndicator();
-                addMessage(data.reply);
-            })
-            .catch((error) => {
-                hideTypingIndicator();
-                addMessage("Error al comunicarse con el servidor.");
-                console.error('Error de conexión:', error);
-            });
-        }
+        // Si NO pertenece al flujo, enviar mensaje normal al backend
+        showTypingIndicator();
+
+        const API_URL = "https://novi-drekbmcchpc0g2gr.centralus-01.azurewebsites.net";
+
+        fetch(`${API_URL}/api/chatbot/chatbot`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            hideTypingIndicator();
+            addMessage(data.reply);
+        })
+        .catch((error) => {
+            hideTypingIndicator();
+            addMessage("Error al comunicarse con el servidor.");
+            console.error('Error:', error);
+        });
+    });
+}
+
+
+
+
+
+async function sendAuthorization() {
+    const check = document.getElementById("authCheck");
+
+    if (!check || !check.checked) {
+        addMessage("Debes autorizar el uso de tus datos antes de continuar.", false);
+        return;
+    }
+
+    const info = {
+        name: window.tempName,
+        phone: window.tempPhone,
+        authorized: true
+    };
+
+    const res = await fetch("/api/register", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(info)
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        addMessage("¡Gracias! 🙌 Tus datos fueron registrados. Muy pronto nos pondremos en contacto contigo.", false);
+    } else {
+        addMessage("Hubo un error guardando tu registro. Intenta nuevamente más tarde.", false);
+    }
+
+    window.participationState = null;
+    window.tempName = null;
+    window.tempPhone = null;
+}
+
+
+
+
+
+
 
         function handleEmergency() {
             addMessage("Necesito orientación para eventos importantes");
-            addMessage("Ofertas del día, compra productos en promoción");
+            addMessage("como hago una compra");
         }
 
         // Mostrar chat al hacer clic en la leyenda

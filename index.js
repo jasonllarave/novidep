@@ -7,7 +7,7 @@ import connectDB from './config/database.js'; //  NUEVO
 import mongoose from 'mongoose';
 import cron from "node-cron";
 import { exec } from "child_process";
-
+import registerRoutes from "./routes/register.js";
 import path from "path";
 
 import authRoutes from "./routes/auth.js";
@@ -36,7 +36,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/register", registerRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 
 
