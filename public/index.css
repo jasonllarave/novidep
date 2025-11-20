@@ -209,26 +209,26 @@ body::before {
 }
 
 .message {
-  max-width: 86%;
-  padding: 12px 15px;
-  border-radius: 18px;
-  line-height: 1.4;
+  max-width: 70%;
+    padding: 12px 15px;
+    border-radius: 18px;
+    line-height: 1.4;
 }
 
 .user-message {
-  align-self: flex-end;
-  background-color: #212a57b0;
-  color: white;
-  border-bottom-right-radius: 5px;
+     align-self: flex-end;
+    background-color: #1f78b4;
+    color: #ffffff;
+    border-bottom-right-radius: 5px;
 }
 
 .bot-message {
   align-self: flex-start;
-  background-color: #1a3e6e46;
-  color: #1a1818;
-  border-bottom-left-radius: 5px;
-  width: 97%;
-  margin-left: 1.4rem;
+    background-color: #c9c9c9;
+    color: #1a1818;
+    border-bottom-left-radius: 5px;
+    width: 97%;
+    margin-left: 1.4rem;
 }
 
 .bot-message a {
@@ -242,13 +242,13 @@ body::before {
 }
 
 .input-container {
-  padding: 20px;
-  background-color: #050a22;
-  border-radius: 0 0 15px 15px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
+   border-top: 2px solid #bcbcbc;
+    padding: 20px;
+    background-color: #d6d6d6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
 .quick-buttons {
@@ -260,15 +260,14 @@ body::before {
 }
 
 .quick-button {
-  background-color: #030e74;
-  box-shadow: 0 1px 1px rgb(2, 111, 255);
-  color: #ffffff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.3s;
+   border: 1px solid #c2c2c2 !important;
+    background-color: rgb(20 111 176 / 92%);
+    color: #ededed;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
 .quick-button:hover {
@@ -282,13 +281,13 @@ body::before {
 }
 
 #user-input {
-  flex: 1;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 25px;
-  font-size: 1rem;
-  outline: none;
-  transition: border 0.3s;
+     flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #515151;
+    border-radius: 25px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s;
 }
 
 #user-input:focus {
@@ -296,17 +295,17 @@ body::before {
 }
 
 .send-button {
-  background-color: #030e74;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.3s;
+   background-color: #4c4c4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
 .send-button:hover {
@@ -331,23 +330,24 @@ body::before {
 }
 
 .typing-indicator {
-  display: none;
-  align-self: flex-start;
-  background-color: #f1f1f1;
-  color: #333;
-  padding: 12px 15px;
-  border-radius: 18px;
-  border-bottom-left-radius: 5px;
+  margin: 10px 40px;
+    display: none;
+    align-self: flex-start;
+    background-color: #c9c9c9;
+    color: #c4b3b3;
+    padding: 12px 15px;
+    border-radius: 18px;
+    border-bottom-left-radius: 5px;
 }
 
 .typing-indicator span {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #3f1103;
-  margin: 0 2px;
-  animation: typing 1.4s infinite;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4c4c4d;
+    margin: 0 2px;
+    animation: typing 1.4s infinite;
 }
 
 .typing-indicator span:nth-child(2) {
