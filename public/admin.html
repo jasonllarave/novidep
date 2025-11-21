@@ -34,6 +34,32 @@
   <div id="history-container" style="display:none; max-height:400px; overflow-y:auto; margin-top:20px;"></div>
 </section>
 
+
+<section>
+  <h2>Registros de Participación</h2>
+
+  <div style="margin-bottom: 10px;">
+    <button id="refresh-regs">Actualizar</button>
+    <button onclick="window.location='/api/registration/export/csv'">Exportar CSV</button>
+    <button onclick="window.location='/api/registration/export/excel'">Exportar Excel</button>
+  </div>
+
+  <p><strong>Total registros:</strong> <span id="reg-count">0</span></p>
+
+  <table id="reg-table" border="1" cellpadding="6" style="width:100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Autorizó</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+
   </div>
 
   <script src="./admin.js"></script>

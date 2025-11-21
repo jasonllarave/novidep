@@ -1,10 +1,30 @@
 import mongoose from "mongoose";
 
-const registrationSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  phone: { type: String, required: true },
-  authorized: { type: Boolean, required: true },
-  createdAt: { type: Date, default: Date.now }
+const RegistrationSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    phone: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    authorized: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
-export const Registration = mongoose.model("Registration", registrationSchema);
+// Para evitar errores de modelo duplicado en hot reload
+export const Registration =
+    mongoose.models.Registration || mongoose.model("Registration", RegistrationSchema);

@@ -48,7 +48,7 @@
         <div class="chat-header">
             <div>
                 <h2>Novi</h2>
-                <p>Asistencia para Visitas Colombianoviolenta</p>
+                <p>Asistencia para Visitas Colombia Noviolenta</p>
             </div>
             <button class="minimize-btn" id="minimize-btn">−</button>
         </div>
@@ -131,6 +131,19 @@
             userInput.value = topic;
             sendMessage();
         }
+
+
+
+
+
+        document.addEventListener("click", function(e) {
+            if (e.target.classList.contains("btn-flow")) {
+        const option = e.target.getAttribute("data-option");
+
+        addMessage(e.target.innerText, true);
+        sendMessage(option);
+          }
+        });
 
 
 
@@ -229,16 +242,20 @@ async function handleParticipationFlow(message) {
 
         const API_URL = "https://novi-drekbmcchpc0g2gr.centralus-01.azurewebsites.net";
 
-        fetch(`${API_URL}/api/chatbot/chatbot`, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message })
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            hideTypingIndicator();
-            addMessage(data.reply);
-        })
+        fetch("/api/conversation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        sessionId: "user123", // luego lo hacemos dinámico
+        message
+    })
+})
+.then(res => res.json())
+.then(data => {
+    hideTypingIndicator();
+    addMessage(data.reply);
+})
+
         .catch((error) => {
             hideTypingIndicator();
             addMessage("Error al comunicarse con el servidor.");
@@ -254,35 +271,23 @@ async function handleParticipationFlow(message) {
 async function sendAuthorization() {
     const check = document.getElementById("authCheck");
 
-    if (!check || !check.checked) {
-        addMessage("Debes autorizar el uso de tus datos antes de continuar.", false);
+    if (!check.checked) {
+        addMessage("Debes autorizar el uso de tus datos.", false);
         return;
     }
 
-    const info = {
-        name: window.tempName,
-        phone: window.tempPhone,
-        authorized: true
-    };
-
-    const res = await fetch("/api/register", {
+    const res = await fetch("/api/conversation/authorize", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(info)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: "user123" })
     });
 
     const data = await res.json();
-
-    if (data.success) {
-        addMessage("¡Gracias!  Tus datos fueron registrados. Muy pronto nos pondremos en contacto contigo.", false);
-    } else {
-        addMessage("Hubo un error guardando tu registro. Intenta nuevamente más tarde.", false);
-    }
-
-    window.participationState = null;
-    window.tempName = null;
-    window.tempPhone = null;
+    addMessage(data.reply, false);
 }
+
+
+    
 
 
 
