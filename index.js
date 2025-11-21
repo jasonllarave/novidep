@@ -9,12 +9,12 @@ import cron from "node-cron";
 import { exec } from "child_process";
 import registerRoutes from "./routes/register.js";
 import path from "path";
-
+import conversationRoutes from "./routes/conversation.js";
 import authRoutes from "./routes/auth.js";
 import linksRoutes from "./routes/links.js";
 import metricsRoutes from "./routes/metrics.js";
 import adminRoutes from "./routes/admin.js";
-
+import registrationRoutes from "./routes/registration.js";
 
 dotenv.config();
 
@@ -27,6 +27,18 @@ cron.schedule("0 3 * * *", () => { // todos los días a las 03:00 AM
   });
 });
 
+
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Servidor funcionando", test: "OK" });
+});
+
+app.use("/api/conversation", conversationRoutes);
+```
+
+Luego intenta en el navegador:
+```
+https://tu-app-en-azure.azurewebsites.net/api/test
+
 const app = express();
 
 // Conectar a MongoDB
@@ -38,7 +50,8 @@ app.use(morgan('dev'));
 app.use("/api/admin", adminRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/chatbot", chatbotRoutes);
-
+app.use("/api/conversation", conversationRoutes);
+app.use("/api/registration", registrationRoutes);
 
 // Rutas principales
 app.use("/api/auth", authRoutes);
