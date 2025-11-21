@@ -55,12 +55,15 @@
         
         <div class="messages-container" id="messages">
             <div class="message bot-message">
-                Hola, soy Novi, tu asistente virtual de Colombia Noviolenta.  
+    Hola, soy Novi, tu asistente virtual de Colombia Noviolenta.  
     Actualmente contamos con talleres, conferencias y espacios de orientación en Noviolencia.  
-    ¿Te gustaría participar en nuestros eventos?  
+    ¿Te gustaría participar en nuestros eventos?
     <br><br>
-    Responde <strong>sí</strong> o <strong>no</strong>.
-            </div>
+
+    <button class="btn-flow" data-option="si">Sí, quiero participar</button>
+    <button class="btn-flow" data-option="no">No por ahora</button>
+</div>
+
         </div>
         
         <div class="typing-indicator" id="typing">
@@ -136,14 +139,21 @@
 
 
 
-        document.addEventListener("click", function(e) {
-            if (e.target.classList.contains("btn-flow")) {
+      document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("btn-flow")) {
         const option = e.target.getAttribute("data-option");
 
+        // Mostrar lo que seleccionó el usuario
         addMessage(e.target.innerText, true);
-        sendMessage(option);
-          }
-        });
+
+        // Mandarlo DIRECTAMENTE al flujo de participación
+        handleParticipationFlow(option);
+
+        // Si es "sí" comenzará el flujo
+        // Si es "no" mostrará los enlaces
+    }
+});
+
 
 
 
