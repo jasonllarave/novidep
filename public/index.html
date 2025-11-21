@@ -1,333 +1,221 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novi - colombianoviolenta.org</title>
-    <link rel="stylesheet" href="./index.css">
-    <style>
-        /* Estilo para la leyenda flotante */
-        .novi-sign {
-            position: fixed;
-            bottom: 30px;
-            right: 40px;
-            background: #3c3f42;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 9999;
-        }
-
-        .chat-container {
-            display: none; /* oculto por defecto */
-            position: fixed;
-            bottom: 60px;
-            right: 40px;
-            width: 550px;
-            height: 700px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            background: #fff;
-            flex-direction: column;
-            z-index: 9998;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Novi - colombianoviolenta.org</title>
+  <link rel="stylesheet" href="./index.css" />
 </head>
 <body>
-    <!-- Leyenda que despliega el chat -->
-    <div class="novi-sign" id="novi-sign">
-        Soy Novi, estoy aquí para ayudarte
+  <div class="novi-sign" id="novi-sign">Soy Novi, estoy aquí para ayudarte</div>
+
+  <div class="chat-container" id="chat-container" role="region" aria-label="Chat Novi">
+    <div class="chat-header">
+      <div>
+        <h2>Novi</h2>
+        <p>Asistencia para Visitas Colombia Noviolenta</p>
+      </div>
+      <button class="minimize-btn" id="minimize-btn">−</button>
     </div>
 
-    <!-- Contenedor del chat -->
-    <div class="chat-container" id="chat-container">
-        <div class="chat-header">
-            <div>
-                <h2>Novi</h2>
-                <p>Asistencia para Visitas Colombia Noviolenta</p>
-            </div>
-            <button class="minimize-btn" id="minimize-btn">−</button>
-        </div>
-        
-        <div class="messages-container" id="messages">
-            <div class="message bot-message">
-    Hola, soy Novi, tu asistente virtual de Colombia Noviolenta.  
-    Actualmente contamos con talleres, conferencias y espacios de orientación en Noviolencia.  
-    ¿Te gustaría participar en nuestros eventos?
-    <br><br>
-
-    <button class="btn-flow" data-option="si">Sí, quiero participar</button>
-    <button class="btn-flow" data-option="no">No por ahora</button>
-</div>
-
-        </div>
-        
-        <div class="typing-indicator" id="typing">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        
-        <div class="input-container">
-            <div class="quick-buttons">
-                <button class="quick-button" onclick="sendQuickMessage('Boletas concierto')">Boletas concierto</button>
-                <button class="quick-button" onclick="sendQuickMessage('Compras tienda')">Compras tienda</button>
-                <button class="quick-button" onclick="sendQuickMessage('Adquirir servicios')">Adquirir servicios</button>
-                <button class="quick-button" onclick="sendQuickMessage('Voluntariado y participación')">Voluntariado y participación</button>
-                <button class="quick-button" onclick="sendQuickMessage('Donaciones')">Donaciones</button>
-                <button class="quick-button" onclick="sendQuickMessage('Cartilla')">Cartilla</button>
-            </div>
-            
-            <div class="input-wrapper">
-                <input type="text" id="user-input" placeholder="Escribe tu mensaje..." autocomplete="off">
-                <button class="send-button" id="send-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </div>
-            
-            
-        </div>
+    <div class="messages-container" id="messages">
+      <!-- Mensaje inicial se solicitará desde backend al abrir chat -->
     </div>
 
-    <script>
-        const noviSign = document.getElementById('novi-sign');
-        const chatContainer = document.getElementById('chat-container');
-        const minimizeBtn = document.getElementById('minimize-btn');
-        const messagesContainer = document.getElementById('messages');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const emergencyBtn = document.getElementById('emergency-btn');
-        const typingIndicator = document.getElementById('typing');
+    <div class="typing-indicator" id="typing" style="display:none;">
+      <span></span><span></span><span></span>
+    </div>
 
-        // Convierte URLs en enlaces clicables
-        function formatLinks(text) {
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-        }
+    <div class="input-container">
+      <div class="quick-buttons" id="quick-buttons" style="display:none"></div>
 
-        function addMessage(content, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
-            messageDiv.innerHTML = isUser ? content : formatLinks(content);
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+      <div class="input-wrapper">
+        <input type="text" id="user-input" placeholder="Mensaje..." autocomplete="off" />
+        <button class="send-button" id="send-btn">➤</button>
+      </div>
+    </div>
+  </div>
 
-        function showTypingIndicator() {
-            typingIndicator.style.display = 'block';
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+  <script>
+    // utils
+    const noviSign = document.getElementById("novi-sign");
+    const chatContainer = document.getElementById("chat-container");
+    const minimizeBtn = document.getElementById("minimize-btn");
+    const messagesContainer = document.getElementById("messages");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const typingIndicator = document.getElementById("typing");
+    const quickButtonsContainer = document.getElementById("quick-buttons");
 
-        function hideTypingIndicator() {
-            typingIndicator.style.display = 'none';
-        }
-
-        function sendQuickMessage(topic) {
-            userInput.value = topic;
-            sendMessage();
-        }
-
-
-
-
-
-      document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("btn-flow")) {
-        const option = e.target.getAttribute("data-option");
-
-        // Mostrar lo que seleccionó el usuario
-        addMessage(e.target.innerText, true);
-
-        // Mandarlo DIRECTAMENTE al flujo de participación
-        handleParticipationFlow(option);
-
-        // Si es "sí" comenzará el flujo
-        // Si es "no" mostrará los enlaces
-    }
-});
-
-
-
-
-
-
- 
-        // ======== MANEJO DE FLUJO DE PARTICIPACIÓN ========
-
-window.participationState = null;
-window.tempName = null;
-window.tempPhone = null;
-
-async function handleParticipationFlow(message) {
-    const msg = message.toLowerCase();
-
-    // → RESPUESTA "NO"
-    if (msg === "no" && window.participationState === null) {
-        addMessage(
-            `
-            ¡Gracias por responder! <br><br>
-            Si deseas conocer más sobre nuestras plataformas y redes, aquí te dejo algunos enlaces:<br><br>
-            <a href="https://www.colombianoviolenta.org" target="_blank"> Sitio Web Oficial</a><br>
-            <a href="https://www.instagram.com/colombianoviolenta/?igsh=NXhndTdqa2MwM3o1" target="_blank"> Instagram</a><br>
-            <a href="https://www.facebook.com/ColombiaNoviolenta/?locale=es_LA" target="_blank"> Facebook</a><br>
-            <a href="https://www.tiktok.com/@colombianoviolenta" target="_blank"> Tik Tok</a><br>
-            <a href="https://x.com/colnoviolenta" target="_blank"> X </a><br>
-             <a href="https://www.youtube.com/@parrapapandi" target="_blank"> Youtube </a><br>
-             <a href="https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu" target="_blank"> Spotify </a><br>
-            `,
-            false
-        );
-        return true; // indica que ya manejamos el flujo
+    // sessionId persistente por usuario (localStorage)
+    let SESSION_ID = localStorage.getItem("novi_session_id");
+    if (!SESSION_ID) {
+      SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("novi_session_id", SESSION_ID);
     }
 
-    // → RESPUESTA "SÍ"
-    if ((msg === "si" || msg === "sí") && window.participationState === null) {
-        addMessage("¡Excelente!  Por favor escribe tu nombre completo:", false);
-        window.participationState = "name";
-        return true;
+    // append message (bot or user). If html=true, content is inserted as HTML
+    function addMessage(content, isUser = false, html = false) {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("message", isUser ? "user-message" : "bot-message");
+      if (html) wrapper.innerHTML = content;
+      else wrapper.textContent = content;
+      messagesContainer.appendChild(wrapper);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // → CAPTURAR NOMBRE
-    if (window.participationState === "name") {
-        window.tempName = message;
-        addMessage("Perfecto  Ahora escribe tu número de contacto:", false);
-        window.participationState = "phone";
-        return true;
-    }
-
-    // → CAPTURAR TELÉFONO
-    if (window.participationState === "phone") {
-        window.tempPhone = message;
-
-        addMessage(
-            `
-            <div>
-                Para continuar, por favor autoriza el uso de tus datos:<br><br>
-                <label style="display:flex;align-items:center;gap:10px;">
-                    <input type="checkbox" id="authCheck"> Autorizo el uso de mis datos
-                </label>
-                <button onclick="sendAuthorization()" 
-                    style="margin-top:10px;background:#003cff;color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;">
-                    Enviar
-                </button>
-            </div>
-            `,
-            false
-        );
-
-        window.participationState = "authorize";
-        return true;
-    }
-
-    return false; // no pertenece al flujo
-}
-
-
-
-
-
-
-
-        function sendMessage() {
-    const message = userInput.value.trim();
-    if (message === '') return;
-
-    addMessage(message, true);
-    userInput.value = '';
-
-    // Primero revisar si el mensaje pertenece al flujo de participación
-    handleParticipationFlow(message).then((handled) => {
-        if (handled) return;
-
-        // Si NO pertenece al flujo, enviar mensaje normal al backend
-        showTypingIndicator();
-
-        const API_URL = "https://novi-drekbmcchpc0g2gr.centralus-01.azurewebsites.net";
-
-        fetch("/api/conversation", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        sessionId: "user123", // luego lo hacemos dinámico
-        message
-    })
-})
-.then(res => res.json())
-.then(data => {
-    hideTypingIndicator();
-    addMessage(data.reply);
-})
-
-        .catch((error) => {
-            hideTypingIndicator();
-            addMessage("Error al comunicarse con el servidor.");
-            console.error('Error:', error);
-        });
-    });
-}
-
-
-
-
-
-async function sendAuthorization() {
-    const check = document.getElementById("authCheck");
-
-    if (!check.checked) {
-        addMessage("Debes autorizar el uso de tus datos.", false);
+    // append bot message with typing effect for plain text; if content contains HTML tags, insert directly
+    function addBotMessageWithTyping(content) {
+      // if content contains button or link HTML, insert directly (we still show small typing)
+      const containsHtml = /<button|<a|<label|<div|<strong|<br/.test(content);
+      if (containsHtml) {
+        // small delay to simulate typing
+        typingIndicator.style.display = "block";
+        setTimeout(() => {
+          typingIndicator.style.display = "none";
+          const div = document.createElement("div");
+          div.classList.add("message", "bot-message");
+          div.innerHTML = content;
+          messagesContainer.appendChild(div);
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }, 500);
         return;
+      }
+
+      typingIndicator.style.display = "block";
+      const div = document.createElement("div");
+      div.classList.add("message", "bot-message");
+      messagesContainer.appendChild(div);
+
+      let i = 0;
+      const text = content;
+      const interval = setInterval(() => {
+        div.textContent = text.slice(0, i);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        i++;
+        if (i > text.length) {
+          clearInterval(interval);
+          typingIndicator.style.display = "none";
+        }
+      }, 18); // velocidad de escritura (ajusta si quieres más lento)
     }
 
-    const res = await fetch("/api/conversation/authorize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: "user123" })
-    });
+    function showTyping() {
+      typingIndicator.style.display = "block";
+    }
+    function hideTyping() {
+      typingIndicator.style.display = "none";
+    }
 
-    const data = await res.json();
-    addMessage(data.reply, false);
-}
+    // fetch wrapper que llama al backend de conversación
+    async function sendToConversation(message) {
+      showTyping();
+      try {
+        const res = await fetch("/api/conversation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: SESSION_ID, message })
+        });
+        const data = await res.json();
+        hideTyping();
 
+        if (!data) return;
 
-    
-
-
-
-
-
-
-
-        function handleEmergency() {
-            addMessage("Necesito orientación para eventos importantes");
-            addMessage("como hago una compra");
+        // si backend devuelve una señal para abrir URL
+        if (typeof data.reply === "string" && data.reply.startsWith("OPEN_URL::")) {
+          const url = data.reply.replace("OPEN_URL::", "");
+          window.open(url, "_blank", "noopener");
+          return;
         }
 
-        // Mostrar chat al hacer clic en la leyenda
-        noviSign.addEventListener('click', () => {
-            chatContainer.style.display = 'flex';
-            noviSign.style.display = 'none';
-            userInput.focus();
-        });
+        // mostrar la respuesta del bot (si trae HTML la insertamos con innerHTML)
+        addBotMessageWithTyping(data.reply || "...");
+        // tras insertar, si hay botones, el listener global manejará clicks
+      } catch (err) {
+        hideTyping();
+        addBotMessageWithTyping("Hubo un error al comunicarnos con el servidor.");
+        console.error(err);
+      }
+    }
 
-        // Minimizar chat y volver a mostrar la leyenda
-        minimizeBtn.addEventListener('click', () => {
-            chatContainer.style.display = 'none';
-            noviSign.style.display = 'block';
+    // enviamos la autorización al backend
+    async function sendAuthorization() {
+      const cb = document.getElementById("authCheck");
+      if (!cb || !cb.checked) {
+        addBotMessageWithTyping("Debes autorizar el uso de tus datos antes de continuar.");
+        return;
+      }
+      showTyping();
+      try {
+        const res = await fetch("/api/conversation/authorize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: SESSION_ID })
         });
+        const data = await res.json();
+        hideTyping();
+        if (data && data.reply) addBotMessageWithTyping(data.reply);
+        // luego pedir que muestre opciones inteligentes
+        // preguntar al backend por mostrar opciones (se puede usar "more_yes")
+        setTimeout(() => sendToConversation("more_yes"), 600);
+      } catch (err) {
+        hideTyping();
+        addBotMessageWithTyping("Error guardando autorización.");
+        console.error(err);
+      }
+    }
 
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-        emergencyBtn.addEventListener('click', handleEmergency);
-    </script>
+    // captura clicks en botones dinámicos
+    document.addEventListener("click", (e) => {
+      // botones creados por backend con clase btn-flow
+      if (e.target.classList.contains("btn-flow")) {
+        const option = e.target.getAttribute("data-option");
+        // mostrar como usuario
+        addMessage(e.target.innerText, true, false);
+        // si option representa abrir url, manejaremos respuesta del backend que devuelve OPEN_URL::
+        sendToConversation(option);
+      }
+
+      // botones creados por backend que llaman a sendAuthorization() directo (onclick inline)
+      if (e.target.classList.contains("btn-send-auth") || e.target.matches("button[onclick='sendAuthorization()']")) {
+        // botón inline generado por backend -> ejecutar la función que envía autorización
+        sendAuthorization();
+      }
+    });
+
+    // envío normal por input (texto)
+    async function sendMessageFromInput(rawText) {
+      const txt = (rawText || "").trim();
+      if (!txt) return;
+      addMessage(txt, true);
+      userInput.value = "";
+      await sendToConversation(txt);
+    }
+
+    // wire input/button
+    sendBtn.addEventListener("click", () => sendMessageFromInput(userInput.value));
+    userInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessageFromInput(userInput.value);
+    });
+
+    // open chat: al abrir por primera vez, solicitamos al backend el mensaje inicial (start)
+    noviSign.addEventListener("click", async () => {
+      chatContainer.style.display = "flex";
+      noviSign.style.display = "none";
+      userInput.focus();
+      // request inicial
+      await sendToConversation(""); // backend en step "start" responde con botones iniciales
+    });
+
+    // minimizar
+    minimizeBtn.addEventListener("click", () => {
+      chatContainer.style.display = "none";
+      noviSign.style.display = "block";
+    });
+
+    // Al inicio, opcional: si prefieres que aparezca el primer mensaje sin hacer click,
+    // descomenta la siguiente línea:
+    // sendToConversation("");
+  </script>
 </body>
 </html>
