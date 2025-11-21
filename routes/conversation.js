@@ -1,50 +1,42 @@
 // routes/conversation.js
 import express from "express";
-import { ConversationSession } from "../models/ConversationSession.js";
 import { Registration } from "../models/Registration.js";
 
 const router = express.Router();
 
-/* ----------------------------------------------------------
-   📌 Función auxiliar: obtener o crear sesión en MongoDB
------------------------------------------------------------ */
-async function getSession(sessionId) {
-  let session = await ConversationSession.findOne({ sessionId });
+/*  
+   Cada sesión se registra en Mongo.
+   Se identifica por sessionId.
+*/
+
+router.post("/", async (req, res) => {
+  const { sessionId, message = "" } = req.body || {};
+  if (!sessionId) return res.status(400).json({ error: "Falta sessionId" });
+
+  const msg = message.trim().toLowerCase();
+
+  // Buscar sesión o crear una nueva
+  let session = await Registration.findOne({ sessionId });
 
   if (!session) {
-    session = await ConversationSession.create({
+    session = await Registration.create({
       sessionId,
-      step: "welcome"
+      step: "start",
+      name: null,
+      phone: null,
+      authorized: false
     });
   }
 
-  return session;
-}
-
-/* ----------------------------------------------------------
-   📌 Conversación principal
------------------------------------------------------------ */
-router.post("/", async (req, res) => {
-  const { sessionId, message = "" } = req.body || {};
-
-  if (!sessionId) {
-    return res.status(400).json({ reply: "Falta sessionId en la petición." });
-  }
-
-  const msg = message.toLowerCase().trim();
-  const session = await getSession(sessionId);
-
-  /* ----------------------------------------------------------
-     PASO 1 — MENSAJE INICIAL
-  ----------------------------------------------------------- */
-  if (session.step === "welcome") {
+  // === ESTADO INICIAL ===
+  if (session.step === "start") {
     session.step = "ask_participation";
     await session.save();
 
     return res.json({
       reply: `
-Hola, soy <strong>Novi</strong>, tu asistente virtual de Colombia Noviolenta.  
-Actualmente contamos con talleres, conferencias y espacios de orientación en Noviolencia.  
+Hola, soy <strong>Novi</strong>, tu asistente virtual de Colombia Noviolenta.<br>
+Actualmente contamos con talleres, conferencias y espacios de orientación en Noviolencia.<br><br>
 ¿Te gustaría participar en nuestros eventos?
 
 <div style="margin-top:10px;">
@@ -55,52 +47,41 @@ Actualmente contamos con talleres, conferencias y espacios de orientación en No
     });
   }
 
-  /* ----------------------------------------------------------
-     PASO 2 — ¿Desea participar?
-  ----------------------------------------------------------- */
+  // === PREGUNTA ¿QUIERES PARTICIPAR? ===
   if (session.step === "ask_participation") {
-    // SI participa
-    if (
-      msg === "participar" ||
-      msg === "si" ||
-      msg === "sí" ||
-      msg === "yes"
-    ) {
+    if (msg === "participar" || msg === "si" || msg === "sí") {
       session.step = "ask_name";
       await session.save();
+
       return res.json({
         reply: `¡Excelente! 🙌<br>¿Cómo te gustaría que te llame?`
       });
     }
 
-    // NO participa
-    if (msg === "no" || msg === "no_participar") {
-      session.step = "ask_name_no_participa";
+    if (msg === "no_participar" || msg === "no") {
+      session.step = "ask_name_no";
       await session.save();
+
       return res.json({
-        reply: `
-Perfecto 😊<br>¿Cómo te gustaría que te llame?
-      `
+        reply: `Perfecto 😊<br>¿Cómo te gustaría que te llame?`
       });
     }
 
     return res.json({
-      reply: "No entendí 😅 ¿Deseas participar? Usa los botones."
+      reply: `Disculpa, no entendí. ¿Deseas participar?<br>Usa los botones 😊`
     });
   }
 
-  /* ----------------------------------------------------------
-     PASO 3 — NOMBRE cuando dijo NO participar
-  ----------------------------------------------------------- */
-  if (session.step === "ask_name_no_participa") {
-    session.name = message.trim();
-    session.step = "social_no_participa";
+  // === NOMBRE SI NO PARTICIPA ===
+  if (session.step === "ask_name_no") {
+    session.name = message;
+    session.step = "socials_no";
     await session.save();
 
     return res.json({
       reply: `
-Perfecto <strong>${session.name}</strong> 😊  
-Aquí tienes nuestras redes sociales. ¿Cuál te gustaría abrir?
+Perfecto, <strong>${session.name}</strong>.<br><br>
+Te invito a seguirnos en nuestras redes sociales:<br><br>
 
 <div style="margin-top:10px;">
   <button class="btn-flow" data-option="open_instagram">Instagram</button>
@@ -111,19 +92,16 @@ Aquí tienes nuestras redes sociales. ¿Cuál te gustaría abrir?
   <button class="btn-flow" data-option="open_spotify">Spotify</button>
 </div>
 
-<br>Puedes escribirme cualquier consulta cuando quieras 😊
+<br>
+También puedes escribirme una pregunta en cualquier momento.
 `
     });
   }
 
-  /* ----------------------------------------------------------
-     PASO 4 — Pedir nombre cuando SÍ participará
-  ----------------------------------------------------------- */
+  // === FLUJO PARTICIPAR — NOMBRE ===
   if (session.step === "ask_name") {
     if (!message || message.length < 2) {
-      return res.json({
-        reply: "Por favor escribe un nombre válido 🙏"
-      });
+      return res.json({ reply: "Por favor escribe un nombre válido 🙏" });
     }
 
     session.name = message.trim();
@@ -131,21 +109,18 @@ Aquí tienes nuestras redes sociales. ¿Cuál te gustaría abrir?
     await session.save();
 
     return res.json({
-      reply: `Encantado, <strong>${session.name}</strong> 😊  
-Ahora escribe tu número de contacto (10 dígitos y empieza con 3).`
+      reply: `Encantado, <strong>${session.name}</strong> 😊<br>Ahora escribe tu número de contacto (10 dígitos, empieza por 3):`
     });
   }
 
-  /* ----------------------------------------------------------
-     PASO 5 — Teléfono
-  ----------------------------------------------------------- */
+  // === FLUJO PARTICIPAR — TELÉFONO ===
   if (session.step === "ask_phone") {
     const phone = message.replace(/\D/g, "");
     const valid = /^3\d{9}$/.test(phone);
 
     if (!valid) {
       return res.json({
-        reply: "El número es inválido ❌. Ejemplo correcto: 3105223645"
+        reply: "Número inválido 😕<br>Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645"
       });
     }
 
@@ -155,19 +130,22 @@ Ahora escribe tu número de contacto (10 dígitos y empieza con 3).`
 
     return res.json({
       reply: `
-Gracias ${session.name} ❤️  
-Antes de continuar necesito tu autorización:
+Para continuar, autoriza el uso de tus datos personales:<br><br>
 
-<button class="btn-flow" onclick="sendAuthorization()">✔ Autorizo el tratamiento de mis datos</button>
+<label style="display:flex;align-items:center;gap:10px;">
+  <input type="checkbox" id="authCheck"> Autorizo el uso de mis datos
+</label>
+
+<br>
+
+<button class="btn-send-auth" onclick="sendAuthorization()">Enviar</button>
 `
     });
   }
 
-  /* ----------------------------------------------------------
-     PASO 6 — Redes sociales (cuando NO participa)
-  ----------------------------------------------------------- */
-  if (session.step === "social_no_participa") {
-    const urls = {
+  // === MANEJO BOTONES DE REDES ===
+  if (msg.startsWith("open_")) {
+    const links = {
       open_instagram: "https://www.instagram.com/colombianoviolenta",
       open_facebook: "https://www.facebook.com/ColombiaNoviolenta",
       open_tiktok: "https://www.tiktok.com/@colombianoviolenta",
@@ -176,125 +154,35 @@ Antes de continuar necesito tu autorización:
       open_spotify: "https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu"
     };
 
-    if (urls[msg]) {
-      return res.json({ reply: `OPEN_URL::${urls[msg]}` });
-    }
-
-    // consulta normal
-    return res.json({
-      reply: `Gracias por tu mensaje 😊 ¿En qué más puedo ayudarte?`
-    });
+    const url = links[msg];
+    if (url) return res.json({ reply: `OPEN_URL::${url}` });
   }
 
-  /* ----------------------------------------------------------
-     PREGUNTAS RÁPIDAS una vez registrado
-  ----------------------------------------------------------- */
-  if (session.step === "completed") {
-    const n = session.name || "";
-
-    if (msg.includes("boletas")) {
-      return res.json({
-        reply: `
-🎫 Las boletas del concierto las puedes adquirir aquí:<br>
-<a href="https://www.colombianoviolenta.org/conciertos-2/" target="_blank">Ver boletas</a>
-
-<br><br>¿Quieres saber algo más?
-<button class="btn-flow" data-option="more_yes">Sí</button>
-<button class="btn-flow" data-option="more_no">No</button>
-`
-      });
-    }
-
-    if (msg.includes("compras") || msg.includes("tienda")) {
-      return res.json({
-        reply: `
-🛍️ Nuestra tienda está aquí:<br>
-<a href="https://www.colombianoviolenta.org/tienda" target="_blank">Tienda Colombia Noviolenta</a>
-
-<br>¿Deseas algo más?
-<button class="btn-flow" data-option="more_yes">Sí</button>
-<button class="btn-flow" data-option="more_no">No</button>
-`
-      });
-    }
-
-    if (msg === "more_yes") {
-      return res.json({
-        reply: `
-Listo ${n}! ¿Qué te gustaría saber?
-
-<button class="btn-flow" data-option="boletas">Boletas concierto</button>
-<button class="btn-flow" data-option="compras">Compras tienda</button>
-<button class="btn-flow" data-option="servicios">Servicios</button>
-<button class="btn-flow" data-option="voluntariado">Voluntariado</button>
-<button class="btn-flow" data-option="donaciones">Donaciones</button>
-`
-      });
-    }
-
-    if (msg === "more_no") {
-      return res.json({ reply: "Perfecto 😊 Aquí estaré si me necesitas." });
-    }
-
-    return res.json({
-      reply: `No entendí muy bien 😅 ¿puedes intentar de nuevo?`
-    });
-  }
-
-  /* ----------------------------------------------------------
-     Cualquier otro caso
-  ----------------------------------------------------------- */
   return res.json({
-    reply: "No entendí ese mensaje 😅"
+    reply: "No entendí esa acción 😅<br>Usa los botones o escríbeme tu consulta."
   });
 });
 
-/* ----------------------------------------------------------
-   AUTORIZACIÓN del uso de datos
------------------------------------------------------------ */
+// =======================
+//   AUTORIZACIÓN FINAL
+// =======================
 router.post("/authorize", async (req, res) => {
-  const { sessionId } = req.body;
+  const { sessionId } = req.body || {};
 
-  if (!sessionId) {
-    return res.status(400).json({ success: false, message: "Falta sessionId" });
+  const session = await Registration.findOne({ sessionId });
+  if (!session) return res.status(400).json({ reply: "Sesión no encontrada" });
+
+  if (!session.name || !session.phone) {
+    return res.status(400).json({ reply: "Faltan datos para completar el registro" });
   }
 
-  const session = await ConversationSession.findOne({ sessionId });
+  session.authorized = true;
+  session.step = "registered";
+  await session.save();
 
-  if (!session || !session.name || !session.phone) {
-    return res.status(400).json({
-      success: false,
-      message: "La sesión no tiene datos suficientes."
-    });
-  }
-
-  try {
-    await Registration.create({
-      name: session.name,
-      phone: session.phone,
-      authorized: true
-    });
-
-    session.authorized = true;
-    session.step = "completed";
-    await session.save();
-
-    return res.json({
-      success: true,
-      reply: `
-¡Gracias ${session.name}! 🎉  
-Tus datos fueron registrados correctamente.  
-Ahora puedes escoger una opción o hacer una consulta 😊
-      `
-    });
-
-  } catch (err) {
-    console.error("Error guardando registro", err);
-    return res.status(500).json({
-      success: false,
-      message: "Error guardando en la base de datos."
-    });
-  }
+  return res.json({
+    reply: `¡Gracias <strong>${session.name}</strong>! 🙌<br>Tus datos fueron registrados. Muy pronto nos pondremos en contacto contigo.`
+  });
 });
 
 export default router;

@@ -1,30 +1,38 @@
+// models/Registration.js
 import mongoose from "mongoose";
 
-const RegistrationSchema = new mongoose.Schema({
+const RegistrationSchema = new mongoose.Schema(
+  {
+    sessionId: {
+      type: String,
+      required: true,
+      index: true,
+      unique: true
+    },
+
     name: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      default: null
     },
 
     phone: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      default: null
     },
 
     authorized: {
-        type: Boolean,
-        required: true,
-        default: false
+      type: Boolean,
+      default: false
     },
 
-    createdAt: {
-        type: Date,
-        default: Date.now
+    step: {
+      type: String,
+      default: "start" // start → ask_participation → ask_name → ask_phone → ask_authorization → registered
     }
-});
+  },
+  {
+    timestamps: true
+  }
+);
 
-// Para evitar errores de modelo duplicado en hot reload
-export const Registration =
-    mongoose.models.Registration || mongoose.model("Registration", RegistrationSchema);
+export const Registration = mongoose.model("Registration", RegistrationSchema);

@@ -1,20 +1,20 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import chatbotRoutes from "./routes/chatbot.routes.js";
+import { Registration } from "./routes/registration.js";
 import morgan from 'morgan';
 import connectDB from './config/database.js'; //  NUEVO
 import mongoose from 'mongoose';
 import cron from "node-cron";
 import { exec } from "child_process";
-import registerRoutes from "./routes/register.js";
+
 import path from "path";
 import conversationRoutes from "./routes/conversation.js";
 import authRoutes from "./routes/auth.js";
 import linksRoutes from "./routes/links.js";
 import metricsRoutes from "./routes/metrics.js";
 import adminRoutes from "./routes/admin.js";
-import registrationRoutes from "./routes/registration.js";
+
 
 dotenv.config();
 
@@ -39,10 +39,11 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 app.use("/api/admin", adminRoutes);
-app.use("/api/register", registerRoutes);
-app.use("/api/chatbot", chatbotRoutes);
-app.use("/api/conversation", conversationRoutes);
 app.use("/api/registration", registrationRoutes);
+
+
+app.use("/api/conversation", conversationRoutes);
+
 
 // Rutas principales
 app.use("/api/auth", authRoutes);

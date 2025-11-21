@@ -1,97 +1,72 @@
+// routes/registration.js
 import express from "express";
 import { Registration } from "../models/Registration.js";
-import { createObjectCsvWriter } from "csv-writer";
+import { Parser as Json2csvParser } from "json2csv";
 import ExcelJS from "exceljs";
-import path from "path";
 
 const router = express.Router();
 
 /**
  * GET /api/registration
- * Listar todos los registros
+ * Lista todos los registros
  */
 router.get("/", async (req, res) => {
   try {
-    const data = await Registration.find().sort({ createdAt: -1 });
-    res.json({ success: true, data });
+    const list = await Registration.find().sort({ createdAt: -1 });
+    res.json(list);
   } catch (err) {
-    console.error("Error listando registros:", err);
-    res.status(500).json({ success: false, message: "Error interno" });
+    res.status(500).json({ error: "Error obteniendo registros" });
   }
 });
 
-
 /**
- * GET /api/registration/count
- * Contador para dashboard admin
+ * GET /api/registration/csv
+ * Exporta CSV
  */
-router.get("/count", async (req, res) => {
+router.get("/csv", async (req, res) => {
   try {
-    const total = await Registration.countDocuments();
-    res.json({ success: true, total });
+    const list = await Registration.find().lean();
+    const fields = ["name", "phone", "authorized", "createdAt"];
+    const json2csv = new Json2csvParser({ fields });
+    const csv = json2csv.parse(list);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("registros.csv");
+    return res.send(csv);
   } catch (err) {
-    res.status(500).json({ success: false });
+    console.error("CSV Error:", err);
+    res.status(500).json({ error: "Error generando CSV" });
   }
 });
 
-
 /**
- * GET /api/registration/export/csv
- * Exportar registros en CSV
+ * GET /api/registration/excel
+ * Exporta Excel
  */
-router.get("/export/csv", async (req, res) => {
+router.get("/excel", async (req, res) => {
   try {
-    const data = await Registration.find().sort({ createdAt: -1 });
+    const list = await Registration.find().lean();
 
-    const filePath = path.join(process.cwd(), "exports", "registros.csv");
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet("Registros");
 
-    const csvWriter = createObjectCsvWriter({
-      path: filePath,
-      header: [
-        { id: "name", title: "Nombre" },
-        { id: "phone", title: "Teléfono" },
-        { id: "authorized", title: "Autorizó" },
-        { id: "createdAt", title: "Fecha registro" },
-      ],
-    });
-
-    await csvWriter.writeRecords(data);
-
-    res.download(filePath);
-  } catch (err) {
-    console.error("Error exportando CSV:", err);
-    res.status(500).json({ success: false });
-  }
-});
-
-
-/**
- * GET /api/registration/export/excel
- * Exportar registros a Excel
- */
-router.get("/export/excel", async (req, res) => {
-  try {
-    const data = await Registration.find().sort({ createdAt: -1 });
-
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet("Registros");
-
-    sheet.columns = [
-      { header: "Nombre", key: "name", width: 30 },
-      { header: "Teléfono", key: "phone", width: 20 },
-      { header: "Autorizó", key: "authorized", width: 10 },
-      { header: "Fecha registro", key: "createdAt", width: 30 }
+    ws.columns = [
+      { header: "Nombre", key: "name", width: 25 },
+      { header: "Teléfono", key: "phone", width: 15 },
+      { header: "Autorizado", key: "authorized", width: 10 },
+      { header: "Fecha", key: "createdAt", width: 20 }
     ];
 
-    data.forEach((item) => sheet.addRow(item));
+    list.forEach((item) => ws.addRow(item));
 
-    const filePath = path.join(process.cwd(), "exports", "registros.xlsx");
-    await workbook.xlsx.writeFile(filePath);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", "attachment; filename=registros.xlsx");
 
-    res.download(filePath);
+    await wb.xlsx.write(res);
+    res.end();
   } catch (err) {
-    console.error("Error exportando Excel:", err);
-    res.status(500).json({ success: false });
+    console.error("Excel Error:", err);
+    res.status(500).json({ error: "Error generando Excel" });
   }
 });
 

@@ -1,13 +1,17 @@
 import express from "express";
 import mongoose from "mongoose";
 import { KnowledgeBase } from "../models/KnowledgeBase.js";
+import { Registration } from "../models/Registration.js";
+import { ConversationSession } from "../models/ConversationSession.js";
 import { spawn } from "child_process";
 
 const router = express.Router();
 
-// ======== CONFIG LOGIN BÁSICO ========
+// =======================
+//  LOGIN ADMIN BÁSICO
+// =======================
 const ADMIN_USER = "admin";
-const ADMIN_PASS = "1234"; // cámbialo por algo más seguro
+const ADMIN_PASS = "1234";
 
 router.post("/login", (req, res) => {
   const { username, password } = req.body;
@@ -18,9 +22,10 @@ router.post("/login", (req, res) => {
   }
 });
 
-// ======== CRUD DE LINKS ========
+// =======================
+// CRUD DE LINKS
+// =======================
 
-// Obtener todos los enlaces guardados
 router.get("/links", async (req, res) => {
   try {
     const doc = await KnowledgeBase.findOne({ category: "links" });
@@ -30,7 +35,6 @@ router.get("/links", async (req, res) => {
   }
 });
 
-// Agregar un enlace nuevo
 router.post("/links", async (req, res) => {
   const { title, url } = req.body;
   if (!title || !url) return res.status(400).json({ error: "Faltan datos" });
@@ -47,7 +51,6 @@ router.post("/links", async (req, res) => {
   }
 });
 
-// Eliminar enlace por título
 router.delete("/links/:title", async (req, res) => {
   const { title } = req.params;
   try {
@@ -62,11 +65,14 @@ router.delete("/links/:title", async (req, res) => {
   }
 });
 
-// ======== EJECUTAR CRAWLER ========
+// =======================
+//  EJECUTAR CRAWLER
+// =======================
+
 router.post("/crawl", (req, res) => {
   try {
     const crawler = spawn("node", ["./scripts/crawler.js"], { stdio: "inherit" });
-    crawler.on("close", (code) => {
+    crawler.on("close", code => {
       console.log(`Crawler finalizado con código ${code}`);
     });
     res.json({ success: true, message: "Crawler iniciado" });
@@ -75,22 +81,50 @@ router.post("/crawl", (req, res) => {
   }
 });
 
-// ======== MÉTRICAS ========
+// =======================
+//   MÉTRICAS DEL SISTEMA
+// =======================
+
 router.get("/stats", async (req, res) => {
   try {
-    const messages = mongoose.connection.collection("messages"); // si guardas tus chats aquí
-    const total = await messages.countDocuments();
+    const totalConversaciones = await ConversationSession.countDocuments();
+    const totalRegistros = await Registration.countDocuments();
 
-    // Agrupa por tema (si tienes campo "topic" o "intent" en tus mensajes)
-    const topTemas = await messages
-      .aggregate([
-        { $group: { _id: "$topic", total: { $sum: 1 } } },
-        { $sort: { total: -1 } },
-        { $limit: 5 }
-      ])
-      .toArray();
+    res.json({
+      totalConversaciones,
+      totalRegistros
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    res.json({ total, topTemas });
+// =======================
+//   RESUMEN DEL ADMIN
+// =======================
+
+router.get("/summary", async (req, res) => {
+  try {
+    const totalRegistros = await Registration.countDocuments();
+    const autorizados = await Registration.countDocuments({ authorized: true });
+
+    res.json({
+      totalRegistros,
+      autorizados
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// =======================
+//   LISTAR REGISTROS
+// =======================
+
+router.get("/registros", async (req, res) => {
+  try {
+    const list = await Registration.find().sort({ createdAt: -1 });
+    res.json(list);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -5,7 +5,10 @@
   <title>Panel Administrativo - Novi</title>
   <link rel="stylesheet" href="./admin.css">
 </head>
+
 <body>
+
+  <!-- ===== LOGIN ===== -->
   <div id="login-section">
     <h2>Acceso al Panel</h2>
     <input type="text" id="username" placeholder="Usuario">
@@ -14,9 +17,11 @@
     <p id="login-error" style="color:red; display:none;">Credenciales incorrectas</p>
   </div>
 
+  <!-- ===== PANEL ===== -->
   <div id="panel-section" style="display:none;">
     <h1>Panel Administrativo</h1>
 
+    <!-- ---------------- LINKS ---------------- -->
     <section>
       <h2>Gestión de Enlaces</h2>
       <div id="links-list"></div>
@@ -26,44 +31,46 @@
       <button id="run-crawler">Ejecutar Crawler</button>
     </section>
 
+    <!-- ---------------- METRICAS ---------------- -->
     <section>
-  <h2>Métricas</h2>
-  <div id="metrics"></div>
-  <canvas id="topicsChart" width="400" height="200"></canvas>
-  <button id="view-history-btn"> Consultar Historial</button>
-  <div id="history-container" style="display:none; max-height:400px; overflow-y:auto; margin-top:20px;"></div>
-</section>
+      <h2>Métricas</h2>
+      <div id="metrics"></div>
 
+      <canvas id="topicsChart" width="400" height="200"></canvas>
 
-<section>
-  <h2>Registros de Participación</h2>
+      <button id="view-history-btn">Consultar Historial</button>
+      <div id="history-container" style="display:none; max-height:400px; overflow-y:auto; margin-top:20px;"></div>
+    </section>
 
-  <div style="margin-bottom: 10px;">
-    <button id="refresh-regs">Actualizar</button>
-    <button onclick="window.location='/api/registration/export/csv'">Exportar CSV</button>
-    <button onclick="window.location='/api/registration/export/excel'">Exportar Excel</button>
+    <!-- ---------------- REGISTROS ---------------- -->
+    <section>
+      <h2>Registros de Participación</h2>
+
+      <div style="margin-bottom: 10px;">
+        <button id="refresh-regs">Actualizar</button>
+        <button onclick="window.location='/api/admin/registros/export/csv'">Exportar CSV</button>
+        <button onclick="window.location='/api/admin/registros/export/excel'">Exportar Excel</button>
+      </div>
+
+      <p><strong>Total registros:</strong> <span id="reg-count">0</span></p>
+
+      <table id="reg-table" border="1" cellpadding="6" style="width:100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Autorizó</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
   </div>
 
-  <p><strong>Total registros:</strong> <span id="reg-count">0</span></p>
-
-  <table id="reg-table" border="1" cellpadding="6" style="width:100%; border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Autorizó</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</section>
-
-
-  </div>
-
-  <script src="./admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="./admin.js"></script>
+  <script src="./admin.js"></script>
+
 </body>
 </html>
