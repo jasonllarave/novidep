@@ -28,16 +28,7 @@ cron.schedule("0 3 * * *", () => { // todos los días a las 03:00 AM
 });
 
 
-app.get("/api/test", (req, res) => {
-  res.json({ message: "Servidor funcionando", test: "OK" });
-});
 
-app.use("/api/conversation", conversationRoutes);
-```
-
-Luego intenta en el navegador:
-```
-https://tu-app-en-azure.azurewebsites.net/api/test
 
 const app = express();
 
