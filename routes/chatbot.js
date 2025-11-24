@@ -1,18 +1,24 @@
 import express from "express";
-import { getChatbotResponse } from "../responses.js";
+import { getChatbotResponse } from "../utils/intelligentResponses.js";
 
 const router = express.Router();
 
-router.post("/chatbot", (req, res) => {
+// ✅ Agregar async aquí
+router.post("/chatbot", async (req, res) => {
   const { message } = req.body;
 
   if (!message) {
     return res.status(400).json({ error: "Mensaje faltante" });
   }
 
-  const reply = getChatbotResponse(message);
-
-  res.json({ reply });
+  try {
+    // ✅ Agregar await aquí
+    const reply = await getChatbotResponse(message);
+    res.json({ reply });
+  } catch (error) {
+    console.error('Error en ruta chatbot:', error);
+    res.status(500).json({ error: "Error procesando mensaje" });
+  }
 });
 
 export default router;

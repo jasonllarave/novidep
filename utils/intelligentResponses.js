@@ -278,3 +278,77 @@ export const needsHumanAgent = (message, sentiment) => {
   
   return { escalate: false };
 };
+
+
+// Función principal del chatbot
+export const getChatbotResponse = async (message) => {
+  try {
+    // 1. Clasificar el tipo de consulta
+    const queryType = classifyQuery(message);
+    
+    // 2. Buscar en la base de conocimiento
+    const kbResult = await searchKnowledgeBase(message);
+    
+    let response = '';
+    let context = {};
+    
+    // 3. Manejar según el tipo de consulta
+    switch (queryType) {
+      case 'productos':
+        const products = await searchProducts(message);
+        context.products = products;
+        if (products.length > 0) {
+          response = formatProductResponse(products);
+        }
+        break;
+        
+      case 'eventos':
+        const events = await searchEvents();
+        context.events = events;
+        if (events.length > 0) {
+          response = formatEventResponse(events);
+        }
+        break;
+        
+      case 'horarios':
+        response = "Nuestro horario de atención es de lunes a viernes de 9:00 AM a 6:00 PM. ¿En qué más puedo ayudarte?";
+        break;
+        
+      case 'contacto':
+        response = "📞 Puedes contactarnos:\n- WhatsApp: [número]\n- Email: info@colombianoviolenta.org\n- Ubicación: [dirección]\n\n¿Necesitas algo más?";
+        break;
+        
+      default:
+        // Si hay resultado en KB, usarlo
+        if (kbResult) {
+          response = kbResult.answer.text;
+          
+          // Agregar enlaces si los hay
+          if (kbResult.answer.links && kbResult.answer.links.length > 0) {
+            response += "\n\n📎 **Enlaces útiles:**\n";
+            kbResult.answer.links.forEach(link => {
+              response += `- [${link.title}](${link.url})\n`;
+            });
+          }
+        }
+        break;
+    }
+    
+    // 4. Si no hay respuesta específica, usar IA
+    if (!response) {
+      response = await generateAIResponse(message, context);
+    }
+    
+    // 5. Verificar si necesita agente humano
+    const escalation = needsHumanAgent(message);
+    if (escalation.escalate) {
+      response += "\n\n⚠️ *Un agente humano revisará tu consulta pronto para ayudarte mejor.*";
+    }
+    
+    return response || "Disculpa, no entendí tu pregunta. ¿Podrías reformularla?";
+    
+  } catch (error) {
+    console.error('Error en getChatbotResponse:', error);
+    return "Lo siento, hubo un error procesando tu mensaje. Por favor intenta nuevamente.";
+  }
+};
