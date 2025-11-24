@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Registration } from "./routes/registration.js";
+import registrationRoutes from "./routes/registration.js";
+import chatbotRoutes from "./routes/chatbot.js";
 import morgan from 'morgan';
 import connectDB from './config/database.js'; //  NUEVO
 import mongoose from 'mongoose';
@@ -40,8 +41,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use("/api/admin", adminRoutes);
 app.use("/api/registration", registrationRoutes);
-
-
+app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/conversation", conversationRoutes);
 
 

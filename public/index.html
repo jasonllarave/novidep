@@ -37,185 +37,86 @@
   </div>
 
   <script>
-    // utils
-    const noviSign = document.getElementById("novi-sign");
-    const chatContainer = document.getElementById("chat-container");
-    const minimizeBtn = document.getElementById("minimize-btn");
-    const messagesContainer = document.getElementById("messages");
-    const userInput = document.getElementById("user-input");
-    const sendBtn = document.getElementById("send-btn");
-    const typingIndicator = document.getElementById("typing");
-    const quickButtonsContainer = document.getElementById("quick-buttons");
+  const noviSign = document.getElementById("novi-sign");
+  const chatContainer = document.getElementById("chat-container");
+  const minimizeBtn = document.getElementById("minimize-btn");
+  const messagesContainer = document.getElementById("messages");
+  const userInput = document.getElementById("user-input");
+  const sendBtn = document.getElementById("send-btn");
+  const typingIndicator = document.getElementById("typing");
 
-    // sessionId persistente por usuario (localStorage)
-    let SESSION_ID = localStorage.getItem("novi_session_id");
-    if (!SESSION_ID) {
-      SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10);
-      localStorage.setItem("novi_session_id", SESSION_ID);
+  let SESSION_ID = localStorage.getItem("novi_session_id");
+  if (!SESSION_ID) {
+    SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem("novi_session_id", SESSION_ID);
+  }
+
+  function addMessage(content, isUser = false) {
+    const div = document.createElement("div");
+    div.classList.add("message", isUser ? "user-message" : "bot-message");
+    div.textContent = content;
+    messagesContainer.appendChild(div);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function showTyping() {
+    typingIndicator.style.display = "block";
+  }
+
+  function hideTyping() {
+    typingIndicator.style.display = "none";
+  }
+
+  async function sendToChatbot(message) {
+    showTyping();
+    try {
+      const res = await fetch("/api/chatbot/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      hideTyping();
+
+      addMessage(data.reply || "No hubo respuesta del servidor");
+
+    } catch (err) {
+      hideTyping();
+      addMessage("Error comunicando con el servidor 😥");
+      console.error(err);
     }
+  }
 
-    // append message (bot or user). If html=true, content is inserted as HTML
-    function addMessage(content, isUser = false, html = false) {
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("message", isUser ? "user-message" : "bot-message");
-      if (html) wrapper.innerHTML = content;
-      else wrapper.textContent = content;
-      messagesContainer.appendChild(wrapper);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
+  async function sendMessage() {
+    const message = userInput.value.trim();
+    if (!message) return;
 
-    // append bot message with typing effect for plain text; if content contains HTML tags, insert directly
-    function addBotMessageWithTyping(content) {
-      // if content contains button or link HTML, insert directly (we still show small typing)
-      const containsHtml = /<button|<a|<label|<div|<strong|<br/.test(content);
-      if (containsHtml) {
-        // small delay to simulate typing
-        typingIndicator.style.display = "block";
-        setTimeout(() => {
-          typingIndicator.style.display = "none";
-          const div = document.createElement("div");
-          div.classList.add("message", "bot-message");
-          div.innerHTML = content;
-          messagesContainer.appendChild(div);
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 500);
-        return;
-      }
+    addMessage(message, true);
+    userInput.value = "";
 
-      typingIndicator.style.display = "block";
-      const div = document.createElement("div");
-      div.classList.add("message", "bot-message");
-      messagesContainer.appendChild(div);
+    await sendToChatbot(message);
+  }
 
-      let i = 0;
-      const text = content;
-      const interval = setInterval(() => {
-        div.textContent = text.slice(0, i);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        i++;
-        if (i > text.length) {
-          clearInterval(interval);
-          typingIndicator.style.display = "none";
-        }
-      }, 18); // velocidad de escritura (ajusta si quieres más lento)
-    }
+  sendBtn.addEventListener("click", sendMessage);
 
-    function showTyping() {
-      typingIndicator.style.display = "block";
-    }
-    function hideTyping() {
-      typingIndicator.style.display = "none";
-    }
+  userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
 
-    // fetch wrapper que llama al backend de conversación
-    async function sendToConversation(message) {
-      showTyping();
-      try {
-        const res = await fetch("/api/conversation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId: SESSION_ID, message })
-        });
-        const data = await res.json();
-        hideTyping();
+  noviSign.addEventListener("click", async () => {
+    chatContainer.style.display = "flex";
+    noviSign.style.display = "none";
+    userInput.focus();
 
-        if (!data) return;
+    await sendToChatbot("start");
+  });
 
-        // si backend devuelve una señal para abrir URL
-        if (typeof data.reply === "string" && data.reply.startsWith("OPEN_URL::")) {
-          const url = data.reply.replace("OPEN_URL::", "");
-          window.open(url, "_blank", "noopener");
-          return;
-        }
+  minimizeBtn.addEventListener("click", () => {
+    chatContainer.style.display = "none";
+    noviSign.style.display = "block";
+  });
+</script>
 
-        // mostrar la respuesta del bot (si trae HTML la insertamos con innerHTML)
-        addBotMessageWithTyping(data.reply || "...");
-        // tras insertar, si hay botones, el listener global manejará clicks
-      } catch (err) {
-        hideTyping();
-        addBotMessageWithTyping("Hubo un error al comunicarnos con el servidor.");
-        console.error(err);
-      }
-    }
-
-    // enviamos la autorización al backend
-    async function sendAuthorization() {
-      const cb = document.getElementById("authCheck");
-      if (!cb || !cb.checked) {
-        addBotMessageWithTyping("Debes autorizar el uso de tus datos antes de continuar.");
-        return;
-      }
-      showTyping();
-      try {
-        const res = await fetch("/api/conversation/authorize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId: SESSION_ID })
-        });
-        const data = await res.json();
-        hideTyping();
-        if (data && data.reply) addBotMessageWithTyping(data.reply);
-        // luego pedir que muestre opciones inteligentes
-        // preguntar al backend por mostrar opciones (se puede usar "more_yes")
-        setTimeout(() => sendToConversation("more_yes"), 600);
-      } catch (err) {
-        hideTyping();
-        addBotMessageWithTyping("Error guardando autorización.");
-        console.error(err);
-      }
-    }
-
-    // captura clicks en botones dinámicos
-    document.addEventListener("click", (e) => {
-      // botones creados por backend con clase btn-flow
-      if (e.target.classList.contains("btn-flow")) {
-        const option = e.target.getAttribute("data-option");
-        // mostrar como usuario
-        addMessage(e.target.innerText, true, false);
-        // si option representa abrir url, manejaremos respuesta del backend que devuelve OPEN_URL::
-        sendToConversation(option);
-      }
-
-      // botones creados por backend que llaman a sendAuthorization() directo (onclick inline)
-      if (e.target.classList.contains("btn-send-auth") || e.target.matches("button[onclick='sendAuthorization()']")) {
-        // botón inline generado por backend -> ejecutar la función que envía autorización
-        sendAuthorization();
-      }
-    });
-
-    // envío normal por input (texto)
-    async function sendMessageFromInput(rawText) {
-      const txt = (rawText || "").trim();
-      if (!txt) return;
-      addMessage(txt, true);
-      userInput.value = "";
-      await sendToConversation(txt);
-    }
-
-    // wire input/button
-    sendBtn.addEventListener("click", () => sendMessageFromInput(userInput.value));
-    userInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendMessageFromInput(userInput.value);
-    });
-
-    // open chat: al abrir por primera vez, solicitamos al backend el mensaje inicial (start)
-    noviSign.addEventListener("click", async () => {
-      chatContainer.style.display = "flex";
-      noviSign.style.display = "none";
-      userInput.focus();
-      // request inicial
-      await sendToConversation(""); // backend en step "start" responde con botones iniciales
-    });
-
-    // minimizar
-    minimizeBtn.addEventListener("click", () => {
-      chatContainer.style.display = "none";
-      noviSign.style.display = "block";
-    });
-
-    // Al inicio, opcional: si prefieres que aparezca el primer mensaje sin hacer click,
-    // descomenta la siguiente línea:
-    // sendToConversation("");
-  </script>
 </body>
 </html>
