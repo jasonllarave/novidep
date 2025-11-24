@@ -47,20 +47,51 @@
 
   let SESSION_ID = localStorage.getItem("novi_session_id");
   if (!SESSION_ID) {
-    SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10);
+    SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10) + "_" + Date.now();
     localStorage.setItem("novi_session_id", SESSION_ID);
   }
 
-  function addMessage(content, isUser = false) {
+  // Efecto de escritura
+  function typeWriter(element, text, speed = 30) {
+    let i = 0;
+    element.innerHTML = "";
+    
+    function type() {
+      if (i < text.length) {
+        element.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(type, speed);
+      }
+    }
+    
+    type();
+  }
+
+  function addMessage(content, isUser = false, withTyping = false) {
     const div = document.createElement("div");
     div.classList.add("message", isUser ? "user-message" : "bot-message");
-    div.textContent = content;
+    
+    if (isUser || !withTyping) {
+      div.innerHTML = content;
+    } else {
+      typeWriter(div, content);
+    }
+    
     messagesContainer.appendChild(div);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // Manejar botones
+    div.querySelectorAll(".quick-button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const option = btn.getAttribute("data-option");
+        sendToChatbot(option);
+      });
+    });
   }
 
   function showTyping() {
     typingIndicator.style.display = "block";
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
   function hideTyping() {
@@ -69,17 +100,34 @@
 
   async function sendToChatbot(message) {
     showTyping();
+    
     try {
       const res = await fetch("/api/chatbot/chatbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message, sessionId: SESSION_ID })
       });
 
       const data = await res.json();
       hideTyping();
 
-      addMessage(data.reply || "No hubo respuesta del servidor");
+      // Actualizar sessionId si es nuevo
+      if (data.sessionId) {
+        SESSION_ID = data.sessionId;
+        localStorage.setItem("novi_session_id", SESSION_ID);
+      }
+
+      // Manejar apertura de URLs
+      if (data.reply && data.reply.startsWith("OPEN_URL::")) {
+        const url = data.reply.replace("OPEN_URL::", "");
+        window.open(url, "_blank");
+        
+        if (data.continueWith) {
+          setTimeout(() => addMessage(data.continueWith, false, true), 500);
+        }
+      } else {
+        addMessage(data.reply || "No hubo respuesta del servidor", false, true);
+      }
 
     } catch (err) {
       hideTyping();
@@ -97,6 +145,34 @@
 
     await sendToChatbot(message);
   }
+
+  // Función para autorización
+  window.sendAuthorization = async function() {
+    const checkbox = document.getElementById("authCheck");
+    if (!checkbox || !checkbox.checked) {
+      alert("Por favor marca la casilla de autorización");
+      return;
+    }
+
+    showTyping();
+
+    try {
+      const res = await fetch("/api/chatbot/authorize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: SESSION_ID })
+      });
+
+      const data = await res.json();
+      hideTyping();
+      addMessage(data.reply, false, true);
+
+    } catch (err) {
+      hideTyping();
+      addMessage("Error procesando autorización");
+      console.error(err);
+    }
+  };
 
   sendBtn.addEventListener("click", sendMessage);
 

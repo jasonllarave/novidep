@@ -10,7 +10,7 @@ const router = express.Router();
 // Resumen: total conversaciones, mensajes por día, top topics
 router.get("/", async (req, res) => {
   // total de mensajes
-  const totalMessages = await ChatLog.countDocuments();
+  const totalMessages = await Chatlog.countDocuments();
 
   // total de conversaciones aproximado (por userId y rango temporal simple)
   const totalConversations = await ChatLog.distinct("userId").then(arr => arr.length);
