@@ -6,19 +6,21 @@ const router = express.Router();
 
 router.post("/chatbot", async (req, res) => {
   const { message, sessionId } = req.body;
+  
+  console.log("📩 Mensaje recibido:", message, "SessionID:", sessionId); // ✅ Log
 
   if (!message) {
     return res.status(400).json({ error: "Mensaje faltante" });
   }
 
-  // Si no hay sessionId, crear uno
   const sid = sessionId || `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
   try {
     const msg = message.trim().toLowerCase();
 
-    // Buscar o crear sesión
     let session = await Registration.findOne({ sessionId: sid });
+    
+    console.log("💾 Sesión encontrada:", session ? "SÍ" : "NO"); // ✅ Log
 
     if (!session) {
       session = await Registration.create({
@@ -28,7 +30,10 @@ router.post("/chatbot", async (req, res) => {
         phone: null,
         authorized: false
       });
+      console.log("✅ Nueva sesión creada:", session._id); // ✅ Log
     }
+    
+    // ... resto del código
 
     // === FLUJO CONVERSACIONAL ===
 

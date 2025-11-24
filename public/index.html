@@ -119,44 +119,48 @@ function addMessage(content, isUser = false, withTyping = false) {
     typingIndicator.style.display = "none";
   }
 
-  async function sendToChatbot(message) {
-    showTyping();
-    
-    try {
-      const res = await fetch("/api/chatbot/chatbot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, sessionId: SESSION_ID })
-      });
+  let isSending = false; // ✅ Agregar esta variable al inicio
 
-      const data = await res.json();
-      hideTyping();
+async function sendToChatbot(message) {
+  if (isSending) return; // ✅ Evitar múltiples envíos
+  isSending = true;
+  
+  showTyping();
+  
+  try {
+    const res = await fetch("/api/chatbot/chatbot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, sessionId: SESSION_ID })
+    });
 
-      // Actualizar sessionId si es nuevo
-      if (data.sessionId) {
-        SESSION_ID = data.sessionId;
-        localStorage.setItem("novi_session_id", SESSION_ID);
-      }
+    const data = await res.json();
+    hideTyping();
 
-      // Manejar apertura de URLs
-      if (data.reply && data.reply.startsWith("OPEN_URL::")) {
-        const url = data.reply.replace("OPEN_URL::", "");
-        window.open(url, "_blank");
-        
-        if (data.continueWith) {
-          setTimeout(() => addMessage(data.continueWith, false, true), 500);
-        }
-      } else {
-        addMessage(data.reply || "No hubo respuesta del servidor", false, true);
-      }
-
-    } catch (err) {
-      hideTyping();
-      addMessage("Error comunicando con el servidor 😥");
-      console.error(err);
+    if (data.sessionId) {
+      SESSION_ID = data.sessionId;
+      localStorage.setItem("novi_session_id", SESSION_ID);
     }
-  }
 
+    if (data.reply && data.reply.startsWith("OPEN_URL::")) {
+      const url = data.reply.replace("OPEN_URL::", "");
+      window.open(url, "_blank");
+      
+      if (data.continueWith) {
+        setTimeout(() => addMessage(data.continueWith, false, true), 500);
+      }
+    } else {
+      addMessage(data.reply || "No hubo respuesta del servidor", false, true);
+    }
+
+  } catch (err) {
+    hideTyping();
+    addMessage("Error comunicando con el servidor 😥");
+    console.error(err);
+  } finally {
+    isSending = false; // ✅ Liberar el flag
+  }
+}
   async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
