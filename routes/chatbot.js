@@ -190,13 +190,13 @@ Escribe tu pregunta o también puedes consultar sobre:<br><br>
     }
 
     if (msg === "util_no" || msg === "servicios_no") {
-      session.step = "open_chat";
-      await session.save();
+  session.step = "open_chat";
+  await session.save();
 
-      return res.json({
-        sessionId: sid,
-        reply: `Escribe tu pregunta o consulta sobre:<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;">
+  return res.json({
+    sessionId: sid,
+    reply: `De acuerdo 😊<br><br>Escribe tu pregunta o también puedes consultar sobre:<br><br>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
   <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
   <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
   <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
@@ -204,8 +204,8 @@ Escribe tu pregunta o también puedes consultar sobre:<br><br>
   <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
   <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
 </div>`
-      });
-    }
+  });
+}
 
     if (msg === "servicios_si") {
       const reply = await getChatbotResponse("servicios");

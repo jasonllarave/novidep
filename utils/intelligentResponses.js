@@ -171,7 +171,6 @@ export const formatEventResponse = (events) => {
 export const buildEnrichedContext = async (message) => {
   let kbMatch = await searchKnowledgeBase(message);
 
-  // Si no hay match, traer TODOS los links del admin
   if (!kbMatch) {
     kbMatch = await KnowledgeBase.findOne({ category: "links", isActive: true });
   }
@@ -185,9 +184,14 @@ export const buildEnrichedContext = async (message) => {
 
   const kbLinks = kbMatch.answer.links;
 
+  // Convertir links a botones HTML
+  const linksHTML = kbLinks.map(l => 
+    `<button class="quick-button" onclick="window.open('${l.url}', '_blank')">${l.title}</button>`
+  ).join(' ');
+
   return {
     knowledge: kbMatch.answer?.text || null,
-    links: kbLinks.map(l => `${l.title}: ${l.url}`).join('\n')
+    links: `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${linksHTML}</div>`
   };
 };
 

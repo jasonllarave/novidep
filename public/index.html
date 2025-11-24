@@ -51,43 +51,64 @@
     localStorage.setItem("novi_session_id", SESSION_ID);
   }
 
-  // Efecto de escritura
-  function typeWriter(element, text, speed = 30) {
-    let i = 0;
-    element.innerHTML = "";
-    
-    function type() {
-      if (i < text.length) {
-        element.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(type, speed);
-      }
-    }
-    
-    type();
-  }
-
-  function addMessage(content, isUser = false, withTyping = false) {
-    const div = document.createElement("div");
-    div.classList.add("message", isUser ? "user-message" : "bot-message");
-    
-    if (isUser || !withTyping) {
-      div.innerHTML = content;
-    } else {
-      typeWriter(div, content);
-    }
-    
-    messagesContainer.appendChild(div);
+// Efecto de escritura que soporta HTML
+function typeWriter(element, htmlText, speed = 20) {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = htmlText;
+  
+  // Si tiene botones o elementos complejos, mostrar directamente
+  if (tempDiv.querySelector('button') || tempDiv.querySelector('div')) {
+    element.innerHTML = htmlText;
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-    // Manejar botones
-    div.querySelectorAll(".quick-button").forEach(btn => {
+    
+    // Activar eventos de botones
+    element.querySelectorAll(".quick-button").forEach(btn => {
       btn.addEventListener("click", () => {
         const option = btn.getAttribute("data-option");
         sendToChatbot(option);
       });
     });
+    return;
   }
+  
+  // Para texto simple, hacer efecto typing
+  const textContent = tempDiv.textContent;
+  let i = 0;
+  element.textContent = "";
+  
+  function type() {
+    if (i < textContent.length) {
+      element.textContent += textContent.charAt(i);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      i++;
+      setTimeout(type, speed);
+    }
+  }
+  
+  type();
+}
+
+function addMessage(content, isUser = false, withTyping = false) {
+  const div = document.createElement("div");
+  div.classList.add("message", isUser ? "user-message" : "bot-message");
+  
+  if (isUser || !withTyping) {
+    div.innerHTML = content;
+  } else {
+    typeWriter(div, content);
+  }
+  
+  messagesContainer.appendChild(div);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+  // Manejar botones después de agregar
+  div.querySelectorAll(".quick-button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const option = btn.getAttribute("data-option");
+      sendToChatbot(option);
+    });
+  });
+}
 
   function showTyping() {
     typingIndicator.style.display = "block";
