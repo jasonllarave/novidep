@@ -43,7 +43,6 @@ router.post("/chatbot", async (req, res) => {
   const msg = message.trim().toLowerCase();
 
   try {
-
     // === MENSAJE INICIAL ===
     if (msg === "start" || session.step === "start") {
       session.step = "ask_participation";
@@ -67,17 +66,14 @@ router.post("/chatbot", async (req, res) => {
         return res.json({ sessionId: sid, reply: "¡Excelente! 😊 ¿Cómo te gustaría que te llame?" });
       }
       if (msg === "no_participar" || msg === "no") {
-        session.step = "ask_socials";
+        session.step = "no_participate_socials";
         await session.save();
         const aiText = await getChatbotResponse("Usuario no participará, invítalo a conocer servicios y recursos.");
-        return res.json({
-          sessionId: sid,
-          reply: `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+        return res.json({ sessionId: sid, reply: `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
 <div>
 <button class="quick-button" data-option="socials_si">Sí</button>
 <button class="quick-button" data-option="socials_no">No</button>
-</div>`
-        });
+</div>` });
       }
     }
 
@@ -111,9 +107,9 @@ Autorizo el tratamiento de mis datos personales
 
     // === DESPUÉS DE AUTORIZACIÓN ===
     if (session.step === "show_options") {
-      session.step = "ask_socials"; // corregido
-      await session.save();
       const aiText = await getChatbotResponse("Usuario autorizado, invítalo a explorar servicios y redes");
+      session.step = "ask_socials";
+      await session.save();
       return res.json({
         sessionId: sid,
         reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
@@ -124,21 +120,22 @@ Autorizo el tratamiento de mis datos personales
       });
     }
 
-    // === REDES SOCIALES ===
+    // === REDES SOCIALES (SI) ===
     if (msg === "socials_si") {
-      session.step = "after_socials"; // paso intermedio
+      session.step = "socials_followup";
       await session.save();
       return res.json({
         sessionId: sid,
-        reply: `¡Genial! 😄 Aquí están nuestras redes sociales:<br><br>${generateButtonsHTML(socialButtons)}
-<br><br>¿Deseas conocer nuestros servicios y recursos?<br>
+        reply: `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}
+<br><br>¿Te fue útil esta información?<br>
 <div>
-<button class="quick-button" data-option="servicios_si">Sí</button>
-<button class="quick-button" data-option="servicios_no">No</button>
+<button class="quick-button" data-option="util_si">Sí</button>
+<button class="quick-button" data-option="util_no">No</button>
 </div>`
       });
     }
 
+    // === REDES SOCIALES (NO) ===
     if (msg === "socials_no") {
       session.step = "ask_services";
       await session.save();
@@ -152,10 +149,27 @@ Autorizo el tratamiento de mis datos personales
       });
     }
 
+    // === UTILIDAD REDES SOCIALES ===
+    if (msg === "util_si" || msg === "util_no") {
+      session.step = "ask_services";
+      await session.save();
+      return res.json({
+        sessionId: sid,
+        reply: `¿Deseas conocer nuestros servicios y recursos?<br>
+<div>
+<button class="quick-button" data-option="servicios_si">Sí</button>
+<button class="quick-button" data-option="servicios_no">No</button>
+</div>`
+      });
+    }
+
     // === SERVICIOS ===
     if (msg === "servicios_si") {
       const aiText = await getChatbotResponse("Usuario quiere ver servicios");
-      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}` });
+      return res.json({
+        sessionId: sid,
+        reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}`
+      });
     }
 
     if (msg === "servicios_no") {
@@ -208,7 +222,10 @@ Autorizo el tratamiento de mis datos personales
     const buttonActions = ["boletas_concierto","compras_tienda","adquirir_servicios","voluntariado","donaciones","cartilla"];
     if (buttonActions.includes(msg)) {
       const reply = await getChatbotResponse(msg);
-      return res.json({ sessionId: sid, reply: `${reply}<br><br>¿Deseas explorar algo más?<br>${generateButtonsHTML(serviceButtons,true)}` });
+      return res.json({
+        sessionId: sid,
+        reply: `${reply}<br><br>¿Deseas explorar algo más?<br>${generateButtonsHTML(serviceButtons,true)}`
+      });
     }
 
     // === MENSAJE GENERAL ===
@@ -230,6 +247,7 @@ router.post("/authorize", async (req,res) => {
   session.authorized = true;
   session.step = "show_options";
   await session.save();
+
   const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y redes");
   return res.json({
     reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>

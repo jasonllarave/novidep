@@ -24,9 +24,9 @@ export const getChatbotResponse = async (message) => {
         prompt: 'El usuario pregunta por servicios. Menciona talleres, consultas y recursos de noviolencia.',
         url: 'https://www.colombianoviolenta.org/servicios/'
       },
-      'voluntariado': {
+      'contacto': {
         prompt: 'El usuario quiere ser voluntario. Anímalo a unirse al movimiento de noviolencia.',
-        url: 'https://www.colombianoviolenta.org/voluntariado/'
+        url: 'https://www.colombianoviolenta.org/contacto/'
       },
       'donaciones': {
         prompt: 'El usuario quiere donar. Agradece su apoyo y explica brevemente cómo ayuda.',
