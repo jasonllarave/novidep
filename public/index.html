@@ -7,12 +7,15 @@
   <link rel="stylesheet" href="./index.css" />
 </head>
 <body>
+
+  <!-- BORRAR O COMENTAR ESTO -->
+<!--
   <div class="novi-sign" id="novi-sign">
     Soy Novi, estoy aquí para ayudarte
     <video width="640" height="360" autoplay muted loop>
       <source src="/public/assets/Abre y ora.mp4" type="video/mp4">
     </video>
-  </div>
+  </div>-->
 
   <div class="chat-container" id="chat-container" role="region" aria-label="Chat Novi">
     <div class="chat-header">
@@ -180,6 +183,12 @@
       chatContainer.style.display = "none";
       noviSign.style.display = "block";
     });
+
+    // Iniciar chat automáticamente al cargar
+document.addEventListener("DOMContentLoaded", () => {
+  sendToChatbot("start");
+});
+
   </script>
 </body>
 </html>
