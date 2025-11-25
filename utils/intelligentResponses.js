@@ -285,69 +285,87 @@ export const needsHumanAgent = (message, sentiment) => {
 // Función principal del chatbot
 export const getChatbotResponse = async (message) => {
   try {
-    // 1. Clasificar el tipo de consulta
-    const queryType = classifyQuery(message);
+    const msg = message.toLowerCase();
     
-    // 2. Buscar en la base de conocimiento
-    const kbResult = await searchKnowledgeBase(message);
-    
-    let response = '';
-    let context = {};
-    
-    // 3. Manejar según el tipo de consulta
-    switch (queryType) {
-      case 'productos':
-        const products = await searchProducts(message);
-        context.products = products;
-        if (products.length > 0) {
-          response = formatProductResponse(products);
-        }
+    // Mapeo de keywords a categorías
+    const categoryMap = {
+      'boletas conciertos': ['boletas', 'concierto', 'conciertos', 'entradas'],
+      'tienda': ['tienda', 'comprar', 'productos', 'shop'],
+      'servicios': ['servicios', 'talleres', 'cursos'],
+      'voluntariado': ['voluntariado', 'voluntario', 'participar'],
+      'donaciones': ['donaciones', 'donar', 'apoyo', 'contribuir'],
+      'cartilla': ['cartilla', 'guia', 'material educativo']
+    };
+
+    // Detectar categoría
+    let detectedCategory = null;
+    for (const [category, keywords] of Object.entries(categoryMap)) {
+      if (keywords.some(kw => msg.includes(kw))) {
+        detectedCategory = category;
         break;
-        
-      case 'eventos':
-        const events = await searchEvents();
-        context.events = events;
-        if (events.length > 0) {
-          response = formatEventResponse(events);
-        }
-        break;
-        
-      case 'horarios':
-        response = "Nuestro horario de atención es de lunes a viernes de 9:00 AM a 6:00 PM. ¿En qué más puedo ayudarte?";
-        break;
-        
-      case 'contacto':
-        response = "📞 Puedes contactarnos:\n- WhatsApp: [número]\n- Email: info@colombianoviolenta.org\n- Ubicación: [dirección]\n\n¿Necesitas algo más?";
-        break;
-        
-      default:
-        // Si hay resultado en KB, usarlo
-        if (kbResult) {
-          response = kbResult.answer.text;
-          
-          // Agregar enlaces si los hay
-          if (kbResult.answer.links && kbResult.answer.links.length > 0) {
-            response += "\n\n📎 **Enlaces útiles:**\n";
-            kbResult.answer.links.forEach(link => {
-              response += `- [${link.title}](${link.url})\n`;
-            });
-          }
-        }
-        break;
+      }
     }
-    
-    // 4. Si no hay respuesta específica, usar IA
-    if (!response) {
-      response = await generateAIResponse(message, context);
+
+    // 1. PRIMERO: Usar IA para generar respuesta contextual
+    let aiResponse = '';
+    if (detectedCategory || msg.length > 3) {
+      const context = {};
+      
+      // Buscar productos/eventos si aplica
+      if (msg.includes('producto') || msg.includes('tienda')) {
+        context.products = await searchProducts(msg);
+      }
+      if (msg.includes('evento') || msg.includes('taller')) {
+        context.events = await searchEvents();
+      }
+      
+      // Buscar en Knowledge Base
+      const kbResult = await searchKnowledgeBase(message);
+      if (kbResult) {
+        context.knowledgeBase = kbResult;
+      }
+      
+      aiResponse = await generateAIResponse(message, context);
     }
-    
-    // 5. Verificar si necesita agente humano
-    const escalation = needsHumanAgent(message);
-    if (escalation.escalate) {
-      response += "\n\n⚠️ *Un agente humano revisará tu consulta pronto para ayudarte mejor.*";
+
+    // 2. SEGUNDO: Complementar con links directos según categoría
+    const directLinks = {
+      'boletas conciertos': {
+        title: 'Ver Conciertos y Boletas',
+        url: 'https://www.colombianoviolenta.org/conciertos/'
+      },
+      'tienda': {
+        title: 'Ir a la Tienda',
+        url: 'https://www.colombianoviolenta.org/tienda/'
+      },
+      'servicios': {
+        title: 'Ver Servicios',
+        url: 'https://www.colombianoviolenta.org/servicios/'
+      },
+      'voluntariado': {
+        title: 'Información de Voluntariado',
+        url: 'https://www.colombianoviolenta.org/voluntariado/'
+      },
+      'donaciones': {
+        title: 'Donar Ahora',
+        url: 'https://donorbox.org/colombianoviolenta'
+      },
+      'cartilla': {
+        title: 'Descargar Cartilla',
+        url: 'https://www.colombianoviolenta.org/cartilla/'
+      }
+    };
+
+    // Construir respuesta final
+    let finalResponse = aiResponse || "Déjame ayudarte con eso.";
+
+    // Agregar botón si hay categoría detectada
+    if (detectedCategory && directLinks[detectedCategory]) {
+      const link = directLinks[detectedCategory];
+      finalResponse += `<br><br><button class="quick-button" onclick="window.open('${link.url}', '_blank')">${link.title}</button>`;
     }
-    
-    return response || "Disculpa, no entendí tu pregunta. ¿Podrías reformularla?";
+
+    return finalResponse;
     
   } catch (error) {
     console.error('Error en getChatbotResponse:', error);
