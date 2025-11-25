@@ -11,7 +11,7 @@ const openai = new OpenAI({
  * @param {string} message - Mensaje del usuario o clave de contexto
  * @returns {Promise<string>} - Respuesta del chatbot en HTML
  */
-export const getChatbotResponse = async (message) => {
+export const getChatbotResponse = async (message, sessionContext = {}) => {
   const msg = message.toLowerCase().trim();
 
   // ===================================================
@@ -219,6 +219,19 @@ if (msg.includes("llama") || msg.includes("nombre") || msg.includes("organizacio
 
    // ===================================================
   try {
+    // Construir contexto del usuario
+    let userContext = "";
+    if (sessionContext.name) {
+      userContext = `\n\nCONTEXTO DEL USUARIO:\n- Nombre: ${sessionContext.name}`;
+      if (sessionContext.phone) {
+        userContext += `\n- Teléfono: ${sessionContext.phone}`;
+      }
+      if (sessionContext.authorized) {
+        userContext += `\n- Usuario registrado y autorizado`;
+      }
+      userContext += `\n\nUSA SU NOMBRE cuando sea natural en la conversación.`;
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -242,7 +255,7 @@ INSTRUCCIONES:
 - Incluye emojis apropiados
 - Si mencionas URLs, usa botones HTML: <button class="quick-button" data-url="URL">TEXTO</button>
 - Enfócate en paz, noviolencia y resolución de conflictos
-- Si no sabes algo, recomienda contactar por WhatsApp o web`
+- Si no sabes algo, recomienda contactar por WhatsApp o web${userContext}`
         },
         {
           role: "user",

@@ -304,7 +304,12 @@ if (msg === "especifico_no") {
     }
 
     // === MENSAJE GENERAL (usando IA) ===
-    const reply = await getChatbotResponse(message);
+   const sessionContext = {
+  name: session.name,
+  phone: session.phone,
+  authorized: session.authorized
+};
+const reply = await getChatbotResponse(message, sessionContext);
     res.json({ sessionId: sid, reply });
 
   } catch (err) {
