@@ -55,13 +55,19 @@
     let isSending = false;
 
     function showTyping() {
-      typingIndicator.style.display = "block";
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
+  const typingDiv = document.createElement("div");
+  typingDiv.classList.add("message", "bot-message", "typing-message");
+  typingDiv.innerHTML = `<span></span><span></span><span></span>`;
+  typingDiv.id = "typing-message";
 
-    function hideTyping() {
-      typingIndicator.style.display = "none";
-    }
+  messagesContainer.appendChild(typingDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function hideTyping() {
+  const typingDiv = document.getElementById("typing-message");
+  if (typingDiv) typingDiv.remove();
+}
 
     function activateQuickButtons(container) {
       container.querySelectorAll(".quick-button").forEach(btn => {
