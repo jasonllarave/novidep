@@ -248,7 +248,7 @@ INFORMACIÓN CLAVE:
 - Tienda: www.colombianoviolenta.org/tienda/
 - Conciertos: www.colombianoviolenta.org/conciertos/
 - Donaciones: donorbox.org/colombianoviolenta
-- Ubicación: Bogotá, Colombia
+- Ubicación: Medellin, Barrio: Boston, Colombia
 
 INSTRUCCIONES:
 - Responde en español, amigable y breve (máximo 3-4 líneas)
