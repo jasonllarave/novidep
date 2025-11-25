@@ -156,7 +156,7 @@ Para eventos presenciales, visita nuestros conciertos y ferias donde también ve
   }
 
   // Ubicación / Dirección
-  if ((msg.includes("ubicación") || msg.includes("ubicacion") || msg.includes("dirección") || msg.includes("direccion") || msg.includes("donde") || msg.includes("dónde") || msg.includes("quedan")) && !msg.includes("tienda")) {
+  if ((msg.includes("ubicación") || msg.includes("ubicacion")|| msg.includes("barrio") || msg.includes("ver") || msg.includes("dirección") || msg.includes("direccion") || msg.includes("donde") || msg.includes("dónde") || msg.includes("quedan")) && !msg.includes("tienda")) {
     return `📍 Estamos ubicados en Medellin, Barrio: Boston Colombia:<br><br>
 <button class="quick-button" data-url="https://www.facebook.com/ColombiaNoviolenta/about">📍 Ver ubicación</button><br><br>
 Para conocer la dirección exacta de nuestros eventos y talleres, visita nuestra página web.`;
