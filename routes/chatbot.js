@@ -127,7 +127,7 @@ Autorizo el tratamiento de mis datos personales
       return res.json({
         sessionId: sid,
         reply: `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}
-<br><br>¿Te fue útil esta información?<br>
+<br><br>¿Te fue útil esta información, ${session.name}?<br>
 <div>
 <button class="quick-button" data-option="util_si">Sí</button>
 <button class="quick-button" data-option="util_no">No</button>
@@ -141,7 +141,7 @@ Autorizo el tratamiento de mis datos personales
       await session.save();
       return res.json({
         sessionId: sid,
-        reply: `No hay problema 😊<br>¿Deseas conocer nuestros servicios y recursos?<br>
+        reply: `No hay problema 😊<br>${session.name}, ¿deseas conocer nuestros servicios y recursos?<br>
 <div>
 <button class="quick-button" data-option="servicios_si">Sí</button>
 <button class="quick-button" data-option="servicios_no">No</button>
@@ -150,12 +150,12 @@ Autorizo el tratamiento de mis datos personales
     }
 
     // === UTILIDAD REDES SOCIALES ===
-    if (msg === "util_si" || msg === "util_no") {
+    if (msg === "util_si") {
       session.step = "ask_services";
       await session.save();
       return res.json({
         sessionId: sid,
-        reply: `¿Deseas conocer nuestros servicios y recursos?<br>
+        reply: `${session.name}, ¿deseas conocer nuestros servicios y recursos?<br>
 <div>
 <button class="quick-button" data-option="servicios_si">Sí</button>
 <button class="quick-button" data-option="servicios_no">No</button>
@@ -163,9 +163,20 @@ Autorizo el tratamiento de mis datos personales
       });
     }
 
+    if (msg === "util_no") {
+      session.step = "ask_message";
+      await session.save();
+      return res.json({
+        sessionId: sid,
+        reply: `${session.name}, no hay problema. Por favor escribe tu consulta y con gusto te ayudaré 😊`
+      });
+    }
+
     // === SERVICIOS ===
     if (msg === "servicios_si") {
       const aiText = await getChatbotResponse("Usuario quiere ver servicios");
+      session.step = "after_services";
+      await session.save();
       return res.json({
         sessionId: sid,
         reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}`
@@ -173,49 +184,18 @@ Autorizo el tratamiento de mis datos personales
     }
 
     if (msg === "servicios_no") {
-      session.step = "ask_specific";
+      session.step = "ask_message";
       await session.save();
       return res.json({
         sessionId: sid,
-        reply: `¿Hay algo en específico que quieras consultar?<br>
-<div>
-<button class="quick-button" data-option="consulta_si">Sí</button>
-<button class="quick-button" data-option="consulta_no">No</button>
-</div>`
+        reply: `${session.name}, perfecto. Por favor escribe tu consulta y con gusto te ayudaré 😊`
       });
     }
 
-    // === CONSULTA ESPECÍFICA ===
-    if (msg === "consulta_si") {
-      session.step = "ask_message";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `Perfecto 😊, escribe tu pregunta específica:` });
-    }
-
-    if (msg === "consulta_no") {
-      session.step = "contact_personal";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `¿Deseas que te contactemos personalmente?<br>
-<div>
-<button class="quick-button" data-option="contact_si">Sí</button>
-<button class="quick-button" data-option="contact_no">No</button>
-</div>`
-      });
-    }
-
-    // === CONTACTO PERSONAL ===
-    if (msg === "contact_si") {
-      session.step = "ask_name_contact";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `Por favor escribe tu nombre:` });
-    }
-
-    if (msg === "contact_no") {
-      session.step = "ask_message";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `Escribe tu pregunta específica y con gusto te ayudaré 😊` });
+    // === CONSULTA / MENSAJE ===
+    if (session.step === "ask_message") {
+      // Aquí el usuario escribe su consulta libre
+      return res.json({ sessionId: sid, reply: `Gracias ${session.name}, hemos recibido tu consulta: "${message}". Te responderemos pronto 😊` });
     }
 
     // === BOTONES INTELIGENTES GENERALES (SERVICIOS) ===
