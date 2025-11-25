@@ -188,7 +188,7 @@ Para conocer la dirección exacta de nuestros eventos y talleres, visita nuestra
 
   // Despedidas
   if (msg.includes("adiós") || msg.includes("adios") || msg.includes("chao") || msg.includes("hasta luego") || msg.includes("bye")) {
-    return "¡Hasta pronto! 👋 Que tengas un excelente día. Recuerda que siempre puedes volver si necesitas algo más.";
+    return "¡Hasta pronto! 👋 La no violencia no es pasividad, es una fuerza activa que transforma sin destruir. Recuerda que siempre puedes volver si necesitas algo más.";
   }
 
   // Nombre de la organización
