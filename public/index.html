@@ -7,23 +7,15 @@
   <link rel="stylesheet" href="./index.css" />
 </head>
 <body>
-
-  <!-- BORRAR O COMENTAR ESTO -->
-<!--
-  <div class="novi-sign" id="novi-sign">
-    Soy Novi, estoy aquí para ayudarte
-    <video width="640" height="360" autoplay muted loop>
-      <source src="/public/assets/Abre y ora.mp4" type="video/mp4">
-    </video>
-  </div>-->
-
-  <div class="chat-container" id="chat-container" role="region" aria-label="Chat Novi">
+  
+  <!-- Chat siempre visible -->
+  <div class="chat-container" id="chat-container" role="region" aria-label="Chat Novi" style="display: flex;">
     <div class="chat-header">
       <div>
         <h2>Novi</h2>
         <p>Asistencia para Visitas Colombia Noviolenta</p>
       </div>
-      <button class="minimize-btn" id="minimize-btn">−</button>
+      <button class="minimize-btn" id="minimize-btn" title="Minimizar">−</button>
     </div>
 
     <div class="messages-container" id="messages"></div>
@@ -41,7 +33,6 @@
   </div>
 
   <script>
-    const noviSign = document.getElementById("novi-sign");
     const chatContainer = document.getElementById("chat-container");
     const minimizeBtn = document.getElementById("minimize-btn");
     const messagesContainer = document.getElementById("messages");
@@ -56,6 +47,7 @@
     }
 
     let isSending = false;
+    let chatInitialized = false;
 
     function showTyping() {
       typingIndicator.style.display = "block";
@@ -169,26 +161,39 @@
       }
     };
 
-    sendBtn.addEventListener("click", sendMessage);
-    userInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
-
-    noviSign.addEventListener("click", async () => {
-      chatContainer.style.display = "flex";
-      noviSign.style.display = "none";
-      userInput.focus();
-      await sendToChatbot("start");
-    });
-
+    // Botón minimizar
     minimizeBtn.addEventListener("click", () => {
       chatContainer.style.display = "none";
-      noviSign.style.display = "block";
+      // Si estás en WordPress iframe, puedes enviar mensaje al parent
+      if (window.parent !== window) {
+        window.parent.postMessage({ action: 'closeChat' }, '*');
+      }
     });
 
-    // Iniciar chat automáticamente al cargar
-document.addEventListener("DOMContentLoaded", () => {
-  sendToChatbot("start");
-});
+    // Enviar mensaje
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", e => { 
+      if (e.key === "Enter") sendMessage(); 
+    });
 
+    // 🔥 INICIALIZAR CHAT AUTOMÁTICAMENTE
+    window.addEventListener('load', async () => {
+      // Esperar 300ms para asegurar que todo esté cargado
+      setTimeout(async () => {
+        if (!chatInitialized) {
+          chatInitialized = true;
+          await sendToChatbot("start");
+          userInput.focus();
+        }
+      }, 300);
+    });
+
+    // También detectar parámetro ?init=start
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('init') === 'start' && !chatInitialized) {
+      chatInitialized = true;
+      setTimeout(() => sendToChatbot("start"), 500);
+    }
   </script>
 </body>
 </html>
