@@ -72,7 +72,9 @@ router.get("/excel", async (req, res) => {
         name: item.name,
         phone: item.phone,
         authorized: item.authorized ? "Sí" : "No",
-        createdAt: item.createdAt ? new Date(item.createdAt).toLocaleString() : ""
+        createdAt: item.createdAt
+          ? new Date(item.createdAt).toLocaleString("es-CO")
+          : ""
       });
     });
 

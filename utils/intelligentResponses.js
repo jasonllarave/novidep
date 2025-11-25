@@ -1,9 +1,24 @@
 import express from "express";
 import { Registration } from "../models/Registration.js";
-import { getChatbotResponse } from "../utils/intelligentResponses.js";
 
 const router = express.Router();
 
+// Fallback seguro para getChatbotResponse
+let getChatbotResponse = async (msg) => `Respuesta temporal: ${msg}`;
+
+// Carga dinámica de intelligentResponses.js
+async function loadIntelligentResponses() {
+  try {
+    const mod = await import("../utils/intelligentResponses.js");
+    if (mod.getChatbotResponse) getChatbotResponse = mod.getChatbotResponse;
+    console.log("intelligentResponses.js cargado correctamente");
+  } catch (err) {
+    console.warn("No se pudo cargar intelligentResponses.js, se usará respuesta temporal.", err);
+  }
+}
+loadIntelligentResponses();
+
+// Botones sociales
 const socialButtons = [
   { label: "Instagram", url: "https://www.instagram.com/colombianoviolenta" },
   { label: "Facebook", url: "https://www.facebook.com/ColombiaNoviolenta" },
@@ -13,6 +28,7 @@ const socialButtons = [
   { label: "Spotify", url: "https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu" }
 ];
 
+// Botones de servicios
 const serviceButtons = [
   { label: "🎵 Boletas concierto", key: "boletas_concierto", url: "https://www.colombianoviolenta.org/conciertos/" },
   { label: "🛒 Compras tienda", key: "compras_tienda", url: "https://www.colombianoviolenta.org/tienda/" },
@@ -22,12 +38,14 @@ const serviceButtons = [
   { label: "📖 Cartilla", key: "cartilla", url: "https://www.colombianoviolenta.org/cartilla/" }
 ];
 
+// Función para generar HTML de botones
 const generateButtonsHTML = (buttons, useOptionKey = false) =>
   buttons.map(b => useOptionKey
     ? `<button class="quick-button" data-option="${b.key}" data-url="${b.url}">${b.label}</button>`
     : `<button class="quick-button" data-url="${b.url}">${b.label}</button>`
   ).join(" ");
 
+// === RUTA PRINCIPAL DEL CHATBOT ===
 router.post("/chatbot", async (req, res) => {
   const { message, sessionId } = req.body;
   if (!message) return res.status(400).json({ error: "Mensaje faltante" });
@@ -42,7 +60,6 @@ router.post("/chatbot", async (req, res) => {
   const msg = message.trim().toLowerCase();
 
   try {
-
     // === MENSAJE INICIAL ===
     if (msg === "start" || session.step === "start") {
       session.step = "ask_participation";
@@ -60,12 +77,12 @@ router.post("/chatbot", async (req, res) => {
 
     // === PARTICIPAR / NO PARTICIPAR ===
     if (session.step === "ask_participation") {
-      if (msg === "participar" || msg === "si" || msg === "sí") {
+      if (["participar","si","sí"].includes(msg)) {
         session.step = "ask_name";
         await session.save();
         return res.json({ sessionId: sid, reply: "¡Excelente! 😊 ¿Cómo te gustaría que te llame?" });
       }
-      if (msg === "no_participar" || msg === "no") {
+      if (["no_participar","no"].includes(msg)) {
         session.step = "ask_socials_no_participation";
         await session.save();
         const aiText = await getChatbotResponse("Usuario no participará, invítalo a conocer servicios y recursos.");
@@ -82,9 +99,7 @@ router.post("/chatbot", async (req, res) => {
 
     // === PEDIR NOMBRE ===
     if (session.step === "ask_name") {
-      if (!message || message.length < 2) {
-        return res.json({ sessionId: sid, reply: "Por favor escribe un nombre válido 🙏" });
-      }
+      if (!message || message.length < 2) return res.json({ sessionId: sid, reply: "Por favor escribe un nombre válido 🙏" });
       session.name = message.trim();
       session.step = "ask_phone";
       await session.save();
@@ -94,9 +109,7 @@ router.post("/chatbot", async (req, res) => {
     // === VALIDAR TELÉFONO ===
     if (session.step === "ask_phone") {
       const phone = message.replace(/\D/g, "");
-      if (!/^3\d{9}$/.test(phone)) {
-        return res.json({ sessionId: sid, reply: "Número inválido 😕 Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645" });
-      }
+      if (!/^3\d{9}$/.test(phone)) return res.json({ sessionId: sid, reply: "Número inválido 😕 Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645" });
       session.phone = phone;
       session.step = "ask_authorization";
       await session.save();
@@ -111,14 +124,14 @@ Autorizo el tratamiento de mis datos personales
       });
     }
 
-    // === DESPUÉS DE AUTORIZACIÓN ===
+    // === AUTORIZACIÓN ===
     if (session.step === "show_options") {
       session.step = "after_authorization";
       await session.save();
       const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y redes");
       return res.json({
         sessionId: sid,
-        reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+        reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
 <div>
 <button class="quick-button" data-option="socials_si">Sí</button>
 <button class="quick-button" data-option="socials_no">No</button>
@@ -132,8 +145,7 @@ Autorizo el tratamiento de mis datos personales
       await session.save();
       return res.json({
         sessionId: sid,
-        reply: `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}
-<br><br>¿Te fue útil esta información?<br>
+        reply: `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}<br><br>¿Te fue útil esta información?<br>
 <div>
 <button class="quick-button" data-option="util_si">Sí</button>
 <button class="quick-button" data-option="util_no">No</button>
@@ -171,10 +183,7 @@ Autorizo el tratamiento de mis datos personales
     if (msg === "util_no") {
       session.step = "ask_message";
       await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `Lamento que no te haya sido útil 😕<br>Por favor, escribe tu consulta específica y con gusto te ayudaré.`
-      });
+      return res.json({ sessionId: sid, reply: `Lamento que no te haya sido útil 😕<br>Por favor, escribe tu consulta específica y con gusto te ayudaré.` });
     }
 
     // === SERVICIOS ===
@@ -182,7 +191,7 @@ Autorizo el tratamiento de mis datos personales
       session.step = "after_services";
       await session.save();
       const aiText = await getChatbotResponse("Usuario quiere ver servicios");
-      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}` });
+      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}` });
     }
 
     if (msg === "servicios_no") {
@@ -208,14 +217,17 @@ Autorizo el tratamiento de mis datos personales
     if (msg === "consulta_no") {
       session.step = "ask_satisfaction";
       await session.save();
-      return res.json({ sessionId: sid, reply: `¿Estás satisfecho con nuestra atención?<br>
+      return res.json({
+        sessionId: sid,
+        reply: `¿Estás satisfecho con nuestra atención?<br>
 <div>
 <button class="quick-button" data-option="satisfaccion_si">Sí</button>
 <button class="quick-button" data-option="satisfaccion_no">No</button>
-</div>` });
+</div>`
+      });
     }
 
-    // === CONSULTA MENSAJE ===
+    // === MENSAJE LIBRE ===
     if (session.step === "ask_message") {
       session.step = "ask_satisfaction";
       await session.save();
@@ -242,7 +254,7 @@ Autorizo el tratamiento de mis datos personales
       return res.json({ sessionId: sid, reply: `Lamento que no estés satisfecho 😕<br>Por favor, escribe tu consulta y con gusto te ayudaré.` });
     }
 
-    // === BOTONES INTELIGENTES GENERALES (SERVICIOS) ===
+    // === BOTONES INTELIGENTES ===
     const buttonActions = ["boletas_concierto","compras_tienda","adquirir_servicios","voluntariado","donaciones","cartilla"];
     if (buttonActions.includes(msg)) {
       const reply = await getChatbotResponse(msg);
@@ -251,7 +263,7 @@ Autorizo el tratamiento de mis datos personales
 
     // === MENSAJE GENERAL ===
     const reply = await getChatbotResponse(message);
-    res.json({ sessionId: sid, reply: reply });
+    res.json({ sessionId: sid, reply });
 
   } catch (err) {
     console.error("Chatbot error:", err);
@@ -260,7 +272,7 @@ Autorizo el tratamiento de mis datos personales
 });
 
 // === AUTORIZACIÓN ===
-router.post("/authorize", async (req,res) => {
+router.post("/authorize", async (req, res) => {
   const { sessionId } = req.body;
   const session = await Registration.findOne({ sessionId });
   if (!session) return res.status(400).json({ reply: "Sesión no encontrada" });
@@ -268,7 +280,9 @@ router.post("/authorize", async (req,res) => {
   session.authorized = true;
   session.step = "show_options";
   await session.save();
+
   const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y redes");
+
   return res.json({
     reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
 <div>
