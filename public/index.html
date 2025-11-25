@@ -51,6 +51,16 @@
   const sendBtn = document.getElementById("send-btn");
   const typingIndicator = document.getElementById("typing");
 
+
+  // Detectar si se abrió desde WordPress con ?init=start
+window.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const initMessage = urlParams.get("init");
+  if (initMessage === "start") {
+    sendToChatbot("start"); // envía el mensaje inicial automáticamente
+  }
+});
+
   let SESSION_ID = localStorage.getItem("novi_session_id");
   if (!SESSION_ID) {
     SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10) + "_" + Date.now();
