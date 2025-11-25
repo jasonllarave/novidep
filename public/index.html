@@ -30,7 +30,6 @@
     </div>
 
     <div class="input-container">
-      <div class="quick-buttons" id="quick-buttons" style="display:none"></div>
       <div class="input-wrapper">
         <input type="text" id="user-input" placeholder="Mensaje..." autocomplete="off" />
         <button class="send-button" id="send-btn">➤</button>
@@ -72,10 +71,12 @@
 
           const url = this.getAttribute("data-url");
           if (url) {
-            window.open(url, "_blank"); // abrir link real
+            window.open(url, "_blank");
           } else {
             const option = this.getAttribute("data-option");
-            if (option) {
+            if (option === "authorize") {
+              sendAuthorization();
+            } else if (option) {
               addMessage(this.textContent, true);
               sendToChatbot(option);
             }
@@ -91,14 +92,12 @@
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-      // Activar quick-buttons del mensaje
       setTimeout(() => activateQuickButtons(div), 50);
     }
 
     async function sendToChatbot(message) {
       if (isSending) return;
       isSending = true;
-
       showTyping();
 
       try {
@@ -109,7 +108,6 @@
         });
 
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
         const data = await res.json();
         hideTyping();
 
@@ -118,15 +116,12 @@
           localStorage.setItem("novi_session_id", SESSION_ID);
         }
 
-        if (data.reply) {
-          addMessage(data.reply);
-        } else {
-          addMessage("No recibí respuesta del servidor");
-        }
+        if (data.reply) addMessage(data.reply);
+        else addMessage("No recibí respuesta del servidor");
       } catch (err) {
         hideTyping();
         addMessage("Error: " + err.message);
-        console.error("Error completo:", err);
+        console.error(err);
       } finally {
         isSending = false;
       }
@@ -143,7 +138,7 @@
 
     window.sendAuthorization = async function() {
       const checkbox = document.getElementById("authCheck");
-      if (!checkbox || !checkbox.checked) {
+      if (checkbox && !checkbox.checked) {
         alert("Por favor marca la casilla de autorización");
         return;
       }
@@ -172,7 +167,7 @@
     };
 
     sendBtn.addEventListener("click", sendMessage);
-    userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+    userInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
 
     noviSign.addEventListener("click", async () => {
       chatContainer.style.display = "flex";

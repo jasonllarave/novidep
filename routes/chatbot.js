@@ -5,7 +5,16 @@ import { getChatbotResponse } from "../utils/intelligentResponses.js";
 
 const router = express.Router();
 
-const optionsButtons = [
+const socialButtons = [
+  { label: "Instagram", url: "https://www.instagram.com/colombianoviolenta" },
+  { label: "Facebook", url: "https://www.facebook.com/ColombiaNoviolenta" },
+  { label: "TikTok", url: "https://www.tiktok.com/@colombianoviolenta" },
+  { label: "X", url: "https://x.com/colnoviolenta" },
+  { label: "YouTube", url: "https://www.youtube.com/@parrapapandi" },
+  { label: "Spotify", url: "https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu" }
+];
+
+const serviceButtons = [
   { label: "🎵 Boletas concierto", key: "boletas_concierto", url: "https://www.colombianoviolenta.org/conciertos/" },
   { label: "🛒 Compras tienda", key: "compras_tienda", url: "https://www.colombianoviolenta.org/tienda/" },
   { label: "📋 Servicios", key: "adquirir_servicios", url: "https://www.colombianoviolenta.org/servicios/" },
@@ -14,21 +23,26 @@ const optionsButtons = [
   { label: "📖 Cartilla", key: "cartilla", url: "https://www.colombianoviolenta.org/cartilla/" }
 ];
 
-const generateButtonsHTML = () =>
-  optionsButtons.map(o => `<button class="quick-button" data-option="${o.key}" data-url="${o.url}">${o.label}</button>`).join(" ");
+const generateButtonsHTML = (buttons, useOptionKey = false) =>
+  buttons.map(b => useOptionKey
+    ? `<button class="quick-button" data-option="${b.key}" data-url="${b.url}">${b.label}</button>`
+    : `<button class="quick-button" data-url="${b.url}">${b.label}</button>`
+  ).join(" ");
 
 router.post("/chatbot", async (req, res) => {
   const { message, sessionId } = req.body;
   if (!message) return res.status(400).json({ error: "Mensaje faltante" });
 
   const sid = sessionId || `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-  try {
-    const msg = message.trim().toLowerCase();
-    let session = await Registration.findOne({ sessionId: sid });
+  let session = await Registration.findOne({ sessionId: sid });
 
-    if (!session) {
-      session = await Registration.create({ sessionId: sid, step: "start", name: null, phone: null, authorized: false });
-    }
+  if (!session) {
+    session = await Registration.create({ sessionId: sid, step: "start", name: null, phone: null, authorized: false });
+  }
+
+  const msg = message.trim().toLowerCase();
+
+  try {
 
     // === MENSAJE INICIAL ===
     if (msg === "start" || session.step === "start") {
@@ -36,16 +50,16 @@ router.post("/chatbot", async (req, res) => {
       await session.save();
       return res.json({
         sessionId: sid,
-        reply: `¡Hola! Soy <strong>Novi</strong>, el asistente virtual de Colombia Noviolenta. 🌱<br><br>
+        reply: `¡Hola! Soy <strong>Novi</strong>, asistente virtual de Colombia Noviolenta. 🌱<br>
 ¿Te gustaría participar en uno de nuestros talleres o eventos?<br><br>
-<div style="margin-top:10px;">
-  <button class="quick-button" data-option="participar">Sí, quiero participar</button>
-  <button class="quick-button" data-option="no_participar">No, gracias</button>
+<div>
+<button class="quick-button" data-option="participar">Sí, quiero participar</button>
+<button class="quick-button" data-option="no_participar">No, gracias</button>
 </div>`
       });
     }
 
-    // === PARTICIPACIÓN ===
+    // === PARTICIPAR / NO PARTICIPAR ===
     if (session.step === "ask_participation") {
       if (msg === "participar" || msg === "si" || msg === "sí") {
         session.step = "ask_name";
@@ -53,12 +67,15 @@ router.post("/chatbot", async (req, res) => {
         return res.json({ sessionId: sid, reply: "¡Excelente! 😊 ¿Cómo te gustaría que te llame?" });
       }
       if (msg === "no_participar" || msg === "no") {
-        session.step = "show_options";
+        session.step = "ask_socials";
         await session.save();
-        const aiText = await getChatbotResponse("Usuario no quiere participar, invítalo a conocer servicios y recursos");
-        return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML()}` });
+        const aiText = await getChatbotResponse("Usuario no participará, invítalo a conocer servicios y recursos.");
+        return res.json({ sessionId: sid, reply: `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+<div>
+<button class="quick-button" data-option="socials_si">Sí</button>
+<button class="quick-button" data-option="socials_no">No</button>
+</div>` });
       }
-      return res.json({ sessionId: sid, reply: "Por favor usa los botones para responder 😊" });
     }
 
     // === PEDIR NOMBRE ===
@@ -81,49 +98,122 @@ router.post("/chatbot", async (req, res) => {
       session.phone = phone;
       session.step = "ask_authorization";
       await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `Gracias ${session.name}! ❤️<br><br>
-<label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-  <input type="checkbox" id="authCheck" style="width:20px;height:20px;"> 
-  <span>Autorizo el tratamiento de mis datos personales</span>
+      return res.json({ sessionId: sid, reply: `Gracias ${session.name}! ❤️<br>
+<label>
+<input type="checkbox" id="authCheck"> 
+Autorizo el tratamiento de mis datos personales
 </label><br>
-<button class="quick-button" onclick="sendAuthorization()">✓ Confirmar autorización</button>`
-      });
+<button class="quick-button" onclick="sendAuthorization()">✓ Confirmar autorización</button>` });
     }
 
-    // === DESPUÉS DE AUTORIZACIÓN O NO PARTICIPAR ===
+    // === DESPUÉS DE AUTORIZACIÓN ===
     if (session.step === "show_options") {
-      const aiText = await getChatbotResponse("Usuario quiere explorar servicios y recursos, sugiere opciones y enlaces");
-      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML()}` });
+      const aiText = await getChatbotResponse("Usuario autorizado, invítalo a explorar servicios y recursos");
+      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+<div>
+<button class="quick-button" data-option="socials_si">Sí</button>
+<button class="quick-button" data-option="socials_no">No</button>
+</div>` });
     }
 
-    // === BOTONES INTELIGENTES ===
-    const buttonActions = {
-      boletas_concierto: "boletas_concierto",
-      compras_tienda: "compras_tienda",
-      adquirir_servicios: "adquirir_servicios",
-      voluntariado: "voluntariado",
-      donaciones: "donaciones",
-      cartilla: "cartilla"
-    };
-    if (buttonActions[msg]) {
+    // === REDES SOCIALES ===
+    if (msg === "socials_si") {
+      session.step = "socials_followup";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}
+<br><br>¿Te fue útil esta información?<br>
+<div>
+<button class="quick-button" data-option="util_si">Sí</button>
+<button class="quick-button" data-option="util_no">No</button>
+</div>` });
+    }
+
+    if (msg === "socials_no") {
+      session.step = "ask_services";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `No hay problema 😊<br>¿Deseas conocer nuestros servicios y recursos?<br>
+<div>
+<button class="quick-button" data-option="servicios_si">Sí</button>
+<button class="quick-button" data-option="servicios_no">No</button>
+</div>` });
+    }
+
+    // === UTILIDAD REDES ===
+    if (msg === "util_si" || msg === "util_no") {
+      session.step = "ask_services";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `¿Deseas conocer nuestros servicios y recursos?<br>
+<div>
+<button class="quick-button" data-option="servicios_si">Sí</button>
+<button class="quick-button" data-option="servicios_no">No</button>
+</div>` });
+    }
+
+    // === SERVICIOS ===
+    if (msg === "servicios_si") {
+      const aiText = await getChatbotResponse("Usuario quiere ver servicios");
+      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}` });
+    }
+
+    if (msg === "servicios_no") {
+      session.step = "ask_specific";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `¿Hay algo en específico que quieras consultar?<br>
+<div>
+<button class="quick-button" data-option="consulta_si">Sí</button>
+<button class="quick-button" data-option="consulta_no">No</button>
+</div>` });
+    }
+
+    // === CONSULTA ESPECÍFICA ===
+    if (msg === "consulta_si") {
+      session.step = "ask_message";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `Perfecto 😊, escribe tu pregunta específica:` });
+    }
+
+    if (msg === "consulta_no") {
+      session.step = "contact_personal";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `¿Deseas que te contactemos personalmente?<br>
+<div>
+<button class="quick-button" data-option="contact_si">Sí</button>
+<button class="quick-button" data-option="contact_no">No</button>
+</div>` });
+    }
+
+    // === CONTACTO PERSONAL ===
+    if (msg === "contact_si") {
+      session.step = "ask_name_contact";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `Por favor escribe tu nombre:` });
+    }
+
+    if (msg === "contact_no") {
+      session.step = "ask_message";
+      await session.save();
+      return res.json({ sessionId: sid, reply: `Escribe tu pregunta específica y con gusto te ayudaré 😊` });
+    }
+
+    // === BOTONES INTELIGENTES GENERALES (SERVICIOS) ===
+    const buttonActions = ["boletas_concierto","compras_tienda","adquirir_servicios","voluntariado","donaciones","cartilla"];
+    if (buttonActions.includes(msg)) {
       const reply = await getChatbotResponse(msg);
-      return res.json({ sessionId: sid, reply: `${reply}<br><br>¿Quieres explorar algo más?<br><br>${generateButtonsHTML()}` });
+      return res.json({ sessionId: sid, reply: `${reply}<br><br>¿Deseas explorar algo más?<br>${generateButtonsHTML(serviceButtons,true)}` });
     }
 
-    // === CONSULTA GENERAL ===
+    // === MENSAJE GENERAL ===
     const reply = await getChatbotResponse(message);
-    res.json({ sessionId: sid, reply: `${reply}<br><br>¿Quieres explorar algo más?<br><br>${generateButtonsHTML()}` });
+    res.json({ sessionId: sid, reply: reply });
 
-  } catch (error) {
-    console.error('Error en chatbot:', error);
+  } catch (err) {
+    console.error("Chatbot error:", err);
     res.status(500).json({ error: "Error procesando mensaje" });
   }
 });
 
-// === ENDPOINT AUTORIZACIÓN ===
-router.post("/authorize", async (req, res) => {
+// === AUTORIZACIÓN ===
+router.post("/authorize", async (req,res) => {
   const { sessionId } = req.body;
   const session = await Registration.findOne({ sessionId });
   if (!session) return res.status(400).json({ reply: "Sesión no encontrada" });
@@ -131,9 +221,12 @@ router.post("/authorize", async (req, res) => {
   session.authorized = true;
   session.step = "show_options";
   await session.save();
-
-  const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y recursos");
-  return res.json({ reply: `${aiText}<br><br>${generateButtonsHTML()}` });
+  const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y redes");
+  return res.json({ reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+<div>
+<button class="quick-button" data-option="socials_si">Sí</button>
+<button class="quick-button" data-option="socials_no">No</button>
+</div>` });
 });
 
 export default router;
