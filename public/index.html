@@ -51,71 +51,77 @@
   const sendBtn = document.getElementById("send-btn");
   const typingIndicator = document.getElementById("typing");
 
-
   let SESSION_ID = localStorage.getItem("novi_session_id");
   if (!SESSION_ID) {
     SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10) + "_" + Date.now();
     localStorage.setItem("novi_session_id", SESSION_ID);
   }
 
-// Efecto de escritura que soporta HTML
-function typeWriter(element, htmlText, speed = 20) {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlText;
-  
-  // Si tiene botones o elementos complejos, mostrar directamente
-  if (tempDiv.querySelector('button') || tempDiv.querySelector('div')) {
-    element.innerHTML = htmlText;
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  let isSending = false;
+
+  // Efecto de escritura que soporta HTML
+  function typeWriter(element, htmlText, speed = 20) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlText;
     
-    // Activar eventos de botones
-    element.querySelectorAll(".quick-button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const option = btn.getAttribute("data-option");
-        sendToChatbot(option);
+    // Si tiene botones o elementos complejos, mostrar directamente
+    if (tempDiv.querySelector('button') || tempDiv.querySelector('div')) {
+      element.innerHTML = htmlText;
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      attachButtonEvents(element); // ✅ Activar eventos
+      return;
+    }
+    
+    // Para texto simple, hacer efecto typing
+    const textContent = tempDiv.textContent;
+    let i = 0;
+    element.textContent = "";
+    
+    function type() {
+      if (i < textContent.length) {
+        element.textContent += textContent.charAt(i);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        i++;
+        setTimeout(type, speed);
+      }
+    }
+    
+    type();
+  }
+
+  function attachButtonEvents(container) {
+    container.querySelectorAll(".quick-button").forEach(btn => {
+      // ✅ Remover eventos anteriores
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      
+      // ✅ Agregar evento limpio
+      newBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const option = newBtn.getAttribute("data-option");
+        if (option) {
+          addMessage(newBtn.textContent, true); // Mostrar lo que el usuario clickeó
+          sendToChatbot(option);
+        }
       });
     });
-    return;
   }
-  
-  // Para texto simple, hacer efecto typing
-  const textContent = tempDiv.textContent;
-  let i = 0;
-  element.textContent = "";
-  
-  function type() {
-    if (i < textContent.length) {
-      element.textContent += textContent.charAt(i);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      i++;
-      setTimeout(type, speed);
+
+  function addMessage(content, isUser = false, withTyping = false) {
+    const div = document.createElement("div");
+    div.classList.add("message", isUser ? "user-message" : "bot-message");
+    
+    if (isUser || !withTyping) {
+      div.innerHTML = content;
+      attachButtonEvents(div);
+    } else {
+      typeWriter(div, content);
     }
+    
+    messagesContainer.appendChild(div);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
-  
-  type();
-}
-
-function addMessage(content, isUser = false, withTyping = false) {
-  const div = document.createElement("div");
-  div.classList.add("message", isUser ? "user-message" : "bot-message");
-  
-  if (isUser || !withTyping) {
-    div.innerHTML = content;
-  } else {
-    typeWriter(div, content);
-  }
-  
-  messagesContainer.appendChild(div);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-  // Manejar botones después de agregar
-  div.querySelectorAll(".quick-button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const option = btn.getAttribute("data-option");
-      sendToChatbot(option);
-    });
-  });
-}
 
   function showTyping() {
     typingIndicator.style.display = "block";
@@ -126,48 +132,42 @@ function addMessage(content, isUser = false, withTyping = false) {
     typingIndicator.style.display = "none";
   }
 
-  let isSending = false; // ✅ Agregar esta variable al inicio
+  async function sendToChatbot(message) {
+    if (isSending) return;
+    isSending = true;
+    
+    showTyping();
+    
+    try {
+      const res = await fetch("/api/chatbot/chatbot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, sessionId: SESSION_ID })
+      });
 
-async function sendToChatbot(message) {
-  if (isSending) return; // ✅ Evitar múltiples envíos
-  isSending = true;
-  
-  showTyping();
-  
-  try {
-    const res = await fetch("/api/chatbot/chatbot", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, sessionId: SESSION_ID })
-    });
+      const data = await res.json();
+      hideTyping();
 
-    const data = await res.json();
-    hideTyping();
-
-    if (data.sessionId) {
-      SESSION_ID = data.sessionId;
-      localStorage.setItem("novi_session_id", SESSION_ID);
-    }
-
-    if (data.reply && data.reply.startsWith("OPEN_URL::")) {
-      const url = data.reply.replace("OPEN_URL::", "");
-      window.open(url, "_blank");
-      
-      if (data.continueWith) {
-        setTimeout(() => addMessage(data.continueWith, false, true), 500);
+      if (data.sessionId) {
+        SESSION_ID = data.sessionId;
+        localStorage.setItem("novi_session_id", SESSION_ID);
       }
-    } else {
-      addMessage(data.reply || "No hubo respuesta del servidor", false, true);
-    }
 
-  } catch (err) {
-    hideTyping();
-    addMessage("Error comunicando con el servidor 😥");
-    console.error(err);
-  } finally {
-    isSending = false; // ✅ Liberar el flag
+      if (data.reply) {
+        addMessage(data.reply, false, true);
+      } else {
+        addMessage("No hubo respuesta del servidor");
+      }
+
+    } catch (err) {
+      hideTyping();
+      addMessage("Error comunicando con el servidor 😥");
+      console.error(err);
+    } finally {
+      isSending = false;
+    }
   }
-}
+
   async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
@@ -186,6 +186,9 @@ async function sendToChatbot(message) {
       return;
     }
 
+    if (isSending) return;
+    isSending = true;
+
     showTyping();
 
     try {
@@ -203,6 +206,8 @@ async function sendToChatbot(message) {
       hideTyping();
       addMessage("Error procesando autorización");
       console.error(err);
+    } finally {
+      isSending = false;
     }
   };
 
@@ -224,15 +229,6 @@ async function sendToChatbot(message) {
     chatContainer.style.display = "none";
     noviSign.style.display = "block";
   });
-
-  // Detectar si se abrió desde WordPress con ?init=start
-window.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const initMessage = urlParams.get("init");
-  if (initMessage === "start") {
-    sendToChatbot("start"); // envía el mensaje inicial automáticamente
-  }
-});
 </script>
 
 </body>
