@@ -272,7 +272,7 @@ if (msg === "especifico_no") {
       await session.save();
       return res.json({ 
         sessionId: sid, 
-        reply: `¡Excelente! 🎉 Gracias por usar nuestro servicio. Si necesitas algo más, no dudes en escribirnos nuevamente. ¡Que tengas un excelente día! 🌟` 
+        reply: `¡Excelente! 🎉 Gracias por usar nuestro servicio. Si necesitas algo más, no dudes en escribirnos nuevamente. ¡La no violencia no es pasividad, es una fuerza activa que transforma sin destruir.! 🌟` 
       });
     }
 
