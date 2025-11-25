@@ -66,67 +66,108 @@ export const getChatbotResponse = async (message) => {
   }
 
   // ===================================================
-  // RESPUESTAS BASADAS EN PALABRAS CLAVE
+  // RESPUESTAS BASADAS EN PALABRAS CLAVE CON BOTONES
   // ===================================================
 
   // Conciertos / Eventos / Boletas
   if (msg.includes("concierto") || msg.includes("boleta") || msg.includes("evento") || msg.includes("show")) {
-    return "🎵 Tenemos próximos conciertos y eventos culturales. Puedes ver las fechas y adquirir boletas en nuestra página oficial. ¡Te esperamos!";
+    return `🎵 Tenemos próximos conciertos y eventos culturales:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/conciertos/">🎵 Ver eventos y boletas</button>`;
   }
 
   // Tienda / Compras / Productos
   if (msg.includes("tienda") || msg.includes("comprar") || msg.includes("producto") || msg.includes("merchandising")) {
-    return "🛒 En nuestra tienda oficial encontrarás merchandising, libros y productos que apoyan la causa de la noviolencia. ¡Cada compra hace la diferencia!";
+    return `🛒 En nuestra tienda oficial encontrarás merchandising, libros y productos que apoyan la causa de la noviolencia:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/tienda/">🛒 Ir a la tienda</button>`;
+  }
+
+  // Ubicación tienda física
+  if ((msg.includes("donde") || msg.includes("dónde")) && (msg.includes("tienda") || msg.includes("queda"))) {
+    return `📍 Puedes visitar nuestra tienda online:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/tienda/">🛒 Visitar tienda</button><br><br>
+Para eventos presenciales, visita nuestros conciertos y ferias donde también vendemos productos.`;
   }
 
   // Talleres / Formación / Cursos
   if (msg.includes("taller") || msg.includes("formación") || msg.includes("formacion") || msg.includes("curso") || msg.includes("capacitación") || msg.includes("capacitacion")) {
-    return "📚 Ofrecemos talleres y formaciones en cultura de paz, resolución de conflictos, comunicación noviolenta y manejo de emociones. ¿Te gustaría conocer más?";
+    return `📚 Ofrecemos talleres y formaciones en cultura de paz, resolución de conflictos, comunicación noviolenta y manejo de emociones:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/talleres/">📚 Ver talleres</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">📋 Ver servicios</button>`;
   }
 
   // Voluntariado / Ayudar / Colaborar
   if (msg.includes("voluntario") || msg.includes("ayudar") || msg.includes("colaborar") || msg.includes("unirme") || msg.includes("participar")) {
-    return "🤝 ¡Nos encantaría contar contigo! Puedes unirte a nuestro equipo de voluntarios y ser parte activa del cambio hacia una Colombia más pacífica.";
+    return `🤝 ¡Nos encantaría contar contigo! Puedes unirte a nuestro equipo de voluntarios:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/voluntariado/">🤝 Inscribirme como voluntario</button>`;
   }
 
   // Donaciones / Apoyo / Contribuir
   if (msg.includes("donar") || msg.includes("donación") || msg.includes("donacion") || msg.includes("apoyar") || msg.includes("contribuir") || msg.includes("apoyo")) {
-    return "💝 Tu apoyo es fundamental para continuar nuestro trabajo. Puedes hacer una donación segura que nos ayude a seguir construyendo paz en Colombia. ¡Gracias!";
+    return `💝 Tu apoyo es fundamental para continuar nuestro trabajo:<br><br>
+<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">💝 Hacer una donación</button>`;
   }
 
   // Cartilla / Material educativo
   if (msg.includes("cartilla") || msg.includes("material") || msg.includes("educativo") || msg.includes("guía") || msg.includes("guia") || msg.includes("recurso")) {
-    return "📖 Nuestra cartilla educativa está disponible para descarga gratuita. Es un recurso valioso sobre noviolencia, resolución pacífica de conflictos y construcción de paz.";
+    return `📖 Nuestra cartilla educativa está disponible para descarga gratuita:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 Descargar cartilla</button>`;
   }
 
   // Contacto / Comunicación
   if (msg.includes("contacto") || msg.includes("comunicar") || msg.includes("hablar") || msg.includes("teléfono") || msg.includes("telefono") || msg.includes("correo") || msg.includes("email")) {
-    return "📞 Puedes contactarnos a través de:<br>• WhatsApp: +57 315 790 27 61<br>• Email: info@colombianoviolenta.org<br>• Redes sociales<br>• Web: www.colombianoviolenta.org";
+    return `📞 Puedes contactarnos a través de:<br><br>
+<button class="quick-button" data-url="https://wa.me/573157902761">💬 WhatsApp</button>
+<button class="quick-button" data-url="mailto:info@colombianoviolenta.org">📧 Email</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org">🌐 Sitio web</button>`;
+  }
+
+  // Links / URLs / Página
+  if (msg.includes("link") || msg.includes("url") || msg.includes("página") || msg.includes("pagina") || msg.includes("sitio") || msg.includes("web")) {
+    return `🌐 Nuestra página oficial es:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org">🌐 Visitar sitio web</button>`;
   }
 
   // Servicios generales
   if (msg.includes("servicio") || msg.includes("ofrece") || msg.includes("ofrecen") || msg.includes("hace") || msg.includes("hacen")) {
-    return "🌟 Ofrecemos talleres de paz, formación en resolución de conflictos, eventos culturales, recursos educativos, espacios de voluntariado y mucho más. ¿Qué te interesa conocer?";
+    return `🌟 Ofrecemos talleres de paz, formación en resolución de conflictos, eventos culturales, recursos educativos y más:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">📋 Ver todos los servicios</button>`;
+  }
+
+  // "cuales son" para servicios
+  if ((msg.includes("cuales") || msg.includes("cuáles") || msg.includes("que")) && msg.includes("servicio")) {
+    return `🌟 Ofrecemos varios servicios:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">📋 Ver servicios</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/talleres/">📚 Ver talleres</button>`;
   }
 
   // Horarios
   if (msg.includes("horario") || msg.includes("hora") || msg.includes("abierto") || msg.includes("atiende") || msg.includes("disponible")) {
-    return "🕐 Nuestro horario de atención es:<br>• Lunes a Viernes: 8:00 AM - 6:00 PM<br>• Sábados: 9:00 AM - 2:00 PM<br>• Domingos: Cerrado<br><br>Este chat está disponible 24/7 para ayudarte.";
+    return `🕐 Nuestro horario de atención es:<br><br>
+• <strong>Lunes a Viernes:</strong> 8:00 AM - 6:00 PM<br>
+• <strong>Sábados:</strong> 9:00 AM - 2:00 PM<br>
+• <strong>Domingos:</strong> Cerrado<br><br>
+💬 Este chat está disponible 24/7 para ayudarte.`;
   }
 
   // Ubicación / Dirección
-  if (msg.includes("ubicación") || msg.includes("ubicacion") || msg.includes("dirección") || msg.includes("direccion") || msg.includes("donde") || msg.includes("dónde") || msg.includes("quedan")) {
-    return "📍 Estamos ubicados en Bogotá, Colombia. Para conocer la dirección exacta de nuestros eventos y talleres, visita nuestra página web o contáctanos directamente.";
+  if ((msg.includes("ubicación") || msg.includes("ubicacion") || msg.includes("dirección") || msg.includes("direccion") || msg.includes("donde") || msg.includes("dónde") || msg.includes("quedan")) && !msg.includes("tienda")) {
+    return `📍 Estamos ubicados en Bogotá, Colombia:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/contacto/">📍 Ver ubicación</button><br><br>
+Para conocer la dirección exacta de nuestros eventos y talleres, visita nuestra página web.`;
   }
 
   // Precios / Costos
   if (msg.includes("precio") || msg.includes("costo") || msg.includes("valor") || msg.includes("cuánto") || msg.includes("cuanto") || msg.includes("pagar")) {
-    return "💰 Los precios varían según el servicio o producto:<br>• Algunos talleres y recursos son gratuitos<br>• Consultas y cursos tienen tarifas accesibles<br>• Visita nuestra tienda para ver precios específicos";
+    return `💰 Los precios varían según el servicio o producto:<br>
+• Algunos talleres y recursos son <strong>gratuitos</strong><br>
+• Consultas y cursos tienen tarifas accesibles<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">💰 Ver precios</button>`;
   }
 
   // Paz / Noviolencia
   if (msg.includes("paz") || msg.includes("noviolencia") || msg.includes("noviolenta") || msg.includes("violencia") || msg.includes("conflicto")) {
-    return "🕊️ Colombia Noviolenta trabaja por la construcción de una cultura de paz a través de la educación, el arte y la transformación social. Creemos en resolver los conflictos sin violencia.";
+    return `🕊️ Colombia Noviolenta trabaja por la construcción de una cultura de paz a través de la educación, el arte y la transformación social.<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org">🕊️ Conocer más</button>`;
   }
 
   // Saludos
@@ -146,14 +187,29 @@ export const getChatbotResponse = async (message) => {
 
   // Ayuda
   if (msg.includes("ayuda") || msg.includes("help") || msg.includes("opciones") || msg.includes("qué puedes hacer") || msg.includes("que puedes hacer")) {
-    return "¡Claro! Puedo ayudarte con:<br>• Información sobre talleres y eventos<br>• Servicios de Colombia Noviolenta<br>• Voluntariado y donaciones<br>• Recursos educativos<br>• Contacto y ubicación<br><br>¿Qué te interesa?";
+    return `¡Claro! Puedo ayudarte con:<br>
+• 🎵 Información sobre talleres y eventos<br>
+• 📋 Servicios de Colombia Noviolenta<br>
+• 🤝 Voluntariado y donaciones<br>
+• 📖 Recursos educativos<br>
+• 📞 Contacto y ubicación<br><br>
+¿Qué te interesa?`;
+  }
+
+  // Redes sociales
+  if (msg.includes("redes") || msg.includes("social") || msg.includes("instagram") || msg.includes("facebook") || msg.includes("tiktok") || msg.includes("youtube")) {
+    return `📱 Síguenos en nuestras redes sociales:<br><br>
+<button class="quick-button" data-url="https://www.instagram.com/colombianoviolenta">📷 Instagram</button>
+<button class="quick-button" data-url="https://www.facebook.com/ColombiaNoviolenta">📘 Facebook</button>
+<button class="quick-button" data-url="https://www.tiktok.com/@colombianoviolenta">🎵 TikTok</button>
+<button class="quick-button" data-url="https://www.youtube.com/@parrapapandi">📺 YouTube</button>`;
   }
 
   // ===================================================
   // RESPUESTA POR DEFECTO
   // ===================================================
   
-  return `Gracias por tu mensaje. 😊 Actualmente puedo ayudarte con información sobre:<br>
+  return `Gracias por tu mensaje. 😊 Actualmente puedo ayudarte con información sobre:<br><br>
 • 🎵 Conciertos y eventos<br>
 • 🛒 Nuestra tienda<br>
 • 📚 Talleres y formación<br>
