@@ -183,18 +183,37 @@ Autorizo el tratamiento de mis datos personales
 
     // === SERVICIOS ===
     if (msg === "servicios_si") {
-      session.step = "after_services";
-      await session.save();
-      const aiText = await getChatbotResponse("mostrar_servicios");
-      return res.json({ 
-        sessionId: sid, 
-        reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Estás satisfecho con nuestra atención?<br>
+  session.step = "ask_specific_interest";
+  await session.save();
+  const aiText = await getChatbotResponse("mostrar_servicios");
+  return res.json({ 
+    sessionId: sid, 
+    reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Deseas conocer algo en específico?<br>
 <div>
-<button class="quick-button" data-option="satisfaccion_si">Sí</button>
-<button class="quick-button" data-option="satisfaccion_no">No</button>
+<button class="quick-button" data-option="especifico_si">Sí</button>
+<button class="quick-button" data-option="especifico_no">No</button>
 </div>` 
-      });
-    }
+  });
+}
+
+// Nuevo manejo para "especifico_si"
+if (msg === "especifico_si") {
+  session.step = "ask_message";
+  await session.save();
+  return res.json({ 
+    sessionId: sid, 
+    reply: `Perfecto 😊, escribe tu pregunta:` 
+  });
+}
+
+if (msg === "especifico_no") {
+  session.step = "completed";
+  await session.save();
+  return res.json({ 
+    sessionId: sid, 
+    reply: `¡Genial! 🎉 Gracias por usar nuestro servicio. Si necesitas algo más, escríbeme nuevamente.` 
+  });
+}
 
     if (msg === "servicios_no") {
       session.step = "ask_specific";

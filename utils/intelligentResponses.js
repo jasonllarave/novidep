@@ -185,6 +185,12 @@ Para conocer la dirección exacta de nuestros eventos y talleres, visita nuestra
     return "¡Hasta pronto! 👋 Que tengas un excelente día. Recuerda que siempre puedes volver si necesitas algo más.";
   }
 
+  // Nombre de la organización
+if (msg.includes("llama") || msg.includes("nombre") || msg.includes("organizacion") || msg.includes("organización") || msg.includes("quien") || msg.includes("quién")) {
+  return `🌱 Somos <strong>Colombia Noviolenta</strong>, una organización dedicada a la construcción de paz y cultura noviolenta en Colombia a través de la educación, el arte y la transformación social.<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org">🌐 Conocer más sobre nosotros</button>`;
+}
+
   // Ayuda
   if (msg.includes("ayuda") || msg.includes("help") || msg.includes("opciones") || msg.includes("qué puedes hacer") || msg.includes("que puedes hacer")) {
     return `¡Claro! Puedo ayudarte con:<br>
