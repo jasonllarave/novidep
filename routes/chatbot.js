@@ -70,11 +70,14 @@ router.post("/chatbot", async (req, res) => {
         session.step = "ask_socials";
         await session.save();
         const aiText = await getChatbotResponse("Usuario no participará, invítalo a conocer servicios y recursos.");
-        return res.json({ sessionId: sid, reply: `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+        return res.json({
+          sessionId: sid,
+          reply: `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
 <div>
 <button class="quick-button" data-option="socials_si">Sí</button>
 <button class="quick-button" data-option="socials_no">No</button>
-</div>` });
+</div>`
+        });
       }
     }
 
@@ -108,45 +111,45 @@ Autorizo el tratamiento de mis datos personales
 
     // === DESPUÉS DE AUTORIZACIÓN ===
     if (session.step === "show_options") {
-      const aiText = await getChatbotResponse("Usuario autorizado, invítalo a explorar servicios y recursos");
-      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+      session.step = "ask_socials"; // corregido
+      await session.save();
+      const aiText = await getChatbotResponse("Usuario autorizado, invítalo a explorar servicios y redes");
+      return res.json({
+        sessionId: sid,
+        reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
 <div>
 <button class="quick-button" data-option="socials_si">Sí</button>
 <button class="quick-button" data-option="socials_no">No</button>
-</div>` });
+</div>`
+      });
     }
 
     // === REDES SOCIALES ===
     if (msg === "socials_si") {
-      session.step = "socials_followup";
+      session.step = "after_socials"; // paso intermedio
       await session.save();
-      return res.json({ sessionId: sid, reply: `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}
-<br><br>¿Te fue útil esta información?<br>
+      return res.json({
+        sessionId: sid,
+        reply: `¡Genial! 😄 Aquí están nuestras redes sociales:<br><br>${generateButtonsHTML(socialButtons)}
+<br><br>¿Deseas conocer nuestros servicios y recursos?<br>
 <div>
-<button class="quick-button" data-option="util_si">Sí</button>
-<button class="quick-button" data-option="util_no">No</button>
-</div>` });
+<button class="quick-button" data-option="servicios_si">Sí</button>
+<button class="quick-button" data-option="servicios_no">No</button>
+</div>`
+      });
     }
 
     if (msg === "socials_no") {
       session.step = "ask_services";
       await session.save();
-      return res.json({ sessionId: sid, reply: `No hay problema 😊<br>¿Deseas conocer nuestros servicios y recursos?<br>
+      return res.json({
+        sessionId: sid,
+        reply: `No hay problema 😊<br>¿Deseas conocer nuestros servicios y recursos?<br>
 <div>
 <button class="quick-button" data-option="servicios_si">Sí</button>
 <button class="quick-button" data-option="servicios_no">No</button>
-</div>` });
-    }
-
-    // === UTILIDAD REDES ===
-    if (msg === "util_si" || msg === "util_no") {
-      session.step = "ask_services";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `¿Deseas conocer nuestros servicios y recursos?<br>
-<div>
-<button class="quick-button" data-option="servicios_si">Sí</button>
-<button class="quick-button" data-option="servicios_no">No</button>
-</div>` });
+</div>`
+      });
     }
 
     // === SERVICIOS ===
@@ -158,11 +161,14 @@ Autorizo el tratamiento de mis datos personales
     if (msg === "servicios_no") {
       session.step = "ask_specific";
       await session.save();
-      return res.json({ sessionId: sid, reply: `¿Hay algo en específico que quieras consultar?<br>
+      return res.json({
+        sessionId: sid,
+        reply: `¿Hay algo en específico que quieras consultar?<br>
 <div>
 <button class="quick-button" data-option="consulta_si">Sí</button>
 <button class="quick-button" data-option="consulta_no">No</button>
-</div>` });
+</div>`
+      });
     }
 
     // === CONSULTA ESPECÍFICA ===
@@ -175,11 +181,14 @@ Autorizo el tratamiento de mis datos personales
     if (msg === "consulta_no") {
       session.step = "contact_personal";
       await session.save();
-      return res.json({ sessionId: sid, reply: `¿Deseas que te contactemos personalmente?<br>
+      return res.json({
+        sessionId: sid,
+        reply: `¿Deseas que te contactemos personalmente?<br>
 <div>
 <button class="quick-button" data-option="contact_si">Sí</button>
 <button class="quick-button" data-option="contact_no">No</button>
-</div>` });
+</div>`
+      });
     }
 
     // === CONTACTO PERSONAL ===
@@ -222,11 +231,13 @@ router.post("/authorize", async (req,res) => {
   session.step = "show_options";
   await session.save();
   const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y redes");
-  return res.json({ reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
+  return res.json({
+    reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
 <div>
 <button class="quick-button" data-option="socials_si">Sí</button>
 <button class="quick-button" data-option="socials_no">No</button>
-</div>` });
+</div>`
+  });
 });
 
 export default router;
