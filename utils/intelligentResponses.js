@@ -1,295 +1,168 @@
-import express from "express";
-import { Registration } from "../models/Registration.js";
+// utils/intelligentResponses.js
 
-const router = express.Router();
+/**
+ * Función principal que genera respuestas inteligentes del chatbot
+ * @param {string} message - Mensaje del usuario o clave de contexto
+ * @returns {Promise<string>} - Respuesta del chatbot en HTML
+ */
+export const getChatbotResponse = async (message) => {
+  const msg = message.toLowerCase().trim();
 
-// Fallback seguro para getChatbotResponse
-let getChatbotResponse = async (msg) => `Respuesta temporal: ${msg}`;
+  // ===================================================
+  // RESPUESTAS PARA CONTEXTOS ESPECÍFICOS DEL FLUJO
+  // ===================================================
 
-// Carga dinámica de intelligentResponses.js
-async function loadIntelligentResponses() {
-  try {
-    const mod = await import("../utils/intelligentResponses.js");
-    if (mod.getChatbotResponse) getChatbotResponse = mod.getChatbotResponse;
-    console.log("intelligentResponses.js cargado correctamente");
-  } catch (err) {
-    console.warn("No se pudo cargar intelligentResponses.js, se usará respuesta temporal.", err);
-  }
-}
-loadIntelligentResponses();
+  const contextResponses = {
+    "usuario_no_participa": 
+      "¡No hay problema! 😊 Aún así, puedes explorar nuestros recursos, servicios y mantenerte conectado con nosotros.",
+    
+    "usuario_autorizado": 
+      "¡Perfecto! 🎉 Ya estás registrado. Ahora puedes explorar todo lo que tenemos para ofrecerte:",
+    
+    "usuario autorizó, invítalo a explorar servicios y redes": 
+      "¡Excelente! 🌟 Gracias por registrarte. Ahora puedes conocer nuestros servicios y recursos:",
+    
+    "usuario no participará, invítalo a conocer servicios y recursos.": 
+      "Está bien, no hay problema. 😊 Te invitamos a explorar nuestros servicios y recursos disponibles:",
+    
+    "mostrar_servicios": 
+      "¡Aquí están nuestros servicios disponibles! 🌟",
+    
+    "usuario quiere ver servicios": 
+      "¡Genial! Estos son los servicios que ofrecemos:"
+  };
 
-// Botones sociales
-const socialButtons = [
-  { label: "Instagram", url: "https://www.instagram.com/colombianoviolenta" },
-  { label: "Facebook", url: "https://www.facebook.com/ColombiaNoviolenta" },
-  { label: "TikTok", url: "https://www.tiktok.com/@colombianoviolenta" },
-  { label: "X", url: "https://x.com/colnoviolenta" },
-  { label: "YouTube", url: "https://www.youtube.com/@parrapapandi" },
-  { label: "Spotify", url: "https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu" }
-];
-
-// Botones de servicios
-const serviceButtons = [
-  { label: "🎵 Boletas concierto", key: "boletas_concierto", url: "https://www.colombianoviolenta.org/conciertos/" },
-  { label: "🛒 Compras tienda", key: "compras_tienda", url: "https://www.colombianoviolenta.org/tienda/" },
-  { label: "📋 Servicios", key: "adquirir_servicios", url: "https://www.colombianoviolenta.org/servicios/" },
-  { label: "🤝 Voluntariado", key: "voluntariado", url: "https://www.colombianoviolenta.org/voluntariado/" },
-  { label: "💝 Donaciones", key: "donaciones", url: "https://donorbox.org/colombianoviolenta" },
-  { label: "📖 Cartilla", key: "cartilla", url: "https://www.colombianoviolenta.org/cartilla/" }
-];
-
-// Función para generar HTML de botones
-const generateButtonsHTML = (buttons, useOptionKey = false) =>
-  buttons.map(b => useOptionKey
-    ? `<button class="quick-button" data-option="${b.key}" data-url="${b.url}">${b.label}</button>`
-    : `<button class="quick-button" data-url="${b.url}">${b.label}</button>`
-  ).join(" ");
-
-// === RUTA PRINCIPAL DEL CHATBOT ===
-router.post("/chatbot", async (req, res) => {
-  const { message, sessionId } = req.body;
-  if (!message) return res.status(400).json({ error: "Mensaje faltante" });
-
-  const sid = sessionId || `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-  let session = await Registration.findOne({ sessionId: sid });
-
-  if (!session) {
-    session = await Registration.create({ sessionId: sid, step: "start", name: null, phone: null, authorized: false });
+  // Buscar respuesta de contexto exacta
+  if (contextResponses[msg]) {
+    return contextResponses[msg];
   }
 
-  const msg = message.trim().toLowerCase();
+  // ===================================================
+  // RESPUESTAS PARA BOTONES DE SERVICIOS
+  // ===================================================
 
-  try {
-    // === MENSAJE INICIAL ===
-    if (msg === "start" || session.step === "start") {
-      session.step = "ask_participation";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `¡Hola! Soy <strong>Novi</strong>, asistente virtual de Colombia Noviolenta. 🌱<br>
-¿Te gustaría participar en uno de nuestros talleres o eventos?<br><br>
-<div>
-<button class="quick-button" data-option="participar">Sí, quiero participar</button>
-<button class="quick-button" data-option="no_participar">No, gracias</button>
-</div>`
-      });
-    }
+  const serviceResponses = {
+    "boletas_concierto": 
+      "🎵 ¡Genial! Puedes adquirir tus boletas para nuestros conciertos haciendo clic en el botón. Encontrarás fechas, lugares y precios disponibles.",
+    
+    "compras_tienda": 
+      "🛒 ¡Excelente elección! En nuestra tienda encontrarás productos oficiales de Colombia Noviolenta. Cada compra apoya nuestra causa por la paz.",
+    
+    "adquirir_servicios": 
+      "📋 Ofrecemos diversos servicios de formación, talleres y acompañamiento en cultura de paz y resolución de conflictos. Explora nuestras opciones.",
+    
+    "voluntariado": 
+      "🤝 ¡Qué maravilloso que quieras ser parte del cambio! En nuestro programa de voluntariado podrás contribuir activamente a construir una Colombia más pacífica.",
+    
+    "donaciones": 
+      "💝 Tu generosidad hace la diferencia. Cada donación nos ayuda a seguir trabajando por la paz y la noviolencia en Colombia. ¡Gracias por tu apoyo!",
+    
+    "cartilla": 
+      "📖 Nuestra cartilla es una herramienta educativa sobre noviolencia y resolución pacífica de conflictos. Descárgala y compártela."
+  };
 
-    // === PARTICIPAR / NO PARTICIPAR ===
-    if (session.step === "ask_participation") {
-      if (["participar","si","sí"].includes(msg)) {
-        session.step = "ask_name";
-        await session.save();
-        return res.json({ sessionId: sid, reply: "¡Excelente! 😊 ¿Cómo te gustaría que te llame?" });
-      }
-      if (["no_participar","no"].includes(msg)) {
-        session.step = "ask_socials_no_participation";
-        await session.save();
-        const aiText = await getChatbotResponse("Usuario no participará, invítalo a conocer servicios y recursos.");
-        return res.json({
-          sessionId: sid,
-          reply: `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
-<div>
-<button class="quick-button" data-option="socials_si">Sí</button>
-<button class="quick-button" data-option="socials_no">No</button>
-</div>`
-        });
-      }
-    }
-
-    // === PEDIR NOMBRE ===
-    if (session.step === "ask_name") {
-      if (!message || message.length < 2) return res.json({ sessionId: sid, reply: "Por favor escribe un nombre válido 🙏" });
-      session.name = message.trim();
-      session.step = "ask_phone";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `Encantado, <strong>${session.name}</strong> 😊<br>Ahora escribe tu número de contacto (10 dígitos, empieza con 3):` });
-    }
-
-    // === VALIDAR TELÉFONO ===
-    if (session.step === "ask_phone") {
-      const phone = message.replace(/\D/g, "");
-      if (!/^3\d{9}$/.test(phone)) return res.json({ sessionId: sid, reply: "Número inválido 😕 Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645" });
-      session.phone = phone;
-      session.step = "ask_authorization";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `Gracias ${session.name}! ❤️<br>
-<label>
-<input type="checkbox" id="authCheck"> 
-Autorizo el tratamiento de mis datos personales
-</label><br>
-<button class="quick-button" onclick="sendAuthorization()">✓ Confirmar autorización</button>`
-      });
-    }
-
-    // === AUTORIZACIÓN ===
-    if (session.step === "show_options") {
-      session.step = "after_authorization";
-      await session.save();
-      const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y redes");
-      return res.json({
-        sessionId: sid,
-        reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
-<div>
-<button class="quick-button" data-option="socials_si">Sí</button>
-<button class="quick-button" data-option="socials_no">No</button>
-</div>`
-      });
-    }
-
-    // === REDES SOCIALES ===
-    if (msg === "socials_si") {
-      session.step = "after_socials";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}<br><br>¿Te fue útil esta información?<br>
-<div>
-<button class="quick-button" data-option="util_si">Sí</button>
-<button class="quick-button" data-option="util_no">No</button>
-</div>`
-      });
-    }
-
-    if (msg === "socials_no") {
-      session.step = "ask_services";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `No hay problema 😊<br>¿Deseas conocer nuestros servicios y recursos?<br>
-<div>
-<button class="quick-button" data-option="servicios_si">Sí</button>
-<button class="quick-button" data-option="servicios_no">No</button>
-</div>`
-      });
-    }
-
-    // === UTILIDAD REDES ===
-    if (msg === "util_si") {
-      session.step = "ask_services";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `¡Me alegra que te haya sido útil! 😊<br>¿Deseas conocer nuestros servicios y recursos?<br>
-<div>
-<button class="quick-button" data-option="servicios_si">Sí</button>
-<button class="quick-button" data-option="servicios_no">No</button>
-</div>`
-      });
-    }
-
-    if (msg === "util_no") {
-      session.step = "ask_message";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `Lamento que no te haya sido útil 😕<br>Por favor, escribe tu consulta específica y con gusto te ayudaré.` });
-    }
-
-    // === SERVICIOS ===
-    if (msg === "servicios_si") {
-      session.step = "after_services";
-      await session.save();
-      const aiText = await getChatbotResponse("Usuario quiere ver servicios");
-      return res.json({ sessionId: sid, reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}` });
-    }
-
-    if (msg === "servicios_no") {
-      session.step = "ask_specific";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `¿Hay algo en específico que quieras consultar?<br>
-<div>
-<button class="quick-button" data-option="consulta_si">Sí</button>
-<button class="quick-button" data-option="consulta_no">No</button>
-</div>`
-      });
-    }
-
-    // === CONSULTA ESPECÍFICA ===
-    if (msg === "consulta_si") {
-      session.step = "ask_message";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `Perfecto 😊, escribe tu pregunta específica:` });
-    }
-
-    if (msg === "consulta_no") {
-      session.step = "ask_satisfaction";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `¿Estás satisfecho con nuestra atención?<br>
-<div>
-<button class="quick-button" data-option="satisfaccion_si">Sí</button>
-<button class="quick-button" data-option="satisfaccion_no">No</button>
-</div>`
-      });
-    }
-
-    // === MENSAJE LIBRE ===
-    if (session.step === "ask_message") {
-      session.step = "ask_satisfaction";
-      await session.save();
-      return res.json({
-        sessionId: sid,
-        reply: `Gracias por tu consulta 😊<br>¿Estás satisfecho con nuestra atención?<br>
-<div>
-<button class="quick-button" data-option="satisfaccion_si">Sí</button>
-<button class="quick-button" data-option="satisfaccion_no">No</button>
-</div>`
-      });
-    }
-
-    // === SATISFACCIÓN ===
-    if (msg === "satisfaccion_si") {
-      session.step = "calificacion";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `¡Excelente! Por favor califica nuestra atención de 1 a 5 estrellas:` });
-    }
-
-    if (msg === "satisfaccion_no") {
-      session.step = "ask_message";
-      await session.save();
-      return res.json({ sessionId: sid, reply: `Lamento que no estés satisfecho 😕<br>Por favor, escribe tu consulta y con gusto te ayudaré.` });
-    }
-
-    // === BOTONES INTELIGENTES ===
-    const buttonActions = ["boletas_concierto","compras_tienda","adquirir_servicios","voluntariado","donaciones","cartilla"];
-    if (buttonActions.includes(msg)) {
-      const reply = await getChatbotResponse(msg);
-      return res.json({ sessionId: sid, reply: `${reply}<br><br>¿Deseas explorar algo más?<br>${generateButtonsHTML(serviceButtons,true)}` });
-    }
-
-    // === MENSAJE GENERAL ===
-    const reply = await getChatbotResponse(message);
-    res.json({ sessionId: sid, reply });
-
-  } catch (err) {
-    console.error("Chatbot error:", err);
-    res.status(500).json({ error: "Error procesando mensaje" });
+  if (serviceResponses[msg]) {
+    return serviceResponses[msg];
   }
-});
 
-// === AUTORIZACIÓN ===
-router.post("/authorize", async (req, res) => {
-  const { sessionId } = req.body;
-  const session = await Registration.findOne({ sessionId });
-  if (!session) return res.status(400).json({ reply: "Sesión no encontrada" });
+  // ===================================================
+  // RESPUESTAS BASADAS EN PALABRAS CLAVE
+  // ===================================================
 
-  session.authorized = true;
-  session.step = "show_options";
-  await session.save();
+  // Conciertos / Eventos / Boletas
+  if (msg.includes("concierto") || msg.includes("boleta") || msg.includes("evento") || msg.includes("show")) {
+    return "🎵 Tenemos próximos conciertos y eventos culturales. Puedes ver las fechas y adquirir boletas en nuestra página oficial. ¡Te esperamos!";
+  }
 
-  const aiText = await getChatbotResponse("Usuario autorizó, invítalo a explorar servicios y redes");
+  // Tienda / Compras / Productos
+  if (msg.includes("tienda") || msg.includes("comprar") || msg.includes("producto") || msg.includes("merchandising")) {
+    return "🛒 En nuestra tienda oficial encontrarás merchandising, libros y productos que apoyan la causa de la noviolencia. ¡Cada compra hace la diferencia!";
+  }
 
-  return res.json({
-    reply: `${aiText}<br><br>${generateButtonsHTML(serviceButtons,true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
-<div>
-<button class="quick-button" data-option="socials_si">Sí</button>
-<button class="quick-button" data-option="socials_no">No</button>
-</div>`
-  });
-});
+  // Talleres / Formación / Cursos
+  if (msg.includes("taller") || msg.includes("formación") || msg.includes("formacion") || msg.includes("curso") || msg.includes("capacitación") || msg.includes("capacitacion")) {
+    return "📚 Ofrecemos talleres y formaciones en cultura de paz, resolución de conflictos, comunicación noviolenta y manejo de emociones. ¿Te gustaría conocer más?";
+  }
 
-export default router;
+  // Voluntariado / Ayudar / Colaborar
+  if (msg.includes("voluntario") || msg.includes("ayudar") || msg.includes("colaborar") || msg.includes("unirme") || msg.includes("participar")) {
+    return "🤝 ¡Nos encantaría contar contigo! Puedes unirte a nuestro equipo de voluntarios y ser parte activa del cambio hacia una Colombia más pacífica.";
+  }
+
+  // Donaciones / Apoyo / Contribuir
+  if (msg.includes("donar") || msg.includes("donación") || msg.includes("donacion") || msg.includes("apoyar") || msg.includes("contribuir") || msg.includes("apoyo")) {
+    return "💝 Tu apoyo es fundamental para continuar nuestro trabajo. Puedes hacer una donación segura que nos ayude a seguir construyendo paz en Colombia. ¡Gracias!";
+  }
+
+  // Cartilla / Material educativo
+  if (msg.includes("cartilla") || msg.includes("material") || msg.includes("educativo") || msg.includes("guía") || msg.includes("guia") || msg.includes("recurso")) {
+    return "📖 Nuestra cartilla educativa está disponible para descarga gratuita. Es un recurso valioso sobre noviolencia, resolución pacífica de conflictos y construcción de paz.";
+  }
+
+  // Contacto / Comunicación
+  if (msg.includes("contacto") || msg.includes("comunicar") || msg.includes("hablar") || msg.includes("teléfono") || msg.includes("telefono") || msg.includes("correo") || msg.includes("email")) {
+    return "📞 Puedes contactarnos a través de:<br>• WhatsApp: +57 315 790 27 61<br>• Email: info@colombianoviolenta.org<br>• Redes sociales<br>• Web: www.colombianoviolenta.org";
+  }
+
+  // Servicios generales
+  if (msg.includes("servicio") || msg.includes("ofrece") || msg.includes("ofrecen") || msg.includes("hace") || msg.includes("hacen")) {
+    return "🌟 Ofrecemos talleres de paz, formación en resolución de conflictos, eventos culturales, recursos educativos, espacios de voluntariado y mucho más. ¿Qué te interesa conocer?";
+  }
+
+  // Horarios
+  if (msg.includes("horario") || msg.includes("hora") || msg.includes("abierto") || msg.includes("atiende") || msg.includes("disponible")) {
+    return "🕐 Nuestro horario de atención es:<br>• Lunes a Viernes: 8:00 AM - 6:00 PM<br>• Sábados: 9:00 AM - 2:00 PM<br>• Domingos: Cerrado<br><br>Este chat está disponible 24/7 para ayudarte.";
+  }
+
+  // Ubicación / Dirección
+  if (msg.includes("ubicación") || msg.includes("ubicacion") || msg.includes("dirección") || msg.includes("direccion") || msg.includes("donde") || msg.includes("dónde") || msg.includes("quedan")) {
+    return "📍 Estamos ubicados en Bogotá, Colombia. Para conocer la dirección exacta de nuestros eventos y talleres, visita nuestra página web o contáctanos directamente.";
+  }
+
+  // Precios / Costos
+  if (msg.includes("precio") || msg.includes("costo") || msg.includes("valor") || msg.includes("cuánto") || msg.includes("cuanto") || msg.includes("pagar")) {
+    return "💰 Los precios varían según el servicio o producto:<br>• Algunos talleres y recursos son gratuitos<br>• Consultas y cursos tienen tarifas accesibles<br>• Visita nuestra tienda para ver precios específicos";
+  }
+
+  // Paz / Noviolencia
+  if (msg.includes("paz") || msg.includes("noviolencia") || msg.includes("noviolenta") || msg.includes("violencia") || msg.includes("conflicto")) {
+    return "🕊️ Colombia Noviolenta trabaja por la construcción de una cultura de paz a través de la educación, el arte y la transformación social. Creemos en resolver los conflictos sin violencia.";
+  }
+
+  // Saludos
+  if (msg.includes("hola") || msg.includes("buenos") || msg.includes("buenas") || msg.includes("hey") || msg.includes("saludos")) {
+    return "¡Hola! 👋 Bienvenido a Colombia Noviolenta. ¿En qué puedo ayudarte hoy?";
+  }
+
+  // Agradecimientos
+  if (msg.includes("gracias") || msg.includes("thank") || msg.includes("agradezco")) {
+    return "¡De nada! 😊 Estoy aquí para ayudarte. Si tienes más preguntas, no dudes en escribirme.";
+  }
+
+  // Despedidas
+  if (msg.includes("adiós") || msg.includes("adios") || msg.includes("chao") || msg.includes("hasta luego") || msg.includes("bye")) {
+    return "¡Hasta pronto! 👋 Que tengas un excelente día. Recuerda que siempre puedes volver si necesitas algo más.";
+  }
+
+  // Ayuda
+  if (msg.includes("ayuda") || msg.includes("help") || msg.includes("opciones") || msg.includes("qué puedes hacer") || msg.includes("que puedes hacer")) {
+    return "¡Claro! Puedo ayudarte con:<br>• Información sobre talleres y eventos<br>• Servicios de Colombia Noviolenta<br>• Voluntariado y donaciones<br>• Recursos educativos<br>• Contacto y ubicación<br><br>¿Qué te interesa?";
+  }
+
+  // ===================================================
+  // RESPUESTA POR DEFECTO
+  // ===================================================
+  
+  return `Gracias por tu mensaje. 😊 Actualmente puedo ayudarte con información sobre:<br>
+• 🎵 Conciertos y eventos<br>
+• 🛒 Nuestra tienda<br>
+• 📚 Talleres y formación<br>
+• 🤝 Voluntariado<br>
+• 💝 Donaciones<br>
+• 📖 Recursos educativos<br>
+• 📞 Contacto<br><br>
+¿En qué puedo ayudarte específicamente?`;
+};
+
+// Exportación adicional para compatibilidad
+export default getChatbotResponse;
