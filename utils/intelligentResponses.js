@@ -1,4 +1,10 @@
 // utils/intelligentResponses.js
+import OpenAI from "openai";
+
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 /**
  * Función principal que genera respuestas inteligentes del chatbot
@@ -211,6 +217,47 @@ if (msg.includes("llama") || msg.includes("nombre") || msg.includes("organizacio
 <button class="quick-button" data-url="https://www.youtube.com/@parrapapandi">📺 YouTube</button>`;
   }
 
+   // ===================================================
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `Eres Novi, asistente virtual de Colombia Noviolenta, una organización dedicada a la construcción de paz en Colombia.
+
+INFORMACIÓN CLAVE:
+- Organización: Colombia Noviolenta
+- Servicios: Talleres de paz, formación en resolución de conflictos, eventos culturales, voluntariado
+- Sitio web: www.colombianoviolenta.org
+- WhatsApp: +57 315 790 27 61
+- Email: info@colombianoviolenta.org
+- Tienda: www.colombianoviolenta.org/tienda/
+- Conciertos: www.colombianoviolenta.org/conciertos/
+- Donaciones: donorbox.org/colombianoviolenta
+- Ubicación: Bogotá, Colombia
+
+INSTRUCCIONES:
+- Responde en español, amigable y breve (máximo 3-4 líneas)
+- Incluye emojis apropiados
+- Si mencionas URLs, usa botones HTML: <button class="quick-button" data-url="URL">TEXTO</button>
+- Enfócate en paz, noviolencia y resolución de conflictos
+- Si no sabes algo, recomienda contactar por WhatsApp o web`
+        },
+        {
+          role: "user",
+          content: message
+        }
+      ],
+      max_tokens: 300,
+      temperature: 0.7
+    });
+
+    return completion.choices[0].message.content;
+    
+  } catch (error) {
+    console.error("Error con OpenAI:", error);
+
   // ===================================================
   // RESPUESTA POR DEFECTO
   // ===================================================
@@ -224,6 +271,7 @@ if (msg.includes("llama") || msg.includes("nombre") || msg.includes("organizacio
 • 📖 Recursos educativos<br>
 • 📞 Contacto<br><br>
 ¿En qué puedo ayudarte específicamente?`;
+  }
 };
 
 // Exportación adicional para compatibilidad
