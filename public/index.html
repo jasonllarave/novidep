@@ -53,74 +53,36 @@
 
   let SESSION_ID = localStorage.getItem("novi_session_id");
   if (!SESSION_ID) {
-    SESSION_ID = "s_" + Math.random().toString(36).slice(2, 10) + "_" + Date.now();
+    SESSION_ID = "s_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
     localStorage.setItem("novi_session_id", SESSION_ID);
   }
 
   let isSending = false;
 
-  // Efecto de escritura que soporta HTML
-  function typeWriter(element, htmlText, speed = 20) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlText;
-    
-    // Si tiene botones o elementos complejos, mostrar directamente
-    if (tempDiv.querySelector('button') || tempDiv.querySelector('div')) {
-      element.innerHTML = htmlText;
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      attachButtonEvents(element); // ✅ Activar eventos
-      return;
-    }
-    
-    // Para texto simple, hacer efecto typing
-    const textContent = tempDiv.textContent;
-    let i = 0;
-    element.textContent = "";
-    
-    function type() {
-      if (i < textContent.length) {
-        element.textContent += textContent.charAt(i);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        i++;
-        setTimeout(type, speed);
-      }
-    }
-    
-    type();
-  }
-
-  function attachButtonEvents(container) {
-    container.querySelectorAll(".quick-button").forEach(btn => {
-      // ✅ Remover eventos anteriores
-      const newBtn = btn.cloneNode(true);
-      btn.parentNode.replaceChild(newBtn, btn);
-      
-      // ✅ Agregar evento limpio
-      newBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const option = newBtn.getAttribute("data-option");
-        if (option) {
-          addMessage(newBtn.textContent, true); // Mostrar lo que el usuario clickeó
-          sendToChatbot(option);
-        }
-      });
-    });
-  }
-
-  function addMessage(content, isUser = false, withTyping = false) {
+  function addMessage(content, isUser = false) {
     const div = document.createElement("div");
     div.classList.add("message", isUser ? "user-message" : "bot-message");
-    
-    if (isUser || !withTyping) {
-      div.innerHTML = content;
-      attachButtonEvents(div);
-    } else {
-      typeWriter(div, content);
-    }
-    
+    div.innerHTML = content;
     messagesContainer.appendChild(div);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // ✅ ESTO ES LO IMPORTANTE - Activar botones correctamente
+    setTimeout(() => {
+      div.querySelectorAll(".quick-button").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const option = this.getAttribute("data-option");
+          
+          if (option) {
+            console.log("Botón clickeado:", option); // Debug
+            addMessage(this.textContent, true);
+            sendToChatbot(option);
+          }
+        });
+      });
+    }, 100);
   }
 
   function showTyping() {
@@ -133,8 +95,13 @@
   }
 
   async function sendToChatbot(message) {
-    if (isSending) return;
+    if (isSending) {
+      console.log("Ya hay un envío en proceso");
+      return;
+    }
+    
     isSending = true;
+    console.log("Enviando mensaje:", message); // Debug
     
     showTyping();
     
@@ -145,7 +112,13 @@
         body: JSON.stringify({ message, sessionId: SESSION_ID })
       });
 
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const data = await res.json();
+      console.log("Respuesta recibida:", data); // Debug
+      
       hideTyping();
 
       if (data.sessionId) {
@@ -154,15 +127,15 @@
       }
 
       if (data.reply) {
-        addMessage(data.reply, false, true);
+        addMessage(data.reply);
       } else {
-        addMessage("No hubo respuesta del servidor");
+        addMessage("No recibí respuesta del servidor");
       }
 
     } catch (err) {
       hideTyping();
-      addMessage("Error comunicando con el servidor 😥");
-      console.error(err);
+      addMessage("Error: " + err.message);
+      console.error("Error completo:", err);
     } finally {
       isSending = false;
     }
@@ -174,11 +147,9 @@
 
     addMessage(message, true);
     userInput.value = "";
-
     await sendToChatbot(message);
   }
 
-  // Función para autorización
   window.sendAuthorization = async function() {
     const checkbox = document.getElementById("authCheck");
     if (!checkbox || !checkbox.checked) {
@@ -188,7 +159,6 @@
 
     if (isSending) return;
     isSending = true;
-
     showTyping();
 
     try {
@@ -200,7 +170,7 @@
 
       const data = await res.json();
       hideTyping();
-      addMessage(data.reply, false, true);
+      addMessage(data.reply);
 
     } catch (err) {
       hideTyping();
@@ -212,7 +182,7 @@
   };
 
   sendBtn.addEventListener("click", sendMessage);
-
+  
   userInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendMessage();
   });
@@ -221,7 +191,6 @@
     chatContainer.style.display = "flex";
     noviSign.style.display = "none";
     userInput.focus();
-
     await sendToChatbot("start");
   });
 
