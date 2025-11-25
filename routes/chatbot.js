@@ -1,15 +1,26 @@
+// routes/chatbot.js
 import express from "express";
 import { Registration } from "../models/Registration.js";
 import { getChatbotResponse } from "../utils/intelligentResponses.js";
 
 const router = express.Router();
 
+// Mapeo de botones con links reales
+const buttonsMap = {
+  boletas_concierto: { text: "🎵 Ver Conciertos", url: "https://www.colombianoviolenta.org/conciertos/" },
+  compras_tienda: { text: "🛒 Ir a la Tienda", url: "https://www.colombianoviolenta.org/tienda/" },
+  adquirir_servicios: { text: "📋 Ver Servicios", url: "https://www.colombianoviolenta.org/servicios/" },
+  voluntariado: { text: "🤝 Únete como Voluntario", url: "https://www.colombianoviolenta.org/voluntariado/" },
+  donaciones: { text: "💝 Donar Ahora", url: "https://donorbox.org/colombianoviolenta" },
+  cartilla: { text: "📖 Descargar Cartilla", url: "https://www.colombianoviolenta.org/cartilla/" }
+};
+
+const buttonActions = Object.keys(buttonsMap);
+
 router.post("/chatbot", async (req, res) => {
   const { message, sessionId } = req.body;
 
-  if (!message) {
-    return res.status(400).json({ error: "Mensaje faltante" });
-  }
+  if (!message) return res.status(400).json({ error: "Mensaje faltante" });
 
   const sid = sessionId || `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
@@ -24,273 +35,116 @@ router.post("/chatbot", async (req, res) => {
         step: "start",
         name: null,
         phone: null,
-        authorized: false
+        authorized: false,
+        shownButtons: []
       });
     }
 
-    // === MENSAJE INICIAL ===
+    // === INICIO ===
     if (msg === "start" || session.step === "start") {
       session.step = "ask_participation";
       await session.save();
 
       return res.json({
         sessionId: sid,
-        reply: `¡Hola! Soy <strong>Novi</strong>, el asistente virtual de Colombia Noviolenta. 🌱<br><br>
-Estoy aquí para ayudarte. Actualmente nuestra organización hace talleres, eventos y recursos para promover la cultura de la Noviolencia.<br><br>
-¿Te gustaría participar en uno de ellos?<br><br>
-<div style="margin-top:10px;">
-  <button class="quick-button" data-option="participar">Sí, quiero participar</button>
-  <button class="quick-button" data-option="no_participar">No, gracias</button>
-</div>`
+        reply: `¡Hola! Soy <strong>Novi</strong>, el asistente virtual de Colombia Noviolenta. 🌱<br>
+¿Te gustaría participar en uno de nuestros talleres o eventos?<br><br>
+<button class="quick-button" data-option="participar">Sí, quiero participar</button>
+<button class="quick-button" data-option="no_participar">No, gracias</button>`
       });
     }
 
-    // === PARTICIPAR ===
+    // === PARTICIPACIÓN ===
     if (session.step === "ask_participation") {
       if (msg === "participar" || msg === "si" || msg === "sí") {
         session.step = "ask_name";
         await session.save();
-        return res.json({
-          sessionId: sid,
-          reply: "¡Excelente! 😊 ¿Cómo te gustaría que te llame?"
-        });
+        return res.json({ sessionId: sid, reply: "¡Excelente! 😊 ¿Cómo te gustaría que te llame?" });
       }
 
       if (msg === "no_participar" || msg === "no") {
         session.step = "ask_useful_no_participation";
         await session.save();
-
         return res.json({
           sessionId: sid,
-          reply: `Perfecto 👍<br><br>
-Te invito a seguirnos en nuestras redes sociales:<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" onclick="window.open('https://www.instagram.com/colombianoviolenta', '_blank')">Instagram</button>
-  <button class="quick-button" onclick="window.open('https://www.facebook.com/ColombiaNoviolenta', '_blank')">Facebook</button>
-  <button class="quick-button" onclick="window.open('https://www.tiktok.com/@colombianoviolenta', '_blank')">TikTok</button>
-  <button class="quick-button" onclick="window.open('https://x.com/colnoviolenta', '_blank')">X</button>
-  <button class="quick-button" onclick="window.open('https://www.youtube.com/@parrapapandi', '_blank')">YouTube</button>
-  <button class="quick-button" onclick="window.open('https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu', '_blank')">Spotify</button>
-</div><br><br>
-¿Te fue útil esta información?<br><br>
-<button class="quick-button" data-option="util_si">Sí</button>
-<button class="quick-button" data-option="util_no">No</button>`
+          reply: `Perfecto 👍<br>Te invito a seguirnos en nuestras redes:<br><br>
+<button class="quick-button" data-url="https://www.instagram.com/colombianoviolenta">Instagram</button>
+<button class="quick-button" data-url="https://www.facebook.com/ColombiaNoviolenta">Facebook</button>`
         });
       }
 
-      return res.json({
-        sessionId: sid,
-        reply: "Por favor, usa los botones para responder 😊"
-      });
+      return res.json({ sessionId: sid, reply: "Por favor, usa los botones para responder 😊" });
     }
 
     // === PEDIR NOMBRE ===
     if (session.step === "ask_name") {
       if (!message || message.length < 2) {
-        return res.json({
-          sessionId: sid,
-          reply: "Por favor escribe un nombre válido 🙏"
-        });
+        return res.json({ sessionId: sid, reply: "Por favor escribe un nombre válido 🙏" });
       }
 
       session.name = message.trim();
       session.step = "ask_phone";
       await session.save();
-
-      return res.json({
-        sessionId: sid,
-        reply: `Encantado, <strong>${session.name}</strong> 😊<br>Ahora escribe tu número de contacto (10 dígitos, empieza con 3):`
-      });
+      return res.json({ sessionId: sid, reply: `Encantado, <strong>${session.name}</strong> 😊<br>Ahora escribe tu número de contacto (10 dígitos, empieza con 3):` });
     }
 
     // === VALIDAR TELÉFONO ===
     if (session.step === "ask_phone") {
       const phone = message.replace(/\D/g, "");
-      const valid = /^3\d{9}$/.test(phone);
-
-      if (!valid) {
-        return res.json({
-          sessionId: sid,
-          reply: "Número inválido 😕<br>Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645"
-        });
+      if (!/^3\d{9}$/.test(phone)) {
+        return res.json({ sessionId: sid, reply: "Número inválido 😕<br>Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645" });
       }
 
       session.phone = phone;
       session.step = "ask_authorization";
       await session.save();
-
       return res.json({
         sessionId: sid,
-        reply: `Gracias ${session.name}! ❤️<br><br>
-Antes de continuar, necesito tu autorización:<br><br>
-<label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-  <input type="checkbox" id="authCheck" style="width:20px;height:20px;"> 
-  <span>Autorizo el tratamiento de mis datos personales</span>
-</label><br>
+        reply: `Gracias ${session.name}! ❤️<br>
+<label><input type="checkbox" id="authCheck"> Autorizo el tratamiento de mis datos personales</label><br>
 <button class="quick-button" onclick="sendAuthorization()">✓ Confirmar autorización</button>`
       });
     }
 
-    // === DESPUÉS DE AUTORIZACIÓN (TANTO SI COMO NO) ===
-    if (session.step === "show_options") {
-      return res.json({
-        sessionId: sid,
-        reply: `Escribe tu pregunta o también puedes consultar sobre:<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
-  <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
-  <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
-  <button class="quick-button" data-option="voluntariado">🤝 Voluntariado</button>
-  <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
-  <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
-</div>`
-      });
-    }
+    // === BOTONES CON LINK REAL ===
+    if (buttonActions.includes(msg)) {
+      if (!session.shownButtons) session.shownButtons = [];
 
-    // === ¿FUE ÚTIL? (PARA QUIEN DIJO NO A PARTICIPAR) ===
-    if (session.step === "ask_useful_no_participation") {
-      if (msg === "util_si") {
-        session.step = "ask_services";
+      if (!session.shownButtons.includes(msg)) {
+        session.shownButtons.push(msg);
         await session.save();
 
-        return res.json({
-          sessionId: sid,
-          reply: `¡Qué bueno! 😊<br><br>¿Te gustaría conocer nuestros servicios?<br><br>
-<button class="quick-button" data-option="servicios_si">Sí</button>
-<button class="quick-button" data-option="servicios_no">No</button>`
-        });
+        const aiText = await getChatbotResponse(msg);
+        const btnHTML = `<br><br><button class="quick-button" data-url="${buttonsMap[msg].url}">${buttonsMap[msg].text}</button>`;
+        return res.json({ sessionId: sid, reply: aiText + btnHTML });
+      } else {
+        const aiText = await getChatbotResponse(msg);
+        return res.json({ sessionId: sid, reply: aiText });
       }
-
-      if (msg === "util_no") {
-        session.step = "show_options";
-        await session.save();
-
-        return res.json({
-          sessionId: sid,
-          reply: `De acuerdo 😊<br><br>Escribe tu pregunta o también puedes consultar sobre:<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
-  <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
-  <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
-  <button class="quick-button" data-option="voluntariado">🤝 Voluntariado</button>
-  <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
-  <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
-</div>`
-        });
-      }
-    }
-
-    // === ¿QUIERES SERVICIOS? ===
-    if (session.step === "ask_services") {
-      if (msg === "servicios_si") {
-        const reply = await getChatbotResponse("servicios");
-        session.step = "show_options";
-        await session.save();
-        
-        return res.json({ 
-          sessionId: sid, 
-          reply: reply + `<br><br>¿Te gustaría consultar algo más?<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
-  <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
-  <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
-  <button class="quick-button" data-option="voluntariado">🤝 Voluntariado</button>
-  <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
-  <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
-</div>` 
-        });
-      }
-
-      if (msg === "servicios_no") {
-        session.step = "show_options";
-        await session.save();
-
-        return res.json({
-          sessionId: sid,
-          reply: `De acuerdo 😊<br><br>Escribe tu pregunta o también puedes consultar sobre:<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
-  <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
-  <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
-  <button class="quick-button" data-option="voluntariado">🤝 Voluntariado</button>
-  <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
-  <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
-</div>`
-        });
-      }
-    }
-
-    // === BOTONES INTELIGENTES ===
-    const buttonActions = {
-      boletas_concierto: "boletas conciertos",
-      compras_tienda: "tienda",
-      adquirir_servicios: "servicios",
-      voluntariado: "voluntariado",
-      donaciones: "donaciones",
-      cartilla: "cartilla"
-    };
-
-    if (buttonActions[msg]) {
-      const reply = await getChatbotResponse(buttonActions[msg]);
-      return res.json({ 
-        sessionId: sid, 
-        reply: reply + `<br><br>¿Te gustaría consultar algo más?<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
-  <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
-  <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
-  <button class="quick-button" data-option="voluntariado">🤝 Voluntariado</button>
-  <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
-  <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
-</div>` 
-      });
     }
 
     // === CONSULTA GENERAL ===
     const reply = await getChatbotResponse(message);
-    res.json({ 
-      sessionId: sid, 
-      reply: reply + `<br><br>¿Te gustaría consultar algo más?<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
-  <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
-  <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
-  <button class="quick-button" data-option="voluntariado">🤝 Voluntariado</button>
-  <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
-  <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
-</div>` 
-    });
-
-  } catch (error) {
-    console.error('Error en chatbot:', error);
+    res.json({ sessionId: sid, reply });
+  } catch (err) {
+    console.error("Error en chatbot:", err);
     res.status(500).json({ error: "Error procesando mensaje" });
   }
 });
 
-// === ENDPOINT AUTORIZACIÓN ===
+// === AUTORIZACIÓN ===
 router.post("/authorize", async (req, res) => {
   const { sessionId } = req.body;
-
   const session = await Registration.findOne({ sessionId });
-  if (!session) {
-    return res.status(400).json({ reply: "Sesión no encontrada" });
-  }
+  if (!session) return res.status(400).json({ reply: "Sesión no encontrada" });
 
   session.authorized = true;
   session.step = "show_options";
   await session.save();
 
   return res.json({
-    reply: `¡Gracias <strong>${session.name}</strong>! 🙌<br>Tus datos fueron registrados correctamente.<br><br>
-Escribe tu pregunta o también puedes consultar sobre:<br><br>
-<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
-  <button class="quick-button" data-option="boletas_concierto">🎵 Boletas concierto</button>
-  <button class="quick-button" data-option="compras_tienda">🛒 Compras tienda</button>
-  <button class="quick-button" data-option="adquirir_servicios">📋 Servicios</button>
-  <button class="quick-button" data-option="voluntariado">🤝 Voluntariado</button>
-  <button class="quick-button" data-option="donaciones">💝 Donaciones</button>
-  <button class="quick-button" data-option="cartilla">📖 Cartilla</button>
-</div>`
+    reply: `¡Gracias <strong>${session.name}</strong>! 🙌<br>Tus datos fueron registrados.<br>
+Escribe tu pregunta o consulta nuestros servicios.<br>`
   });
 });
 

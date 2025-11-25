@@ -1,86 +1,73 @@
-import { KnowledgeBase } from '../models/KnowledgeBase.js';
-import { Product } from '../models/Product.js';
-import { Event } from '../models/Event.js';
-import OpenAI from 'openai';
+// utils/intelligentResponses.js
+import OpenAI from "openai";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export const getChatbotResponse = async (message) => {
   try {
     const msg = message.toLowerCase();
 
-    // Respuestas directas con IA
+    // Opciones con respuesta específica y link
     const responses = {
       'boletas_concierto': {
-        prompt: 'El usuario pregunta por boletas de conciertos. Responde de manera amigable invitándolo a ver los próximos eventos.',
-        button: { text: '🎵 Ver Conciertos', url: 'https://www.colombianoviolenta.org/conciertos/' }
+        prompt: 'El usuario pregunta por boletas de conciertos. Responde de manera breve, amigable, y menciona próximos eventos de Colombia Noviolenta.',
+        url: 'https://www.colombianoviolenta.org/conciertos/'
       },
       'compras_tienda': {
-        prompt: 'El usuario quiere comprar en la tienda. Responde invitándolo a conocer nuestros productos de noviolencia.',
-        button: { text: '🛒 Ir a la Tienda', url: 'https://www.colombianoviolenta.org/tienda/' }
+        prompt: 'El usuario quiere comprar en la tienda. Responde invitando a conocer productos de noviolencia.',
+        url: 'https://www.colombianoviolenta.org/tienda/'
       },
       'adquirir_servicios': {
-        prompt: 'El usuario pregunta por servicios. Responde mencionando talleres, consultas y recursos de noviolencia.',
-        button: { text: '📋 Ver Servicios', url: 'https://www.colombianoviolenta.org/servicios/' }
+        prompt: 'El usuario pregunta por servicios. Menciona talleres, consultas y recursos de noviolencia.',
+        url: 'https://www.colombianoviolenta.org/servicios/'
       },
       'voluntariado': {
-        prompt: 'El usuario quiere ser voluntario. Responde animándolo a unirse al movimiento de noviolencia.',
-        button: { text: '🤝 Únete como Voluntario', url: 'https://www.colombianoviolenta.org/voluntariado/' }
+        prompt: 'El usuario quiere ser voluntario. Anímalo a unirse al movimiento de noviolencia.',
+        url: 'https://www.colombianoviolenta.org/voluntariado/'
       },
       'donaciones': {
-        prompt: 'El usuario quiere donar. Agradece su apoyo y explica cómo las donaciones ayudan.',
-        button: { text: '💝 Donar Ahora', url: 'https://donorbox.org/colombianoviolenta' }
+        prompt: 'El usuario quiere donar. Agradece su apoyo y explica brevemente cómo ayuda.',
+        url: 'https://donorbox.org/colombianoviolenta'
       },
       'cartilla': {
-        prompt: 'El usuario quiere la cartilla educativa. Responde invitándolo a descargarla.',
-        button: { text: '📖 Descargar Cartilla', url: 'https://www.colombianoviolenta.org/cartilla/' }
+        prompt: 'El usuario quiere la cartilla educativa. Invítalo a descargarla.',
+        url: 'https://www.colombianoviolenta.org/cartilla/'
       }
     };
 
-    // Verificar si es una opción directa
+    // Si es una opción directa, generamos texto + link
     if (responses[msg]) {
       const option = responses[msg];
-      
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
-            content: `Eres Novi, asistente de Colombia Noviolenta. Sé breve (máximo 2 oraciones), amigable y directo.`
+            content: `Eres Novi, asistente virtual de Colombia Noviolenta. Sé breve, amigable y profesional (2 frases máximo).`
           },
-          {
-            role: "user",
-            content: option.prompt
-          }
+          { role: "user", content: option.prompt }
         ],
         max_tokens: 100,
         temperature: 0.7
       });
 
       const aiText = completion.choices[0].message.content;
-      return `${aiText}<br><br><button class="quick-button" onclick="window.open('${option.button.url}', '_blank')">${option.button.text}</button>`;
+      return `${aiText}<br><br><button class="quick-button" data-url="${option.url}">Ir al enlace</button>`;
     }
 
-    // Para cualquier otra pregunta, usar IA general
+    // Para cualquier otro mensaje, respuesta general
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
           content: `Eres Novi, asistente virtual de Colombia Noviolenta. 
-Somos una organización que promueve la cultura de la Noviolencia.
-Ofrecemos: talleres, eventos, tienda, voluntariado, donaciones y recursos educativos.
-Responde de manera breve, amigable y profesional.`
+Ofrece información breve, amigable y profesional sobre talleres, eventos, voluntariado, donaciones y recursos educativos.`
         },
-        {
-          role: "user",
-          content: message
-        }
+        { role: "user", content: message }
       ],
       max_tokens: 150,
       temperature: 0.7
@@ -88,8 +75,8 @@ Responde de manera breve, amigable y profesional.`
 
     return completion.choices[0].message.content;
 
-  } catch (error) {
-    console.error('Error en getChatbotResponse:', error);
+  } catch (err) {
+    console.error("Error en getChatbotResponse:", err);
     return "Disculpa, tuve un problema. ¿Podrías reformular tu pregunta?";
   }
 };

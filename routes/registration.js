@@ -8,24 +8,29 @@ const router = express.Router();
 
 /**
  * GET /api/registration
- * Lista todos los registros
+ * Lista todos los registros ordenados por fecha descendente
  */
 router.get("/", async (req, res) => {
   try {
-    const list = await Registration.find().sort({ createdAt: -1 });
+    const list = await Registration.find().sort({ createdAt: -1 }).lean();
     res.json(list);
   } catch (err) {
+    console.error("Error obteniendo registros:", err);
     res.status(500).json({ error: "Error obteniendo registros" });
   }
 });
 
 /**
  * GET /api/registration/csv
- * Exporta CSV
+ * Exporta todos los registros en formato CSV
  */
 router.get("/csv", async (req, res) => {
   try {
     const list = await Registration.find().lean();
+    if (!list || list.length === 0) {
+      return res.status(404).json({ error: "No hay registros para exportar" });
+    }
+
     const fields = ["name", "phone", "authorized", "createdAt"];
     const json2csv = new Json2csvParser({ fields });
     const csv = json2csv.parse(list);
@@ -34,38 +39,56 @@ router.get("/csv", async (req, res) => {
     res.attachment("registros.csv");
     return res.send(csv);
   } catch (err) {
-    console.error("CSV Error:", err);
+    console.error("Error generando CSV:", err);
     res.status(500).json({ error: "Error generando CSV" });
   }
 });
 
 /**
  * GET /api/registration/excel
- * Exporta Excel
+ * Exporta todos los registros en formato Excel (.xlsx)
  */
 router.get("/excel", async (req, res) => {
   try {
     const list = await Registration.find().lean();
+    if (!list || list.length === 0) {
+      return res.status(404).json({ error: "No hay registros para exportar" });
+    }
 
-    const wb = new ExcelJS.Workbook();
-    const ws = wb.addWorksheet("Registros");
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Registros");
 
-    ws.columns = [
+    // Definir columnas con encabezados y ancho
+    worksheet.columns = [
       { header: "Nombre", key: "name", width: 25 },
       { header: "Teléfono", key: "phone", width: 15 },
-      { header: "Autorizado", key: "authorized", width: 10 },
+      { header: "Autorizado", key: "authorized", width: 12 },
       { header: "Fecha", key: "createdAt", width: 20 }
     ];
 
-    list.forEach((item) => ws.addRow(item));
+    // Agregar filas
+    list.forEach(item => {
+      worksheet.addRow({
+        name: item.name,
+        phone: item.phone,
+        authorized: item.authorized ? "Sí" : "No",
+        createdAt: item.createdAt ? new Date(item.createdAt).toLocaleString() : ""
+      });
+    });
 
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    res.setHeader("Content-Disposition", "attachment; filename=registros.xlsx");
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=registros.xlsx"
+    );
 
-    await wb.xlsx.write(res);
+    await workbook.xlsx.write(res);
     res.end();
   } catch (err) {
-    console.error("Excel Error:", err);
+    console.error("Error generando Excel:", err);
     res.status(500).json({ error: "Error generando Excel" });
   }
 });

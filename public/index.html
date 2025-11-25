@@ -7,12 +7,11 @@
   <link rel="stylesheet" href="./index.css" />
 </head>
 <body>
-  <div class="novi-sign" id="novi-sign">Soy Novi, estoy aquí para ayudarte
- <video width="640" height="360" autoplay muted loop>
-  <source src="/public/assets/Abre y ora.mp4" type="video/mp4">
-
-  </video>
-
+  <div class="novi-sign" id="novi-sign">
+    Soy Novi, estoy aquí para ayudarte
+    <video width="640" height="360" autoplay muted loop>
+      <source src="/public/assets/Abre y ora.mp4" type="video/mp4">
+    </video>
   </div>
 
   <div class="chat-container" id="chat-container" role="region" aria-label="Chat Novi">
@@ -24,9 +23,7 @@
       <button class="minimize-btn" id="minimize-btn">−</button>
     </div>
 
-    <div class="messages-container" id="messages">
-      <!-- Mensaje inicial se solicitará desde backend al abrir chat -->
-    </div>
+    <div class="messages-container" id="messages"></div>
 
     <div class="typing-indicator" id="typing" style="display:none;">
       <span></span><span></span><span></span>
@@ -34,7 +31,6 @@
 
     <div class="input-container">
       <div class="quick-buttons" id="quick-buttons" style="display:none"></div>
-
       <div class="input-wrapper">
         <input type="text" id="user-input" placeholder="Mensaje..." autocomplete="off" />
         <button class="send-button" id="send-btn">➤</button>
@@ -43,162 +39,152 @@
   </div>
 
   <script>
-  const noviSign = document.getElementById("novi-sign");
-  const chatContainer = document.getElementById("chat-container");
-  const minimizeBtn = document.getElementById("minimize-btn");
-  const messagesContainer = document.getElementById("messages");
-  const userInput = document.getElementById("user-input");
-  const sendBtn = document.getElementById("send-btn");
-  const typingIndicator = document.getElementById("typing");
+    const noviSign = document.getElementById("novi-sign");
+    const chatContainer = document.getElementById("chat-container");
+    const minimizeBtn = document.getElementById("minimize-btn");
+    const messagesContainer = document.getElementById("messages");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const typingIndicator = document.getElementById("typing");
 
-  let SESSION_ID = localStorage.getItem("novi_session_id");
-  if (!SESSION_ID) {
-    SESSION_ID = "s_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
-    localStorage.setItem("novi_session_id", SESSION_ID);
-  }
+    let SESSION_ID = localStorage.getItem("novi_session_id");
+    if (!SESSION_ID) {
+      SESSION_ID = "s_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("novi_session_id", SESSION_ID);
+    }
 
-  let isSending = false;
+    let isSending = false;
 
-  function addMessage(content, isUser = false) {
-    const div = document.createElement("div");
-    div.classList.add("message", isUser ? "user-message" : "bot-message");
-    div.innerHTML = content;
-    messagesContainer.appendChild(div);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    function showTyping() {
+      typingIndicator.style.display = "block";
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
 
-    // ✅ ESTO ES LO IMPORTANTE - Activar botones correctamente
-    setTimeout(() => {
-      div.querySelectorAll(".quick-button").forEach(btn => {
+    function hideTyping() {
+      typingIndicator.style.display = "none";
+    }
+
+    function activateQuickButtons(container) {
+      container.querySelectorAll(".quick-button").forEach(btn => {
         btn.addEventListener("click", function(e) {
           e.preventDefault();
           e.stopPropagation();
-          
-          const option = this.getAttribute("data-option");
-          
-          if (option) {
-            console.log("Botón clickeado:", option); // Debug
-            addMessage(this.textContent, true);
-            sendToChatbot(option);
+
+          const url = this.getAttribute("data-url");
+          if (url) {
+            window.open(url, "_blank"); // abrir link real
+          } else {
+            const option = this.getAttribute("data-option");
+            if (option) {
+              addMessage(this.textContent, true);
+              sendToChatbot(option);
+            }
           }
         });
       });
-    }, 100);
-  }
-
-  function showTyping() {
-    typingIndicator.style.display = "block";
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }
-
-  function hideTyping() {
-    typingIndicator.style.display = "none";
-  }
-
-  async function sendToChatbot(message) {
-    if (isSending) {
-      console.log("Ya hay un envío en proceso");
-      return;
     }
-    
-    isSending = true;
-    console.log("Enviando mensaje:", message); // Debug
-    
-    showTyping();
-    
-    try {
-      const res = await fetch("/api/chatbot/chatbot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, sessionId: SESSION_ID })
-      });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+    function addMessage(content, isUser = false) {
+      const div = document.createElement("div");
+      div.classList.add("message", isUser ? "user-message" : "bot-message");
+      div.innerHTML = content;
+      messagesContainer.appendChild(div);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      // Activar quick-buttons del mensaje
+      setTimeout(() => activateQuickButtons(div), 50);
+    }
+
+    async function sendToChatbot(message) {
+      if (isSending) return;
+      isSending = true;
+
+      showTyping();
+
+      try {
+        const res = await fetch("/api/chatbot/chatbot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message, sessionId: SESSION_ID })
+        });
+
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+        const data = await res.json();
+        hideTyping();
+
+        if (data.sessionId) {
+          SESSION_ID = data.sessionId;
+          localStorage.setItem("novi_session_id", SESSION_ID);
+        }
+
+        if (data.reply) {
+          addMessage(data.reply);
+        } else {
+          addMessage("No recibí respuesta del servidor");
+        }
+      } catch (err) {
+        hideTyping();
+        addMessage("Error: " + err.message);
+        console.error("Error completo:", err);
+      } finally {
+        isSending = false;
+      }
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      addMessage(message, true);
+      userInput.value = "";
+      await sendToChatbot(message);
+    }
+
+    window.sendAuthorization = async function() {
+      const checkbox = document.getElementById("authCheck");
+      if (!checkbox || !checkbox.checked) {
+        alert("Por favor marca la casilla de autorización");
+        return;
       }
 
-      const data = await res.json();
-      console.log("Respuesta recibida:", data); // Debug
-      
-      hideTyping();
+      if (isSending) return;
+      isSending = true;
+      showTyping();
 
-      if (data.sessionId) {
-        SESSION_ID = data.sessionId;
-        localStorage.setItem("novi_session_id", SESSION_ID);
-      }
+      try {
+        const res = await fetch("/api/chatbot/authorize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: SESSION_ID })
+        });
 
-      if (data.reply) {
+        const data = await res.json();
+        hideTyping();
         addMessage(data.reply);
-      } else {
-        addMessage("No recibí respuesta del servidor");
+      } catch (err) {
+        hideTyping();
+        addMessage("Error procesando autorización");
+        console.error(err);
+      } finally {
+        isSending = false;
       }
+    };
 
-    } catch (err) {
-      hideTyping();
-      addMessage("Error: " + err.message);
-      console.error("Error completo:", err);
-    } finally {
-      isSending = false;
-    }
-  }
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
-  async function sendMessage() {
-    const message = userInput.value.trim();
-    if (!message) return;
+    noviSign.addEventListener("click", async () => {
+      chatContainer.style.display = "flex";
+      noviSign.style.display = "none";
+      userInput.focus();
+      await sendToChatbot("start");
+    });
 
-    addMessage(message, true);
-    userInput.value = "";
-    await sendToChatbot(message);
-  }
-
-  window.sendAuthorization = async function() {
-    const checkbox = document.getElementById("authCheck");
-    if (!checkbox || !checkbox.checked) {
-      alert("Por favor marca la casilla de autorización");
-      return;
-    }
-
-    if (isSending) return;
-    isSending = true;
-    showTyping();
-
-    try {
-      const res = await fetch("/api/chatbot/authorize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: SESSION_ID })
-      });
-
-      const data = await res.json();
-      hideTyping();
-      addMessage(data.reply);
-
-    } catch (err) {
-      hideTyping();
-      addMessage("Error procesando autorización");
-      console.error(err);
-    } finally {
-      isSending = false;
-    }
-  };
-
-  sendBtn.addEventListener("click", sendMessage);
-  
-  userInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
-
-  noviSign.addEventListener("click", async () => {
-    chatContainer.style.display = "flex";
-    noviSign.style.display = "none";
-    userInput.focus();
-    await sendToChatbot("start");
-  });
-
-  minimizeBtn.addEventListener("click", () => {
-    chatContainer.style.display = "none";
-    noviSign.style.display = "block";
-  });
-</script>
-
+    minimizeBtn.addEventListener("click", () => {
+      chatContainer.style.display = "none";
+      noviSign.style.display = "block";
+    });
+  </script>
 </body>
 </html>
