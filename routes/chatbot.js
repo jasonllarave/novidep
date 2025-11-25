@@ -20,7 +20,7 @@ router.post("/chatbot", async (req, res) => {
 
     let session = await Registration.findOne({ sessionId: sid });
     
-    console.log("💾 Sesión encontrada:", session ? "SÍ" : "NO"); // ✅ Log
+    console.log("💾 Sesión encontrada:", session ? "SÍ" : "NO"); //  Log
 
     if (!session) {
       session = await Registration.create({
@@ -30,7 +30,7 @@ router.post("/chatbot", async (req, res) => {
         phone: null,
         authorized: false
       });
-      console.log("✅ Nueva sesión creada:", session._id); // ✅ Log
+      console.log("✅ Nueva sesión creada:", session._id); //  Log
     }
     
     // ... resto del código
