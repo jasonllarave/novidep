@@ -8,7 +8,6 @@
 </head>
 <body>
   
-  <!-- Chat siempre visible -->
   <div class="chat-container" id="chat-container" role="region" aria-label="Chat Novi" style="display: flex;">
     <div class="chat-header">
       <div>
@@ -59,22 +58,36 @@
     }
 
     function activateQuickButtons(container) {
-      container.querySelectorAll(".quick-button").forEach(btn => {
-        btn.addEventListener("click", function(e) {
+      // ✅ Primero: botones con data-url (links externos)
+      container.querySelectorAll(".quick-button[data-url]").forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener("click", function(e) {
           e.preventDefault();
           e.stopPropagation();
-
           const url = this.getAttribute("data-url");
-          if (url) {
-            window.open(url, "_blank");
+          console.log("🔗 Abriendo URL:", url);
+          window.open(url, "_blank");
+        });
+      });
+
+      // ✅ Segundo: botones con data-option (flujo conversacional)
+      container.querySelectorAll(".quick-button[data-option]").forEach(btn => {
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const option = this.getAttribute("data-option");
+          console.log("🔘 Opción clickeada:", option);
+          
+          if (option === "authorize") {
+            sendAuthorization();
           } else {
-            const option = this.getAttribute("data-option");
-            if (option === "authorize") {
-              sendAuthorization();
-            } else if (option) {
-              addMessage(this.textContent, true);
-              sendToChatbot(option);
-            }
+            addMessage(this.textContent, true);
+            sendToChatbot(option);
           }
         });
       });
@@ -91,8 +104,13 @@
     }
 
     async function sendToChatbot(message) {
-      if (isSending) return;
+      if (isSending) {
+        console.log("⏳ Ya hay un envío en proceso");
+        return;
+      }
+      
       isSending = true;
+      console.log("📤 Enviando:", message);
       showTyping();
 
       try {
@@ -103,7 +121,9 @@
         });
 
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
         const data = await res.json();
+        console.log("📥 Respuesta:", data);
         hideTyping();
 
         if (data.sessionId) {
@@ -111,12 +131,16 @@
           localStorage.setItem("novi_session_id", SESSION_ID);
         }
 
-        if (data.reply) addMessage(data.reply);
-        else addMessage("No recibí respuesta del servidor");
+        if (data.reply) {
+          addMessage(data.reply);
+        } else {
+          addMessage("⚠️ No recibí respuesta del servidor");
+        }
+        
       } catch (err) {
         hideTyping();
-        addMessage("Error: " + err.message);
-        console.error(err);
+        addMessage("❌ Error: " + err.message);
+        console.error("Error completo:", err);
       } finally {
         isSending = false;
       }
@@ -134,7 +158,7 @@
     window.sendAuthorization = async function() {
       const checkbox = document.getElementById("authCheck");
       if (checkbox && !checkbox.checked) {
-        alert("Por favor marca la casilla de autorización");
+        alert("⚠️ Por favor marca la casilla de autorización");
         return;
       }
 
@@ -154,23 +178,20 @@
         addMessage(data.reply);
       } catch (err) {
         hideTyping();
-        addMessage("Error procesando autorización");
+        addMessage("❌ Error procesando autorización");
         console.error(err);
       } finally {
         isSending = false;
       }
     };
 
-    // Botón minimizar
     minimizeBtn.addEventListener("click", () => {
       chatContainer.style.display = "none";
-      // Si estás en WordPress iframe, puedes enviar mensaje al parent
       if (window.parent !== window) {
         window.parent.postMessage({ action: 'closeChat' }, '*');
       }
     });
 
-    // Enviar mensaje
     sendBtn.addEventListener("click", sendMessage);
     userInput.addEventListener("keypress", e => { 
       if (e.key === "Enter") sendMessage(); 
@@ -178,7 +199,6 @@
 
     // 🔥 INICIALIZAR CHAT AUTOMÁTICAMENTE
     window.addEventListener('load', async () => {
-      // Esperar 300ms para asegurar que todo esté cargado
       setTimeout(async () => {
         if (!chatInitialized) {
           chatInitialized = true;
@@ -188,7 +208,6 @@
       }, 300);
     });
 
-    // También detectar parámetro ?init=start
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('init') === 'start' && !chatInitialized) {
       chatInitialized = true;
