@@ -139,7 +139,7 @@ Autorizo el tratamiento de mis datos personales
 
     // === DESPUÉS DE AUTORIZACIÓN ===
     if (session.step === "show_options") {
-      session.step = "after_authorization";
+      session.step = "ask_socials"; // 🔥 Cambiar a un paso único
       await session.save();
       const aiText = await getChatbotResponse("usuario_autorizado");
       return res.json({
@@ -312,7 +312,8 @@ if (msg === "especifico_no") {
 const reply = await getChatbotResponse(message, sessionContext);
     res.json({ sessionId: sid, reply });
 
-  } catch (err) {
+  }   
+  catch (err) {
     console.error("Error en chatbot:", err);
     res.status(500).json({ 
       error: "Lo siento, ha ocurrido un error. Por favor intenta nuevamente." 
