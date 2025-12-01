@@ -119,6 +119,40 @@ Para eventos presenciales, visita nuestros conciertos y ferias donde también ve
 <button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">📋 Ver servicios</button>`;
   }
 
+
+  // Manejo de opciones numéricas
+if (msg === "1" || msg === "opcion_1") {
+  return `🎵 Tenemos próximos talleres y eventos culturales:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/conciertos/">🎵 Ver eventos</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/talleres/">📚 Ver talleres</button>`;
+}
+
+if (msg === "2" || msg === "opcion_2") {
+  return `📋 Ofrecemos varios servicios:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">📋 Ver todos los servicios</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/talleres/">📚 Ver talleres</button>`;
+}
+
+if (msg === "3" || msg === "opcion_3") {
+  return `🤝 ¡Nos encantaría contar contigo! Puedes unirte a nuestro equipo:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/voluntariado/">🤝 Inscribirme como voluntario</button>
+<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">💝 Hacer una donación</button>`;
+}
+
+if (msg === "4" || msg === "opcion_4") {
+  return `📖 Recursos educativos disponibles:<br><br>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 Descargar cartilla</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/talleres/">📚 Ver talleres</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">📋 Ver servicios</button>`;
+}
+
+if (msg === "5" || msg === "opcion_5") {
+  return `📞 Puedes contactarnos a través de:<br><br>
+<button class="quick-button" data-url="https://wa.me/573157902761">💬 WhatsApp</button>
+<button class="quick-button" data-url="mailto:info@colombianoviolenta.org">📧 Email</button>
+<button class="quick-button" data-url="https://www.colombianoviolenta.org">🌐 Sitio web</button>`;
+}
+
   // Resto de respuestas rápidas (voluntariado, donaciones, redes, etc.)
   // ⬆️ Todas tus respuestas se mantienen intactas — NO se modificó nada
 
@@ -175,16 +209,23 @@ HISTORIAL RECIENTE:
   } catch (error) {
     console.error("Error con OpenAI:", error);
 
-    return `Gracias por tu mensaje. 😊 Actualmente puedo ayudarte con:<br><br>
-• 🎵 Conciertos y eventos<br>
-• 🛒 Nuestra tienda<br>
-• 📚 Talleres y formación<br>
-• 🤝 Voluntariado<br>
-• 💝 Donaciones<br>
-• 📖 Recursos educativos<br>
-• 📞 Contacto<br><br>
-¿En qué puedo ayudarte específicamente?`;
-  }
+   // Ayuda / Opciones
+if (msg.includes("ayuda") || msg.includes("help") || msg.includes("opciones") || msg.includes("qué puedes hacer") || msg.includes("que puedes hacer") || msg.includes("qué tienes") || msg.includes("que tienes")) {
+  return `¡Claro! Puedo ayudarte con:<br><br>
+<strong>1.</strong> 🎵 Información sobre talleres y eventos<br>
+<strong>2.</strong> 📋 Servicios de Colombia Noviolenta<br>
+<strong>3.</strong> 🤝 Voluntariado y donaciones<br>
+<strong>4.</strong> 📖 Recursos educativos<br>
+<strong>5.</strong> 📞 Contacto y ubicación<br><br>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+  <button class="quick-button" data-option="opcion_1">1️⃣ Talleres y eventos</button>
+  <button class="quick-button" data-option="opcion_2">2️⃣ Servicios</button>
+  <button class="quick-button" data-option="opcion_3">3️⃣ Voluntariado</button>
+  <button class="quick-button" data-option="opcion_4">4️⃣ Recursos</button>
+  <button class="quick-button" data-option="opcion_5">5️⃣ Contacto</button>
+</div><br>
+✍️ También puedes escribir el número de la opción (1, 2, 3, etc.)`;
+}
 };
 
 // Exportación adicional para compatibilidad
