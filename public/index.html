@@ -5,6 +5,44 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Novi - colombianoviolenta.org</title>
   <link rel="stylesheet" href="./index.css" />
+  <style>
+    .scroll-to-bottom {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    
+    .scroll-to-bottom:hover {
+      background: #45a049;
+      transform: scale(1.1);
+    }
+    
+    .scroll-to-bottom.show {
+      display: block;
+      animation: bounce 0.5s ease;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .typing-effect {
+      display: inline;
+    }
+  </style>
 </head>
 <body>
   
@@ -23,6 +61,8 @@
       <span></span><span></span><span></span>
     </div>
 
+    <button class="scroll-to-bottom" id="scroll-to-bottom" title="Ir al final">↓</button>
+
     <div class="input-container">
       <div class="input-wrapper">
         <input type="text" id="user-input" placeholder="Mensaje..." autocomplete="off" />
@@ -38,6 +78,7 @@
     const userInput = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
     const typingIndicator = document.getElementById("typing");
+    const scrollToBottomBtn = document.getElementById("scroll-to-bottom");
 
     let SESSION_ID = localStorage.getItem("novi_session_id");
     if (!SESSION_ID) {
@@ -48,14 +89,80 @@
     let isSending = false;
     let chatInitialized = false;
 
+    // ===================================================
+    // FUNCIÓN DE SCROLL AUTOMÁTICO Y BOTÓN
+    // ===================================================
+    
+    function scrollToBottom(smooth = true) {
+      messagesContainer.scrollTo({
+        top: messagesContainer.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
+
+    function checkScrollPosition() {
+      const isNearBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight < 100;
+      
+      if (isNearBottom) {
+        scrollToBottomBtn.classList.remove('show');
+      } else {
+        scrollToBottomBtn.classList.add('show');
+      }
+    }
+
+    messagesContainer.addEventListener('scroll', checkScrollPosition);
+    
+    scrollToBottomBtn.addEventListener('click', () => {
+      scrollToBottom(true);
+    });
+
+    // ===================================================
+    // EFECTO DE ESCRITURA LETRA POR LETRA
+    // ===================================================
+    
+    function typeWriter(element, text, speed = 20) {
+      return new Promise((resolve) => {
+        let i = 0;
+        const container = document.createElement('span');
+        container.className = 'typing-effect';
+        element.appendChild(container);
+        
+        function type() {
+          if (i < text.length) {
+            container.innerHTML += text.charAt(i);
+            i++;
+            
+            // Scroll automático mientras escribe
+            if (i % 5 === 0) {
+              scrollToBottom(false);
+            }
+            
+            setTimeout(type, speed);
+          } else {
+            resolve();
+          }
+        }
+        
+        type();
+      });
+    }
+
+    // ===================================================
+    // FUNCIONES DE INDICADORES
+    // ===================================================
+
     function showTyping() {
       typingIndicator.style.display = "block";
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      scrollToBottom();
     }
 
     function hideTyping() {
       typingIndicator.style.display = "none";
     }
+
+    // ===================================================
+    // ACTIVAR BOTONES
+    // ===================================================
 
     function activateQuickButtons(container) {
       // ✅ Primero: botones con data-url (links externos)
@@ -93,15 +200,45 @@
       });
     }
 
-    function addMessage(content, isUser = false) {
+    // ===================================================
+    // AGREGAR MENSAJE CON EFECTO TYPING
+    // ===================================================
+
+    async function addMessage(content, isUser = false) {
       const div = document.createElement("div");
       div.classList.add("message", isUser ? "user-message" : "bot-message");
-      div.innerHTML = content;
-      messagesContainer.appendChild(div);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      if (isUser) {
+        div.innerHTML = content;
+        messagesContainer.appendChild(div);
+        scrollToBottom();
+      } else {
+        // Efecto de escritura para mensajes del bot
+        messagesContainer.appendChild(div);
+        
+        // Extraer HTML vs texto plano
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        
+        // Si tiene botones o HTML complejo, mostrarlo directo
+        const hasButtons = content.includes('<button') || content.includes('<div');
+        
+        if (hasButtons) {
+          div.innerHTML = content;
+          scrollToBottom();
+        } else {
+          // Efecto typing para texto simple
+          await typeWriter(div, tempDiv.textContent);
+          scrollToBottom();
+        }
+      }
 
       setTimeout(() => activateQuickButtons(div), 50);
     }
+
+    // ===================================================
+    // ENVIAR A CHATBOT
+    // ===================================================
 
     async function sendToChatbot(message) {
       if (isSending) {
@@ -132,28 +269,36 @@
         }
 
         if (data.reply) {
-          addMessage(data.reply);
+          await addMessage(data.reply);
         } else {
-          addMessage("⚠️ No recibí respuesta del servidor");
+          await addMessage("⚠️ No recibí respuesta del servidor");
         }
         
       } catch (err) {
         hideTyping();
-        addMessage("❌ Error: " + err.message);
+        await addMessage("❌ Error: " + err.message);
         console.error("Error completo:", err);
       } finally {
         isSending = false;
       }
     }
 
+    // ===================================================
+    // ENVIAR MENSAJE USUARIO
+    // ===================================================
+
     async function sendMessage() {
       const message = userInput.value.trim();
       if (!message) return;
 
-      addMessage(message, true);
+      await addMessage(message, true);
       userInput.value = "";
       await sendToChatbot(message);
     }
+
+    // ===================================================
+    // AUTORIZACIÓN
+    // ===================================================
 
     window.sendAuthorization = async function() {
       const checkbox = document.getElementById("authCheck");
@@ -175,15 +320,19 @@
 
         const data = await res.json();
         hideTyping();
-        addMessage(data.reply);
+        await addMessage(data.reply);
       } catch (err) {
         hideTyping();
-        addMessage("❌ Error procesando autorización");
+        await addMessage("❌ Error procesando autorización");
         console.error(err);
       } finally {
         isSending = false;
       }
     };
+
+    // ===================================================
+    // MINIMIZAR
+    // ===================================================
 
     minimizeBtn.addEventListener("click", () => {
       chatContainer.style.display = "none";
@@ -197,7 +346,10 @@
       if (e.key === "Enter") sendMessage(); 
     });
 
-    // 🔥 INICIALIZAR CHAT AUTOMÁTICAMENTE
+    // ===================================================
+    // INICIALIZAR CHAT AUTOMÁTICAMENTE
+    // ===================================================
+
     window.addEventListener('load', async () => {
       setTimeout(async () => {
         if (!chatInitialized) {

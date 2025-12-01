@@ -1,6 +1,6 @@
 // utils/intelligentResponses.js
 import OpenAI from "openai";
-import { detectPsychologicalNeed } from "./psychologicalProtocols.js";
+import { detectPsychologicalNeed, psychologicalProtocols, getPsychologicalSupportMenu } from "./psychologicalProtocols.js";
 import { serviceResponsesData, getMainMenu, generateServiceResponse } from "./serviceResponses.js";
 
 const openai = new OpenAI({
@@ -17,6 +17,7 @@ export const getChatbotResponse = async (
   conversationHistory = []
 ) => {
   const msg = message.toLowerCase().trim();
+  const userName = sessionContext.name || "";
 
   // ===================================================
   // 🚨 PRIORIDAD 1: DETECTAR NECESIDAD PSICOLÓGICA
@@ -25,12 +26,139 @@ export const getChatbotResponse = async (
   const psychNeed = detectPsychologicalNeed(message);
   
   if (psychNeed.detected) {
-    return `${psychNeed.response}<br><br>
+    const protocol = psychNeed.protocol;
+    
+    // Generar respuesta con IA usando contexto del protocolo
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `Eres Novi, un asistente con formación en apoyo psicológico de Colombia Noviolenta.
+
+CONTEXTO DE LA SITUACIÓN: ${protocol.context}
+
+INSTRUCCIONES:
+- Responde como un psicólogo profesional, con empatía y calidez
+- USA EL NOMBRE "${userName}" naturalmente en tu respuesta si está disponible
+- Haz preguntas abiertas para que la persona se exprese
+- Valida sus emociones sin juzgar
+- Responde en 2-3 párrafos máximo
+- Muestra comprensión profunda de lo que está viviendo
+- NO menciones "Paso 1", "Paso 2", etc.
+
+MENSAJE INICIAL SUGERIDO: ${protocol.initialResponse(userName)}
+
+Basándote en esto, responde de forma natural y profesional.`
+          },
+          {
+            role: "user",
+            content: message
+          }
+        ],
+        max_tokens: 300,
+        temperature: 0.8
+      });
+
+      const aiResponse = completion.choices[0].message.content;
+
+      return `
+<div style="background:#f0f8ff;padding:15px;border-radius:8px;margin:10px 0;">
+  ${aiResponse}
+</div>
+
+${protocol.supportLines}
+
 <div style="margin-top:20px;padding:15px;background:#f9f9f9;border-radius:8px;">
   <strong>¿Necesitas más asistencia?</strong><br><br>
   <button class="quick-button" data-option="asistencia_si">✅ Sí, quiero hablar más</button>
   <button class="quick-button" data-option="asistencia_no">❌ No, estoy bien</button>
 </div>`;
+
+    } catch (error) {
+      console.error("Error con OpenAI en protocolo psicológico:", error);
+      
+      // Fallback si falla la IA
+      return `
+<div style="background:#f0f8ff;padding:15px;border-radius:8px;margin:10px 0;">
+  ${protocol.initialResponse(userName)}
+</div>
+
+${protocol.supportLines}
+
+<div style="margin-top:20px;padding:15px;background:#f9f9f9;border-radius:8px;">
+  <strong>¿Necesitas más asistencia?</strong><br><br>
+  <button class="quick-button" data-option="asistencia_si">✅ Sí, quiero hablar más</button>
+  <button class="quick-button" data-option="asistencia_no">❌ No, estoy bien</button>
+</div>`;
+    }
+  }
+
+  // ===================================================
+  // MANEJO DE BOTONES DE APOYO PSICOLÓGICO ESPECÍFICO
+  // ===================================================
+  
+  const apoyoButtons = {
+    "apoyo_suicidio": "suicidio",
+    "apoyo_depresion": "depresion",
+    "apoyo_ira": "ira",
+    "apoyo_miedo": "miedo",
+    "apoyo_frustracion": "frustracion"
+  };
+
+  if (apoyoButtons[msg]) {
+    const protocolKey = apoyoButtons[msg];
+    const protocol = psychologicalProtocols[protocolKey];
+    
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `Eres Novi, un asistente con formación en apoyo psicológico de Colombia Noviolenta.
+
+CONTEXTO: ${protocol.context}
+
+El usuario ha seleccionado apoyo para: ${protocol.category}
+
+INSTRUCCIONES:
+- Responde como un psicólogo profesional
+- USA EL NOMBRE "${userName}" si está disponible
+- Haz preguntas para entender su situación
+- Valida sus emociones
+- Muestra empatía profunda
+- 2-3 párrafos máximo`
+          },
+          {
+            role: "user",
+            content: `Necesito ayuda con ${protocol.category}`
+          }
+        ],
+        max_tokens: 300,
+        temperature: 0.8
+      });
+
+      const aiResponse = completion.choices[0].message.content;
+
+      return `
+<div style="background:#f0f8ff;padding:15px;border-radius:8px;margin:10px 0;">
+  ${aiResponse}
+</div>
+
+${protocol.supportLines}
+
+<div style="margin-top:20px;padding:15px;background:#f9f9f9;border-radius:8px;">
+  <strong>¿Necesitas más asistencia?</strong><br><br>
+  <button class="quick-button" data-option="asistencia_si">✅ Sí, quiero hablar más</button>
+  <button class="quick-button" data-option="asistencia_no">❌ No, estoy bien</button>
+</div>`;
+
+    } catch (error) {
+      console.error("Error con OpenAI:", error);
+      return `${protocol.initialResponse(userName)}<br><br>${protocol.supportLines}`;
+    }
   }
 
   // ===================================================
@@ -38,18 +166,28 @@ export const getChatbotResponse = async (
   // ===================================================
   
   if (msg === "asistencia_si") {
-    return `Estoy aquí para escucharte 💙<br><br>
+    const greeting = userName ? `${userName}, estoy` : "Estoy";
+    return `${greeting} aquí para escucharte 💙<br><br>
 Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que está pasando:`;
   }
   
   if (msg === "asistencia_no") {
-    return `Me alegra que te sientas mejor 🤍<br><br>
+    const greeting = userName ? `Me alegra ${userName}` : "Me alegra que te sientas mejor";
+    return `${greeting} 🤍<br><br>
 ¿Deseas explorar nuestros servicios o tienes alguna pregunta?<br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
   <button class="quick-button" data-option="explorar_servicios">🌟 Explorar servicios</button>
   <button class="quick-button" data-option="pregunta_especifica">✍️ Hacer una pregunta</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar conversación</button>
 </div>`;
+  }
+
+  // ===================================================
+  // PALABRAS CLAVE QUE REQUIEREN MENÚ DE APOYO
+  // ===================================================
+  
+  if (msg.includes("apoyo") && !msg.includes("apoyo_")) {
+    return getPsychologicalSupportMenu();
   }
 
   // ===================================================
@@ -61,7 +199,8 @@ Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que e
   }
   
   if (msg === "pregunta_especifica") {
-    return `Perfecto 😊 Escribe tu pregunta y con gusto te ayudaré:`;
+    const greeting = userName ? `Perfecto ${userName}` : "Perfecto";
+    return `${greeting} 😊 Escribe tu pregunta y con gusto te ayudaré:`;
   }
 
   // ===================================================
@@ -234,7 +373,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
     );
   }
 
-  if (msg.includes("donar") || msg.includes("donación") || msg.includes("apoyo")) {
+  if (msg.includes("donar") || msg.includes("donación")) {
     return generateServiceResponse(
       "💝 Tu apoyo es fundamental:",
       `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">💝 Donar ahora</button>`
@@ -276,20 +415,21 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   }
 
   if (msg.includes("hola") || msg.includes("buenos") || msg.includes("hey")) {
-    const greeting = sessionContext.name ? `¡Hola ${sessionContext.name}! 👋` : "¡Hola! 👋";
+    const greeting = userName ? `¡Hola ${userName}! 👋` : "¡Hola! 👋";
     return `${greeting} Bienvenido a Colombia Noviolenta. ¿En qué puedo ayudarte hoy?<br><br>${getMainMenu()}`;
   }
 
   if (msg.includes("recuerdas") && (msg.includes("nombre") || msg.includes("llamo"))) {
-    if (sessionContext.name) {
-      return `¡Claro que sí! Te llamas <strong>${sessionContext.name}</strong> 😊 ¿En qué puedo ayudarte?`;
+    if (userName) {
+      return `¡Claro que sí! Te llamas <strong>${userName}</strong> 😊 ¿En qué puedo ayudarte?`;
     } else {
       return `Aún no me has dicho tu nombre 😊 ¿Cómo te gustaría que te llame?`;
     }
   }
 
   if (msg.includes("gracias")) {
-    return `¡De nada! 😊 Estoy aquí para ayudarte.<br><br>
+    const response = userName ? `¡De nada ${userName}!` : "¡De nada!";
+    return `${response} 😊 Estoy aquí para ayudarte.<br><br>
 <div style="display:flex;gap:10px;">
   <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar</button>
@@ -331,7 +471,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   }
 
   // ===================================================
-  // RESPUESTA CON IA + HISTORIAL
+  // RESPUESTA CON IA + HISTORIAL + NOMBRE
   // ===================================================
 
   try {
@@ -341,11 +481,11 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
     }));
 
     let userContext = "";
-    if (sessionContext.name) {
-      userContext = `\n\nCONTEXTO DEL USUARIO:\n- Nombre: ${sessionContext.name}`;
+    if (userName) {
+      userContext = `\n\nCONTEXTO DEL USUARIO:\n- Nombre: ${userName}`;
       if (sessionContext.phone) userContext += `\n- Teléfono: ${sessionContext.phone}`;
       if (sessionContext.authorized) userContext += `\n- Usuario registrado`;
-      userContext += `\n\nUSA SU NOMBRE cuando sea natural, NO en cada mensaje.`;
+      userContext += `\n\n⚠️ IMPORTANTE: USA SU NOMBRE "${userName}" de forma natural en tu respuesta, especialmente al inicio.`;
     }
 
     const completion = await openai.chat.completions.create({
@@ -356,13 +496,14 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
           content: `Eres Novi, asistente de Colombia Noviolenta. 
 
 REGLAS CRÍTICAS:
-- NO saludes con "Hola [nombre]" si ya hay conversación en curso
-- MANTÉN contexto de mensajes anteriores
-- Si preguntan "¿cómo?" responde en base a tu mensaje ANTERIOR
+- MANTÉN el contexto del historial de conversación completo
+- Si el usuario menciona algo previo (ej: "quise cortarle la cabeza a mi ganso"), RESPONDE basándote en ESO y en el historial
+- USA EL NOMBRE "${userName}" de forma natural en tu respuesta si está disponible
+- Sé empático, comprensivo y profesional
 - Responde en español, breve (máximo 3-4 líneas) y amigable
 - Si mencionas URLs, usa botones: <button class="quick-button" data-url="URL">TEXTO</button>
-- SIEMPRE ofrece opciones de continuación al final de cada respuesta
-- Detecta si el usuario quiere finalizar la conversación
+- SIEMPRE ofrece opciones de continuación al final
+- Analiza el HISTORIAL COMPLETO antes de responder
 
 INFORMACIÓN:
 - Organización: Colombia Noviolenta
@@ -375,8 +516,8 @@ ${userContext}`
         ...messageHistory,
         { role: "user", content: message }
       ],
-      max_tokens: 300,
-      temperature: 0.7
+      max_tokens: 350,
+      temperature: 0.8
     });
 
     const aiResponse = completion.choices[0].message.content;
