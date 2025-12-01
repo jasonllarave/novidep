@@ -16,22 +16,9 @@ const socialButtons = [
   { label: "Spotify", url: "https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu" }
 ];
 
-// Botones de servicios
-const serviceButtons = [
-  { label: "🎵 Boletas concierto", key: "boletas_concierto", url: "https://www.colombianoviolenta.org/conciertos/" },
-  { label: "🛒 Compras tienda", key: "compras_tienda", url: "https://www.colombianoviolenta.org/tienda/" },
-  { label: "📋 Servicios", key: "adquirir_servicios", url: "https://www.colombianoviolenta.org/servicios/" },
-  { label: "🤝 Voluntariado", key: "voluntariado", url: "https://www.colombianoviolenta.org/voluntariado/" },
-  { label: "💝 Donaciones", key: "donaciones", url: "https://donorbox.org/colombianoviolenta" },
-  { label: "📖 Cartilla", key: "cartilla", url: "https://www.colombianoviolenta.org/cartilla/" }
-];
-
 // Función para generar HTML de botones
-const generateButtonsHTML = (buttons, useOptionKey = false) =>
-  buttons.map(b => useOptionKey
-    ? `<button class="quick-button" data-option="${b.key}" data-url="${b.url}">${b.label}</button>`
-    : `<button class="quick-button" data-url="${b.url}">${b.label}</button>`
-  ).join(" ");
+const generateButtonsHTML = (buttons) =>
+  buttons.map(b => `<button class="quick-button" data-url="${b.url}">${b.label}</button>`).join(" ");
 
 // === RUTA PRINCIPAL DEL CHATBOT ===
 router.post("/chatbot", async (req, res) => {
@@ -82,11 +69,11 @@ router.post("/chatbot", async (req, res) => {
       session.step = "ask_participation";
       await session.save();
 
-      const botReply = `¡Hola! Soy <strong>Novi</strong>, asistente virtual de Colombia Noviolenta. 🌱<br>
+      const botReply = `¡Hola! Soy <strong>Novi</strong>, asistente virtual de Colombia Noviolenta. 🌱<br><br>
 ¿Te gustaría participar en uno de nuestros talleres o eventos?<br><br>
-<div>
-<button class="quick-button" data-option="participar">Sí, quiero participar</button>
-<button class="quick-button" data-option="no_participar">No, gracias</button>
+<div style="display:flex;gap:10px;">
+<button class="quick-button" data-option="participar">✅ Sí, quiero participar</button>
+<button class="quick-button" data-option="no_participar">❌ No, gracias</button>
 </div>`;
 
       await conversation.addMessage("assistant", botReply);
@@ -106,15 +93,15 @@ router.post("/chatbot", async (req, res) => {
       }
       
       if (["no_participar", "no"].includes(msg)) {
-        session.step = "ask_socials_no_participation";
+        session.step = "conversation_mode";
         await session.save();
 
         const aiText = await getChatbotResponse("usuario_no_participa", sessionContext, conversation.messages);
 
-        const botReply = `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
-<div>
-<button class="quick-button" data-option="socials_si">Sí</button>
-<button class="quick-button" data-option="socials_no">No</button>
+        const botReply = `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br><br>
+<div style="display:flex;gap:10px;">
+<button class="quick-button" data-option="socials_si">✅ Sí</button>
+<button class="quick-button" data-option="socials_no">❌ No</button>
 </div>`;
 
         await conversation.addMessage("assistant", botReply);
@@ -155,8 +142,8 @@ router.post("/chatbot", async (req, res) => {
       session.step = "ask_authorization";
       await session.save();
 
-      const botReply = `Gracias ${session.name}! ❤️<br>
-<label>
+      const botReply = `Gracias ${session.name}! ❤️<br><br>
+<label style="display:flex;align-items:center;gap:10px;">
 <input type="checkbox" id="authCheck"> 
 Autorizo el tratamiento de mis datos personales
 </label><br>
@@ -167,33 +154,17 @@ Autorizo el tratamiento de mis datos personales
       return res.json({ sessionId: sid, reply: botReply });
     }
 
-    // === DESPUÉS DE AUTORIZACIÓN ===
-    if (session.step === "show_options") {
-      session.step = "after_authorization";
-      await session.save();
-
-      const aiText = await getChatbotResponse("usuario_autorizado", sessionContext, conversation.messages);
-
-      const botReply = `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
-<div>
-<button class="quick-button" data-option="socials_si">Sí</button>
-<button class="quick-button" data-option="socials_no">No</button>
-</div>`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
     // === REDES SOCIALES ===
     if (msg === "socials_si") {
-      session.step = "ask_services";
+      session.step = "conversation_mode";
       await session.save();
 
-      const botReply = `¡Genial! 😄 Aquí están nuestras redes:<br><br>${generateButtonsHTML(socialButtons)}<br><br>¿Deseas conocer nuestros servicios?<br>
-<div>
-<button class="quick-button" data-option="servicios_si">Sí</button>
-<button class="quick-button" data-option="servicios_no">No</button>
+      const botReply = `¡Genial! 😄 Aquí están nuestras redes:<br><br>
+${generateButtonsHTML(socialButtons)}<br><br>
+¿Deseas explorar nuestros servicios?<br><br>
+<div style="display:flex;gap:10px;">
+<button class="quick-button" data-option="explorar_servicios">✅ Sí</button>
+<button class="quick-button" data-option="explorar_no">❌ No</button>
 </div>`;
 
       await conversation.addMessage("assistant", botReply);
@@ -202,13 +173,14 @@ Autorizo el tratamiento de mis datos personales
     }
 
     if (msg === "socials_no") {
-      session.step = "ask_services";
+      session.step = "conversation_mode";
       await session.save();
 
-      const botReply = `No hay problema 😊<br>¿Deseas conocer nuestros servicios y recursos?<br>
-<div>
-<button class="quick-button" data-option="servicios_si">Sí</button>
-<button class="quick-button" data-option="servicios_no">No</button>
+      const botReply = `No hay problema 😊<br><br>
+¿Deseas explorar nuestros servicios?<br><br>
+<div style="display:flex;gap:10px;">
+<button class="quick-button" data-option="explorar_servicios">✅ Sí</button>
+<button class="quick-button" data-option="explorar_no">❌ No</button>
 </div>`;
 
       await conversation.addMessage("assistant", botReply);
@@ -216,147 +188,16 @@ Autorizo el tratamiento de mis datos personales
       return res.json({ sessionId: sid, reply: botReply });
     }
 
-    // === SERVICIOS ===
-    if (msg === "servicios_si") {
-      session.step = "ask_specific_interest";
-      await session.save();
+    // === MODO CONVERSACIÓN LIBRE ===
+    if (session.step === "conversation_mode" || session.step === "after_authorization") {
+      const reply = await getChatbotResponse(message, sessionContext, conversation.messages);
 
-      const aiText = await getChatbotResponse("mostrar_servicios", sessionContext, conversation.messages);
+      await conversation.addMessage("assistant", reply);
 
-      const botReply = `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Deseas conocer algo en específico?<br>
-<div>
-<button class="quick-button" data-option="especifico_si">Sí</button>
-<button class="quick-button" data-option="especifico_no">No</button>
-</div>`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
+      return res.json({ sessionId: sid, reply });
     }
 
-    if (msg === "especifico_si") {
-      session.step = "ask_message";
-      await session.save();
-
-      const botReply = `Perfecto 😊, escribe tu pregunta:`;
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    if (msg === "especifico_no") {
-      session.step = "completed";
-      await session.save();
-
-      const botReply = `¡Genial! 🎉 Gracias por usar nuestro servicio. Si necesitas algo más, escríbeme nuevamente.`;
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    if (msg === "servicios_no") {
-      session.step = "ask_specific";
-      await session.save();
-
-      const botReply = `¿Hay algo en específico que quieras consultar?<br>
-<div>
-<button class="quick-button" data-option="consulta_si">Sí</button>
-<button class="quick-button" data-option="consulta_no">No</button>
-</div>`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    // === CONSULTA ESPECÍFICA ===
-    if (msg === "consulta_si") {
-      session.step = "ask_message";
-      await session.save();
-
-      const botReply = `Perfecto 😊, escribe tu pregunta específica:`;
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    if (msg === "consulta_no") {
-      session.step = "ask_satisfaction";
-      await session.save();
-
-      const botReply = `¿Estás satisfecho con nuestra atención?<br>
-<div>
-<button class="quick-button" data-option="satisfaccion_si">Sí</button>
-<button class="quick-button" data-option="satisfaccion_no">No</button>
-</div>`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    // === MENSAJE LIBRE ===
-    if (session.step === "ask_message") {
-      const aiResponse = await getChatbotResponse(message, sessionContext, conversation.messages);
-
-      session.step = "ask_satisfaction";
-      await session.save();
-
-      const botReply = `${aiResponse}<br><br>¿Estás satisfecho con nuestra atención?<br>
-<div>
-<button class="quick-button" data-option="satisfaccion_si">Sí</button>
-<button class="quick-button" data-option="satisfaccion_no">No</button>
-</div>`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    // === SATISFACCIÓN ===
-    if (msg === "satisfaccion_si") {
-      session.step = "completed";
-      await session.save();
-
-      const botReply = `¡Excelente! 🎉 Gracias por usar nuestro servicio. Si necesitas algo más, no dudes en escribirnos nuevamente. ¡La no violencia no es pasividad, es una fuerza activa que transforma sin destruir.! 🌟`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    if (msg === "satisfaccion_no") {
-      session.step = "ask_message";
-      await session.save();
-
-      const botReply = `Lamento que no estés satisfecho 😕<br>Por favor, escribe tu consulta y con gusto te ayudaré mejor.`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    // === BOTONES DE SERVICIOS ESPECÍFICOS ===
-    const buttonActions = [
-      "boletas_concierto",
-      "compras_tienda",
-      "adquirir_servicios",
-      "voluntariado",
-      "donaciones",
-      "cartilla"
-    ];
-    
-    if (buttonActions.includes(msg)) {
-      const reply = await getChatbotResponse(msg, sessionContext, conversation.messages);
-
-      const botReply = `${reply}<br><br>¿Deseas explorar algo más?<br>${generateButtonsHTML(serviceButtons, true)}`;
-
-      await conversation.addMessage("assistant", botReply);
-
-      return res.json({ sessionId: sid, reply: botReply });
-    }
-
-    // === MENSAJE GENERAL ===
+    // === MENSAJE GENERAL (FALLBACK) ===
     const reply = await getChatbotResponse(message, sessionContext, conversation.messages);
 
     await conversation.addMessage("assistant", reply);
@@ -390,7 +231,7 @@ router.post("/authorize", async (req, res) => {
     }
 
     session.authorized = true;
-    session.step = "show_options";
+    session.step = "after_authorization";
     await session.save();
 
     let conversation = await ConversationSession.findOne({ sessionId });
@@ -411,10 +252,11 @@ router.post("/authorize", async (req, res) => {
 
     const aiText = await getChatbotResponse("usuario_autorizado", sessionContext, conversation.messages);
 
-    const botReply = `${aiText}<br><br>${generateButtonsHTML(serviceButtons, true)}<br><br>¿Te gustaría conocer nuestras redes sociales?<br>
-<div>
-<button class="quick-button" data-option="socials_si">Sí</button>
-<button class="quick-button" data-option="socials_no">No</button>
+    const botReply = `${aiText}<br><br>
+¿Te gustaría conocer nuestras redes sociales?<br><br>
+<div style="display:flex;gap:10px;">
+<button class="quick-button" data-option="socials_si">✅ Sí</button>
+<button class="quick-button" data-option="socials_no">❌ No</button>
 </div>`;
 
     await conversation.addMessage("assistant", botReply);
