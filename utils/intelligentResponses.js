@@ -229,17 +229,17 @@ Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que e
 La no violencia no es pasividad, es una fuerza activa que transforma sin destruir.<br><br>
 <strong>¿Cómo calificarías nuestra atención?</strong><br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-  <button class="quick-button" data-option="calificar_excelente">⭐⭐⭐⭐⭐ Excelente</button>
-  <button class="quick-button" data-option="calificar_buena">⭐⭐⭐⭐ Buena</button>
-  <button class="quick-button" data-option="calificar_regular">⭐⭐⭐ Regular</button>
+  <button class="quick-button" data-option="calificar_excelente">🏅🏅🏅🏅🏅 Excelente</button>
+  <button class="quick-button" data-option="calificar_buena">🏅🏅🏅🏅 Buena</button>
+  <button class="quick-button" data-option="calificar_regular">🏅🏅🏅 Regular</button>
 </div>`;
   }
   
   if (msg.includes("calificar_")) {
     const ratings = {
-      "calificar_excelente": "⭐⭐⭐⭐⭐ Excelente",
-      "calificar_buena": "⭐⭐⭐⭐ Buena",
-      "calificar_regular": "⭐⭐⭐ Regular"
+      "calificar_excelente": "🏅🏅🏅🏅🏅 Excelente",
+      "calificar_buena": "🏅🏅🏅🏅 Buena",
+      "calificar_regular": "🏅🏅🏅 Regular"
     };
     const rating = ratings[msg] || "tu calificación";
     return `¡Gracias por tu calificación: ${rating}! 👨🏻‍💻<br><br>

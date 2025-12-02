@@ -72,8 +72,8 @@ router.post("/chatbot", async (req, res) => {
       const botReply = `¡Hola! Soy <strong>Novi</strong>, asistente virtual de Colombia Noviolenta. 🌱<br><br>
 ¿Te gustaría participar en uno de nuestros talleres o eventos?<br><br>
 <div style="display:flex;gap:10px;">
-<button class="quick-button" data-option="participar">✅ Sí, quiero participar</button>
-<button class="quick-button" data-option="no_participar">❌ No, gracias</button>
+<button class="quick-button" data-option="participar">🟢 Sí, quiero participar</button>
+<button class="quick-button" data-option="no_participar">🔴 No, gracias</button>
 </div>`;
 
       await conversation.addMessage("assistant", botReply);
@@ -89,11 +89,11 @@ router.post("/chatbot", async (req, res) => {
           session.step = "conversation_mode";
           await session.save();
 
-          const botReply = `¡Perfecto ${session.name}! 🎉<br><br>
+          const botReply = `¡Perfecto ${session.name}! 🧖🏻‍♂️<br><br>
 ¿Te gustaría conocer nuestras redes sociales?<br><br>
 <div style="display:flex;gap:10px;">
-<button class="quick-button" data-option="socials_si">✅ Sí</button>
-<button class="quick-button" data-option="socials_no">❌ No</button>
+<button class="quick-button" data-option="socials_si">🟢 Sí</button>
+<button class="quick-button" data-option="socials_no">🔴 No</button>
 </div>`;
 
           await conversation.addMessage("assistant", botReply);
@@ -103,7 +103,7 @@ router.post("/chatbot", async (req, res) => {
         session.step = "ask_name";
         await session.save();
 
-        const botReply = "¡Excelente! 😊 ¿Cómo te gustaría que te llame?";
+        const botReply = "¡Excelente! 👨🏻 ¿Cómo te gustaría que te llame?";
         await conversation.addMessage("assistant", botReply);
         return res.json({ sessionId: sid, reply: botReply });
       }
@@ -116,8 +116,8 @@ router.post("/chatbot", async (req, res) => {
 
         const botReply = `${aiText}<br><br>¿Te gustaría conocer nuestras redes sociales?<br><br>
 <div style="display:flex;gap:10px;">
-<button class="quick-button" data-option="socials_si">✅ Sí</button>
-<button class="quick-button" data-option="socials_no">❌ No</button>
+<button class="quick-button" data-option="socials_si">🟢 Sí</button>
+<button class="quick-button" data-option="socials_no">🔴 No</button>
 </div>`;
 
         await conversation.addMessage("assistant", botReply);
@@ -129,7 +129,7 @@ router.post("/chatbot", async (req, res) => {
     // === PEDIR NOMBRE ===
     if (session.step === "ask_name") {
       if (!message || message.length < 2) {
-        const botReply = "Por favor escribe un nombre válido 🙏";
+        const botReply = "Por favor escribe un nombre válido 👏🏻";
         await conversation.addMessage("assistant", botReply);
         return res.json({ sessionId: sid, reply: botReply });
       }
@@ -138,7 +138,7 @@ router.post("/chatbot", async (req, res) => {
       session.step = "ask_phone";
       await session.save();
 
-      const botReply = `Encantado, <strong>${session.name}</strong> 😊<br>Ahora escribe tu número de contacto (10 dígitos, empieza con 3):`;
+      const botReply = `Encantado, <strong>${session.name}</strong> 🙋🏻‍♂️<br>Ahora escribe tu número de contacto (10 dígitos, empieza con 3):`;
       await conversation.addMessage("assistant", botReply);
 
       return res.json({ sessionId: sid, reply: botReply });
@@ -149,7 +149,7 @@ router.post("/chatbot", async (req, res) => {
       const phone = message.replace(/\D/g, "");
 
       if (!/^3\d{9}$/.test(phone)) {
-        const botReply = "Número inválido 😕 Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645";
+        const botReply = "Número inválido 🙅🏻‍♂️ Debe ser de 10 dígitos y comenzar con 3. Ej: 3105223645";
         await conversation.addMessage("assistant", botReply);
         return res.json({ sessionId: sid, reply: botReply });
       }
@@ -158,7 +158,7 @@ router.post("/chatbot", async (req, res) => {
       session.step = "ask_authorization";
       await session.save();
 
-      const botReply = `Gracias ${session.name}! ❤️<br><br>
+      const botReply = `Gracias ${session.name}! 🙆🏻‍♂️<br><br>
 <label style="display:flex;align-items:center;gap:10px;">
 <input type="checkbox" id="authCheck"> 
 Autorizo el tratamiento de mis datos personales
@@ -175,12 +175,12 @@ Autorizo el tratamiento de mis datos personales
       session.step = "conversation_mode";
       await session.save();
 
-      const botReply = `¡Genial! 😄 Aquí están nuestras redes:<br><br>
+      const botReply = `¡Genial! 💁🏻‍♂️ Aquí están nuestras redes:<br><br>
 ${generateButtonsHTML(socialButtons)}<br><br>
 ¿Deseas explorar nuestros servicios?<br><br>
 <div style="display:flex;gap:10px;">
-<button class="quick-button" data-option="explorar_servicios">✅ Sí</button>
-<button class="quick-button" data-option="explorar_no">❌ No</button>
+<button class="quick-button" data-option="explorar_servicios">🟢 Sí</button>
+<button class="quick-button" data-option="explorar_no">🔴 No</button>
 </div>`;
 
       await conversation.addMessage("assistant", botReply);
@@ -192,11 +192,11 @@ ${generateButtonsHTML(socialButtons)}<br><br>
       session.step = "conversation_mode";
       await session.save();
 
-      const botReply = `No hay problema 😊<br><br>
+      const botReply = `No hay problema 👨🏻<br><br>
 ¿Deseas explorar nuestros servicios?<br><br>
 <div style="display:flex;gap:10px;">
-<button class="quick-button" data-option="explorar_servicios">✅ Sí</button>
-<button class="quick-button" data-option="explorar_no">❌ No</button>
+<button class="quick-button" data-option="explorar_servicios">🟢 Sí</button>
+<button class="quick-button" data-option="explorar_no">🔴 No</button>
 </div>`;
 
       await conversation.addMessage("assistant", botReply);
@@ -271,8 +271,8 @@ router.post("/authorize", async (req, res) => {
     const botReply = `${aiText}<br><br>
 ¿Te gustaría conocer nuestras redes sociales?<br><br>
 <div style="display:flex;gap:10px;">
-<button class="quick-button" data-option="socials_si">✅ Sí</button>
-<button class="quick-button" data-option="socials_no">❌ No</button>
+<button class="quick-button" data-option="socials_si">🟢 Sí</button>
+<button class="quick-button" data-option="socials_no">🔴 No</button>
 </div>`;
 
     await conversation.addMessage("assistant", botReply);

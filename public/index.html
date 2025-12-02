@@ -165,7 +165,7 @@
     // ===================================================
 
     function activateQuickButtons(container) {
-      // ✅ Primero: botones con data-url (links externos)
+      //  Primero: botones con data-url (links externos)
       container.querySelectorAll(".quick-button[data-url]").forEach(btn => {
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
@@ -179,7 +179,7 @@
         });
       });
 
-      // ✅ Segundo: botones con data-option (flujo conversacional)
+      //  Segundo: botones con data-option (flujo conversacional)
       container.querySelectorAll(".quick-button[data-option]").forEach(btn => {
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
@@ -276,7 +276,7 @@
         
       } catch (err) {
         hideTyping();
-        await addMessage("❌ Error: " + err.message);
+        await addMessage("🔴 Error: " + err.message);
         console.error("Error completo:", err);
       } finally {
         isSending = false;
@@ -323,7 +323,7 @@
         await addMessage(data.reply);
       } catch (err) {
         hideTyping();
-        await addMessage("❌ Error procesando autorización");
+        await addMessage("🔴 Error procesando autorización");
         console.error(err);
       } finally {
         isSending = false;
