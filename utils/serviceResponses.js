@@ -36,7 +36,7 @@ export function getMainMenu() {
 
 <div style="margin-bottom:15px;">
   <button class="quick-button" data-option="momento_calma" style="background:linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);color:white;width:100%;padding:12px;font-size:16px;">
-    🧍🏽‍♂️ Tu Momento de Calma 🧑🏻‍🤝‍🧑🏻
+    👫🏻 Tu Momento de Calma 🧑🏻‍🤝‍🧑🏻
   </button>
 </div>
 
