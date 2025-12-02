@@ -471,7 +471,241 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   }
 
   // ===================================================
-  // RESPUESTA CON IA + HISTORIAL + NOMBRE
+  // BOTÓN "TU MOMENTO DE CALMA"
+  // ===================================================
+
+  if (msg === "momento_calma") {
+    const greeting = userName ? `${userName}, ` : "";
+    return `
+<div style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);padding:20px;border-radius:12px;color:white;margin:10px 0;">
+  <h3 style="margin:0 0 10px 0;">✨ Tu Momento de Calma ✨</h3>
+  <p style="margin:0;opacity:0.9;">Elige la opción que más resuene contigo en este momento:</p>
+</div>
+
+<div style="display:grid;gap:10px;margin-top:15px;">
+  <button class="quick-button" data-option="conversar_ahora" style="background:#4CAF50;">💬 Conversar ahora</button>
+  <button class="quick-button" data-option="tips_bienestar">🌸 Tips rápidos de bienestar</button>
+  <button class="quick-button" data-option="ejercicios_relajacion">🧘‍♀️ Ejercicios de relajación</button>
+  <button class="quick-button" data-option="recursos_autocuidado">💆‍♀️ Recursos de autocuidado</button>
+  <button class="quick-button" data-option="practicas_gratitud">🙏 Prácticas de gratitud</button>
+  <button class="quick-button" data-option="rutinas_energia">⚡ Rutinas de energía positiva</button>
+  <button class="quick-button" data-option="preguntas_frecuentes">❓ Preguntas frecuentes</button>
+</div>`;
+  }
+
+  // Manejo de opciones del momento de calma
+  if (msg === "conversar_ahora") {
+    const greeting = userName ? `${userName}, ` : "";
+    return `${greeting}estoy aquí para ti 💙<br><br>
+Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qué te gustaría compartir en este momento?`;
+  }
+
+  if (msg === "tips_bienestar") {
+    return `
+<div style="background:#f0f8ff;padding:20px;border-radius:12px;margin:10px 0;">
+  <h3 style="color:#667eea;margin-top:0;">🌸 Tips Rápidos de Bienestar</h3>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌊 Respira Conscientemente</h4>
+    <p>Inhala profundamente por 4 segundos, mantén 4 segundos, exhala por 6 segundos. Repite 3 veces.</p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">☀️ Muévete un Poco</h4>
+    <p>Estira tus brazos, rota tus hombros, camina 5 minutos. El movimiento libera tensión.</p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">💧 Hidrátate</h4>
+    <p>Bebe un vaso de agua despacio. Observa cómo el agua refresca tu cuerpo.</p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">📱 Desconecta 10 Minutos</h4>
+    <p>Aleja tu teléfono. Cierra los ojos. Solo respira y siente el presente.</p>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
+  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+</div>`;
+  }
+
+  if (msg === "ejercicios_relajacion") {
+    return `
+<div style="background:#fff8e7;padding:20px;border-radius:12px;margin:10px 0;">
+  <h3 style="color:#f57c00;margin-top:0;">🧘‍♀️ Ejercicios de Relajación</h3>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#ff6f00;margin:10px 0 5px 0;">🌬️ Respiración 4-7-8</h4>
+    <p><strong>Paso 1:</strong> Inhala por la nariz contando hasta 4<br>
+    <strong>Paso 2:</strong> Sostén el aire contando hasta 7<br>
+    <strong>Paso 3:</strong> Exhala por la boca contando hasta 8<br>
+    <em>Repite 4 veces. Calma el sistema nervioso.</em></p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#ff6f00;margin:10px 0 5px 0;">💆 Relajación Muscular Progresiva</h4>
+    <p><strong>Paso 1:</strong> Tensa los músculos de los pies por 5 segundos<br>
+    <strong>Paso 2:</strong> Suelta completamente y siente el alivio<br>
+    <strong>Paso 3:</strong> Sube por piernas, abdomen, brazos, rostro<br>
+    <em>Libera tensión acumulada en todo el cuerpo.</em></p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#ff6f00;margin:10px 0 5px 0;">🎵 Meditación de 5 Minutos</h4>
+    <p><strong>Paso 1:</strong> Siéntate cómodamente, cierra los ojos<br>
+    <strong>Paso 2:</strong> Enfócate en tu respiración natural<br>
+    <strong>Paso 3:</strong> Cuando tu mente divague, vuelve a la respiración<br>
+    <em>5 minutos pueden transformar tu día.</em></p>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
+  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+</div>`;
+  }
+
+  if (msg === "recursos_autocuidado") {
+    return `
+<div style="background:#e7f3ff;padding:20px;border-radius:12px;margin:10px 0;">
+  <h3 style="color:#2196F3;margin-top:0;">💆‍♀️ Recursos de Autocuidado</h3>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#1976D2;margin:10px 0 5px 0;">🛁 Rituales de Cuidado Diario</h4>
+    <p><strong>Mañana:</strong> Despierta 10 min antes, estírate, hidrátate<br>
+    <strong>Tarde:</strong> Pausa activa cada 2 horas, respira profundo<br>
+    <strong>Noche:</strong> Desconecta pantallas 1 hora antes de dormir</p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#1976D2;margin:10px 0 5px 0;">📖 Journaling Terapéutico</h4>
+    <p><strong>Escribe 5 min cada día:</strong><br>
+    ¿Cómo me siento hoy? • ¿Qué agradezco? • ¿Qué necesito?<br>
+    <em>Escribir libera emociones guardadas.</em></p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#1976D2;margin:10px 0 5px 0;">🎨 Actividades que Nutren</h4>
+    <p>Leer • Dibujar • Cocinar • Caminar en naturaleza • Escuchar música<br>
+    <em>Dedica tiempo a lo que te hace sentir vivo.</em></p>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
+  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+</div>`;
+  }
+
+  if (msg === "practicas_gratitud") {
+    return `
+<div style="background:#fff3e0;padding:20px;border-radius:12px;margin:10px 0;">
+  <h3 style="color:#F57C00;margin-top:0;">🙏 Prácticas de Gratitud</h3>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#E65100;margin:10px 0 5px 0;">📝 Diario de Gratitud</h4>
+    <p><strong>Cada noche escribe:</strong><br>
+    3 cosas por las que estás agradecido hoy<br>
+    1 persona que te hizo sonreír<br>
+    1 logro personal (por pequeño que sea)<br>
+    <em>La gratitud transforma perspectivas.</em></p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#E65100;margin:10px 0 5px 0;">💌 Cartas de Aprecio</h4>
+    <p><strong>Escribe una carta a:</strong><br>
+    Alguien que te apoyó • Tu yo del pasado • Tu yo del futuro<br>
+    <em>No hace falta enviarla, el acto de escribir sana.</em></p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#E65100;margin:10px 0 5px 0;">🌟 Momento de Apreciación</h4>
+    <p><strong>Pausa y observa:</strong><br>
+    La luz del sol • El sonido de la lluvia • Tu respiración<br>
+    <em>La belleza está en los detalles.</em></p>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
+  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+</div>`;
+  }
+
+  if (msg === "rutinas_energia") {
+    return `
+<div style="background:#f3e5f5;padding:20px;border-radius:12px;margin:10px 0;">
+  <h3 style="color:#7B1FA2;margin-top:0;">⚡ Rutinas de Energía Positiva</h3>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#6A1B9A;margin:10px 0 5px 0;">🌅 Ritual Matutino Energizante</h4>
+    <p><strong>Al despertar:</strong><br>
+    Estira todo el cuerpo 2 min • Bebe agua con limón<br>
+    Afirmación positiva frente al espejo • Música que te active<br>
+    <em>Los primeros 15 min marcan tu día.</em></p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#6A1B9A;margin:10px 0 5px 0;">💪 Pausas Activas</h4>
+    <p><strong>Cada 2 horas:</strong><br>
+    Levántate • Estira brazos y piernas • Respira profundo 5 veces<br>
+    Camina 3 min • Toma agua<br>
+    <em>Recarga tu energía constantemente.</em></p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#6A1B9A;margin:10px 0 5px 0;">🎵 Playlist de Buen Humor</h4>
+    <p><strong>Crea una lista con canciones que:</strong><br>
+    Te hagan bailar • Te recuerden momentos felices<br>
+    Te den energía • Te inspiren<br>
+    <em>La música es medicina para el alma.</em></p>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
+  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+</div>`;
+  }
+
+  if (msg === "preguntas_frecuentes") {
+    return `
+<div style="background:#fce4ec;padding:20px;border-radius:12px;margin:10px 0;">
+  <h3 style="color:#C2185B;margin-top:0;">❓ Preguntas Frecuentes sobre Bienestar</h3>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#AD1457;margin:10px 0 5px 0;">¿Cuánto tiempo necesito para ver cambios?</h4>
+    <p>Los cambios pequeños y consistentes tienen más impacto que grandes esfuerzos esporádicos. En 21 días puedes crear un nuevo hábito.</p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#AD1457;margin:10px 0 5px 0;">¿Qué hago si no tengo tiempo?</h4>
+    <p>Empieza con 5 minutos al día. La consistencia importa más que la duración. Integra pausas en tu rutina existente.</p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#AD1457;margin:10px 0 5px 0;">¿Es normal sentirse abrumado?</h4>
+    <p>Totalmente normal. Elige UNA práctica. Domínala. Luego agrega otra. Avanza paso a paso, sin presión.</p>
+  </div>
+  
+  <div style="margin:15px 0;">
+    <h4 style="color:#AD1457;margin:10px 0 5px 0;">¿Cuándo buscar ayuda profesional?</h4>
+    <p>Si sientes que no puedes solo, que la tristeza persiste por semanas, o si tienes pensamientos autodestructivos. No estás solo, hay apoyo disponible.</p>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;">
+  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
+  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+  <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
+</div>`;
+  }
+
+  // ===================================================
+  // RESPUESTA CON IA + HISTORIAL + NOMBRE + FORMATO MEJORADO
   // ===================================================
 
   try {
@@ -485,7 +719,10 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
       userContext = `\n\nCONTEXTO DEL USUARIO:\n- Nombre: ${userName}`;
       if (sessionContext.phone) userContext += `\n- Teléfono: ${sessionContext.phone}`;
       if (sessionContext.authorized) userContext += `\n- Usuario registrado`;
-      userContext += `\n\n⚠️ IMPORTANTE: USA SU NOMBRE "${userName}" de forma natural en tu respuesta, especialmente al inicio.`;
+      userContext += `\n\n⚠️ IMPORTANTE: 
+- USA SU NOMBRE "${userName}" de forma natural en tu respuesta
+- Si el usuario responde "sí" o "si" en contexto de continuar conversación, NO pidas datos de nuevo
+- MANTÉN la coherencia con el historial completo`;
     }
 
     const completion = await openai.chat.completions.create({
@@ -497,10 +734,27 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 
 REGLAS CRÍTICAS:
 - MANTÉN el contexto del historial de conversación completo
-- Si el usuario menciona algo previo (ej: "quise cortarle la cabeza a mi ganso"), RESPONDE basándote en ESO y en el historial
+- Si el usuario dice "sí" o "si" como confirmación, NO pidas datos que ya tienes
+- Si ya sabes su nombre, NO lo pidas de nuevo
+- Si el usuario menciona algo previo, RESPONDE basándote en ESO y en el historial
 - USA EL NOMBRE "${userName}" de forma natural en tu respuesta si está disponible
 - Sé empático, comprensivo y profesional
 - Responde en español, breve (máximo 3-4 líneas) y amigable
+
+FORMATO VISUAL:
+- Si das lista de pasos o puntos, usa este formato HTML:
+  <div style="margin:15px 0;">
+    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌟 Título del Punto</h4>
+    <p><strong>Paso 1:</strong> Descripción clara<br>
+    <strong>Paso 2:</strong> Segunda acción<br>
+    <em>Nota adicional en cursiva.</em></p>
+  </div>
+
+- NO uses "1.", "2." simple
+- USA títulos con emojis y colores
+- Separa cada punto en divs diferentes
+- Usa <strong> para resaltar
+- Usa <em> para notas
 - Si mencionas URLs, usa botones: <button class="quick-button" data-url="URL">TEXTO</button>
 - SIEMPRE ofrece opciones de continuación al final
 - Analiza el HISTORIAL COMPLETO antes de responder
@@ -516,7 +770,7 @@ ${userContext}`
         ...messageHistory,
         { role: "user", content: message }
       ],
-      max_tokens: 350,
+      max_tokens: 400,
       temperature: 0.8
     });
 

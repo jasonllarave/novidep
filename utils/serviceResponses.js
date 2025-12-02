@@ -30,12 +30,20 @@ export const serviceResponsesData = {
 // Menú principal con opciones enumeradas
 export function getMainMenu() {
   return `¡Perfecto! 😊 ¿Qué te interesa?<br><br>
+
+<div style="margin-bottom:15px;">
+  <button class="quick-button" data-option="momento_calma" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;width:100%;padding:12px;font-size:16px;">
+    ✨ Tu Momento de Calma ✨
+  </button>
+</div>
+
 <strong>1.</strong> 🎵 Boletas concierto<br>
 <strong>2.</strong> 🛒 Tienda<br>
 <strong>3.</strong> 📋 Servicios<br>
 <strong>4.</strong> 📘 Facebook<br>
 <strong>5.</strong> 📖 Comprar cartilla<br>
 <strong>6.</strong> 📞 Contacto<br><br>
+
 <div style="display:flex;flex-wrap:wrap;gap:8px;">
   <button class="quick-button" data-option="opcion_1">1️⃣ Boletas</button>
   <button class="quick-button" data-option="opcion_2">2️⃣ Tienda</button>

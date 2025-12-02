@@ -84,6 +84,22 @@ router.post("/chatbot", async (req, res) => {
     // === PARTICIPAR / NO PARTICIPAR ===
     if (session.step === "ask_participation") {
       if (["participar", "si", "sí"].includes(msg)) {
+        // Solo pedir nombre si NO lo tenemos
+        if (session.name) {
+          session.step = "conversation_mode";
+          await session.save();
+
+          const botReply = `¡Perfecto ${session.name}! 🎉<br><br>
+¿Te gustaría conocer nuestras redes sociales?<br><br>
+<div style="display:flex;gap:10px;">
+<button class="quick-button" data-option="socials_si">✅ Sí</button>
+<button class="quick-button" data-option="socials_no">❌ No</button>
+</div>`;
+
+          await conversation.addMessage("assistant", botReply);
+          return res.json({ sessionId: sid, reply: botReply });
+        }
+
         session.step = "ask_name";
         await session.save();
 
