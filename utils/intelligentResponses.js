@@ -258,7 +258,7 @@ Tu opinión nos ayuda a mejorar cada día.<br><br>
   if (msg === "cerrar_definitivo") {
     return `¡Hasta pronto! 👋🏻💚<br><br>
 Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
-🌱 <strong>Colombia Noviolenta</strong> - Transformando realidades con paz.`;
+🌱 <strong>La no violencia no es pasividad, es una fuerza activa que transforma sin destruir.</strong> - Colombia Noviolenta`;
   }
 
   // ===================================================
