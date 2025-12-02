@@ -68,12 +68,12 @@ export const psychologicalProtocols = {
   
   miedo: {
     keywords: ["miedo", "temor", "pánico", "panico", "terror", "amenaza", "peligro", "asustado", "asustada", "ansiedad"],
-    category: "😰 Miedo y ansiedad",
+    category: "🙇🏻‍♂️ Miedo y ansiedad",
     context: "La persona experimenta miedo o ansiedad intensa. Requiere contención y evaluación de riesgo real vs percibido.",
     initialResponse: (name) => `${name ? name + ', ' : ''}gracias por escribir. El miedo no es debilidad; es tu cuerpo intentando protegerte. Aquí puedes hablar sin juicio.`,
     supportLines: `
 <div style="background:#fff8e7;padding:15px;border-radius:8px;margin:10px 0;">
-  <strong>😰 Si tu miedo está relacionado con un riesgo real:</strong><br><br>
+  <strong>🙇🏻‍♂️ Si tu miedo está relacionado con un riesgo real:</strong><br><br>
   
   <button class="quick-button" data-url="tel:123">🚨 123 - Emergencias</button>
   <button class="quick-button" data-url="tel:155">📞 155 - Policía Nacional</button>
@@ -86,12 +86,12 @@ export const psychologicalProtocols = {
   
   frustracion: {
     keywords: ["frustración", "frustracion", "frustrado", "frustrada", "impotencia", "cansado", "cansada", "agotado", "agotada", "rendido", "rendida"],
-    category: "😔 Frustración y agotamiento",
+    category: "🙍🏻‍♂️ Frustración y agotamiento",
     context: "La persona siente frustración o agotamiento emocional. Necesita validación y exploración de fuentes de estrés.",
     initialResponse: (name) => `${name ? name + ', ' : ''}gracias por compartir lo que sientes. La frustración aparece cuando damos todo y aun así nada cambia. No estás sol@.`,
     supportLines: `
 <div style="background:#f0f0f0;padding:15px;border-radius:8px;margin:10px 0;">
-  <strong>😔 Si tu frustración viene de violencia o vulneración de derechos:</strong><br><br>
+  <strong>🙍🏻‍♂️ Si tu frustración viene de violencia o vulneración de derechos:</strong><br><br>
   
   <button class="quick-button" data-url="tel:018000112518">💼 Ministerio de Trabajo: 01 8000 112 518</button>
   <button class="quick-button" data-url="tel:155">📞 155 - Policía Nacional</button>

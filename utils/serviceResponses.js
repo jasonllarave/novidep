@@ -15,11 +15,11 @@ export const serviceResponsesData = {
   },
   voluntariado: {
     text: "🤝 ¡Qué maravilloso que quieras ser parte del cambio! En nuestro programa de voluntariado podrás contribuir activamente a construir una Colombia más pacífica.",
-    button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/voluntariado/">🤝 Inscribirme</button>`
+    button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/voluntariado/">🤝🏼 Inscribirme</button>`
   },
   donaciones: {
-    text: "💝 Tu generosidad hace la diferencia. Cada donación nos ayuda a seguir trabajando por la paz y la noviolencia en Colombia. ¡Gracias por tu apoyo!",
-    button: `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">💝 Donar ahora</button>`
+    text: "💏🏼 Tu generosidad hace la diferencia. Cada donación nos ayuda a seguir trabajando por la paz y la noviolencia en Colombia. ¡Gracias por tu apoyo!",
+    button: `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">💏🏼Donar ahora</button>`
   },
   cartilla: {
     text: "📖 Nuestra cartilla es una herramienta educativa sobre noviolencia y resolución pacífica de conflictos. Descárgala y compártela.",
@@ -31,12 +31,12 @@ export const serviceResponsesData = {
 export function getMainMenu() {
   return `
 <div style="background:#f8f9fa;padding:15px;border-radius:10px;margin:10px 0;">
-  <h4 style="color:#555;margin:0;font-weight:normal;font-size:16px;">¡Perfecto! 😊 ¿Qué te interesa?</h4>
+  <h4 style="color:#555;margin:0;font-weight:normal;font-size:16px;">¡Perfecto! 👦🏻 ¿Qué te interesa?</h4>
 </div>
 
 <div style="margin-bottom:15px;">
   <button class="quick-button" data-option="momento_calma" style="background:linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);color:white;width:100%;padding:12px;font-size:16px;">
-    ✨ Tu Momento de Calma ✨
+    🧍🏽‍♂️ Tu Momento de Calma 🧑🏻‍🤝‍🧑🏻
   </button>
 </div>
 
@@ -57,7 +57,7 @@ export function getMainMenu() {
     <button class="quick-button" data-option="opcion_6">6️⃣ Contacto</button>
   </div>
   
-  <p style="margin:10px 0 0 0;font-size:14px;color:#666;">✍️ También puedes escribir el número de la opción.</p>
+  <p style="margin:10px 0 0 0;font-size:14px;color:#666;">✍🏻 También puedes escribir el número de la opción.</p>
 </div>`;
 }
 
@@ -67,7 +67,7 @@ export function generateServiceResponse(text, button) {
 ${button}<br><br>
 ¿Deseas explorar algo más?<br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-  <button class="quick-button" data-option="explorar_si">✅ Sí</button>
-  <button class="quick-button" data-option="explorar_no">❌ No</button>
+  <button class="quick-button" data-option="explorar_si">🟢 Sí</button>
+  <button class="quick-button" data-option="explorar_no">🔴 No</button>
 </div>`;
 }

@@ -72,8 +72,8 @@ ${protocol.supportLines}
 
 <div style="margin-top:20px;padding:15px;background:#f9f9f9;border-radius:8px;">
   <strong>¿Necesitas más asistencia?</strong><br><br>
-  <button class="quick-button" data-option="asistencia_si">✅ Sí, quiero hablar más</button>
-  <button class="quick-button" data-option="asistencia_no">❌ No, estoy bien</button>
+  <button class="quick-button" data-option="asistencia_si">🟢 Sí, quiero hablar más</button>
+  <button class="quick-button" data-option="asistencia_no">🔴 No, estoy bien</button>
 </div>`;
 
     } catch (error) {
@@ -89,8 +89,8 @@ ${protocol.supportLines}
 
 <div style="margin-top:20px;padding:15px;background:#f9f9f9;border-radius:8px;">
   <strong>¿Necesitas más asistencia?</strong><br><br>
-  <button class="quick-button" data-option="asistencia_si">✅ Sí, quiero hablar más</button>
-  <button class="quick-button" data-option="asistencia_no">❌ No, estoy bien</button>
+  <button class="quick-button" data-option="asistencia_si">🟢 Sí, quiero hablar más</button>
+  <button class="quick-button" data-option="asistencia_no">🔴 No, estoy bien</button>
 </div>`;
     }
   }
@@ -151,8 +151,8 @@ ${protocol.supportLines}
 
 <div style="margin-top:20px;padding:15px;background:#f9f9f9;border-radius:8px;">
   <strong>¿Necesitas más asistencia?</strong><br><br>
-  <button class="quick-button" data-option="asistencia_si">✅ Sí, quiero hablar más</button>
-  <button class="quick-button" data-option="asistencia_no">❌ No, estoy bien</button>
+  <button class="quick-button" data-option="asistencia_si">🟢 Sí, quiero hablar más</button>
+  <button class="quick-button" data-option="asistencia_no">🔴 No, estoy bien</button>
 </div>`;
 
     } catch (error) {
@@ -176,8 +176,8 @@ Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que e
     return `${greeting} 🤍<br><br>
 ¿Deseas explorar nuestros servicios o tienes alguna pregunta?<br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-  <button class="quick-button" data-option="explorar_servicios">🌟 Explorar servicios</button>
-  <button class="quick-button" data-option="pregunta_especifica">✍️ Hacer una pregunta</button>
+  <button class="quick-button" data-option="explorar_servicios">👨🏻‍💼 Explorar servicios</button>
+  <button class="quick-button" data-option="pregunta_especifica">✍🏻 Hacer una pregunta</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar conversación</button>
 </div>`;
   }
@@ -200,7 +200,7 @@ Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que e
   
   if (msg === "pregunta_especifica") {
     const greeting = userName ? `Perfecto ${userName}` : "Perfecto";
-    return `${greeting} 😊 Escribe tu pregunta y con gusto te ayudaré:`;
+    return `${greeting} 🙆🏻‍♂️ Escribe tu pregunta y con gusto te ayudaré:`;
   }
 
   // ===================================================
@@ -212,10 +212,10 @@ Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que e
   }
   
   if (msg === "explorar_no") {
-    return `No hay problema 😊<br><br>
+    return `No hay problema 🤷🏻‍♂️<br><br>
 ¿Hay algo más en lo que pueda ayudarte?<br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-  <button class="quick-button" data-option="pregunta_especifica">✍️ Hacer una pregunta</button>
+  <button class="quick-button" data-option="pregunta_especifica">✍🏻 Hacer una pregunta</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar conversación</button>
 </div>`;
   }
@@ -225,7 +225,7 @@ Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que e
   // ===================================================
   
   if (msg === "finalizar_chat") {
-    return `¡Gracias por usar nuestro servicio! 🌟<br><br>
+    return `¡Gracias por usar nuestro servicio! 👁‍🗨 <br><br>
 La no violencia no es pasividad, es una fuerza activa que transforma sin destruir.<br><br>
 <strong>¿Cómo calificarías nuestra atención?</strong><br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -242,12 +242,12 @@ La no violencia no es pasividad, es una fuerza activa que transforma sin destrui
       "calificar_regular": "⭐⭐⭐ Regular"
     };
     const rating = ratings[msg] || "tu calificación";
-    return `¡Gracias por tu calificación: ${rating}! 🌟<br><br>
+    return `¡Gracias por tu calificación: ${rating}! 👨🏻‍💻<br><br>
 Tu opinión nos ayuda a mejorar cada día.<br><br>
 <strong>¿Deseas iniciar una nueva conversación?</strong><br><br>
 <div style="display:flex;gap:10px;">
   <button class="quick-button" data-option="nueva_conversacion">🔄 Nueva conversación</button>
-  <button class="quick-button" data-option="cerrar_definitivo">👋 Cerrar</button>
+  <button class="quick-button" data-option="cerrar_definitivo">🤏🏻 Cerrar</button>
 </div>`;
   }
 
@@ -256,7 +256,7 @@ Tu opinión nos ayuda a mejorar cada día.<br><br>
   }
 
   if (msg === "cerrar_definitivo") {
-    return `¡Hasta pronto! 👋💚<br><br>
+    return `¡Hasta pronto! 👋🏻💚<br><br>
 Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 🌱 <strong>Colombia Noviolenta</strong> - Transformando realidades con paz.`;
   }
@@ -267,11 +267,11 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 
   const contextResponses = {
     "usuario_no_participa":
-      "¡No hay problema! 😊 Aún así, puedes explorar nuestros recursos, servicios y mantenerte conectado con nosotros.",
+      "¡No hay problema! 👨🏻 Aún así, puedes explorar nuestros recursos, servicios y mantenerte conectado con nosotros.",
     "usuario_autorizado":
-      "¡Perfecto! 🎉 Ya estás registrado. Ahora puedes explorar todo lo que tenemos para ofrecerte:",
+      "¡Perfecto! 👏🏻 Ya estás registrado. Ahora puedes explorar todo lo que tenemos para ofrecerte:",
     "mostrar_servicios":
-      "¡Aquí están nuestros servicios disponibles! 🌟"
+      "¡Aquí están nuestros servicios disponibles! 👁‍🗨"
   };
 
   if (contextResponses[msg]) return contextResponses[msg];
@@ -368,15 +368,15 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 
   if (msg.includes("voluntario") || msg.includes("ayudar") || msg.includes("colaborar")) {
     return generateServiceResponse(
-      "🤝 ¡Nos encantaría contar contigo!",
-      `<button class="quick-button" data-url="https://www.colombianoviolenta.org/voluntariado/">🤝 Inscribirme</button>`
+      "🤝🏼 ¡Nos encantaría contar contigo!",
+      `<button class="quick-button" data-url="https://www.colombianoviolenta.org/voluntariado/">🤝🏼 Inscribirme</button>`
     );
   }
 
   if (msg.includes("donar") || msg.includes("donación")) {
     return generateServiceResponse(
-      "💝 Tu apoyo es fundamental:",
-      `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">💝 Donar ahora</button>`
+      "💏🏼 Tu apoyo es fundamental:",
+      `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">💏🏼 Donar ahora</button>`
     );
   }
 
@@ -419,41 +419,41 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 </div>
 
 <div style="display:flex;gap:10px;margin-top:10px;">
-  <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
-  <button class="quick-button" data-option="pregunta_especifica">✍️ Hacer pregunta</button>
+  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
+  <button class="quick-button" data-option="pregunta_especifica">✍🏻 Hacer pregunta</button>
 </div>`;
   }
 
   if (msg.includes("hola") || msg.includes("buenos") || msg.includes("hey")) {
-    const greeting = userName ? `¡Hola ${userName}! 👋` : "¡Hola! 👋";
+    const greeting = userName ? `¡Hola ${userName}! 👋🏻` : "¡Hola! 👋🏻";
     return `${greeting} Bienvenido a Colombia Noviolenta. ¿En qué puedo ayudarte hoy?<br><br>${getMainMenu()}`;
   }
 
   if (msg.includes("recuerdas") && (msg.includes("nombre") || msg.includes("llamo"))) {
     if (userName) {
-      return `¡Claro que sí! Te llamas <strong>${userName}</strong> 😊 ¿En qué puedo ayudarte?`;
+      return `¡Claro que sí! Te llamas <strong>${userName}</strong> 🙋🏻 ¿En qué puedo ayudarte?`;
     } else {
-      return `Aún no me has dicho tu nombre 😊 ¿Cómo te gustaría que te llame?`;
+      return `Aún no me has dicho tu nombre 🙋🏻 ¿Cómo te gustaría que te llame?`;
     }
   }
 
   if (msg.includes("gracias")) {
     const response = userName ? `¡De nada ${userName}!` : "¡De nada!";
-    return `${response} 😊 Estoy aquí para ayudarte.<br><br>
+    return `${response} 💁🏻 Estoy aquí para ayudarte.<br><br>
 <div style="display:flex;gap:10px;">
-  <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
+  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar</button>
 </div>`;
   }
 
   if (msg.includes("adiós") || msg.includes("adios") || msg.includes("chao") || msg.includes("hasta luego")) {
-    return `¡Hasta pronto! 👋 Recuerda que siempre puedes volver si necesitas algo más.<br><br>
+    return `¡Hasta pronto! 👋🏻 Recuerda que siempre puedes volver si necesitas algo más.<br><br>
 <strong>¿Deseas calificar nuestra atención antes de irte?</strong><br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
   <button class="quick-button" data-option="calificar_excelente">⭐⭐⭐⭐⭐</button>
   <button class="quick-button" data-option="calificar_buena">⭐⭐⭐⭐</button>
   <button class="quick-button" data-option="calificar_regular">⭐⭐⭐</button>
-  <button class="quick-button" data-option="cerrar_definitivo">❌ No, gracias</button>
+  <button class="quick-button" data-option="cerrar_definitivo">🔴 No, gracias</button>
 </div>`;
   }
 
@@ -462,8 +462,8 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 <button class="quick-button" data-url="https://www.colombianoviolenta.org">🌐 Conocer más</button><br><br>
 ¿En qué más puedo ayudarte?<br><br>
 <div style="display:flex;gap:10px;">
-  <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
-  <button class="quick-button" data-option="pregunta_especifica">✍️ Hacer pregunta</button>
+  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
+  <button class="quick-button" data-option="pregunta_especifica">✍🏻 Hacer pregunta</button>
 </div>`;
   }
 
@@ -486,8 +486,8 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 </div>
 
 <div style="display:flex;gap:10px;margin-top:10px;">
-  <button class="quick-button" data-option="explorar_servicios">✅ Sí</button>
-  <button class="quick-button" data-option="explorar_no">❌ No</button>
+  <button class="quick-button" data-option="explorar_servicios">🟢 Sí</button>
+  <button class="quick-button" data-option="explorar_no">🔴 No</button>
 </div>`;
   }
 
@@ -499,16 +499,16 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
     const greeting = userName ? `${userName}, ` : "";
     return `
 <div style="background:linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);padding:20px;border-radius:12px;color:white;margin:10px 0;">
-  <h3 style="margin:0 0 10px 0;">✨ Tu Momento de Calma ✨</h3>
+  <h3 style="margin:0 0 10px 0;">🫸🏻 Tu Momento de Calma 🫷🏻</h3>
   <p style="margin:0;opacity:0.9;">Elige la opción que más resuene contigo en este momento:</p>
 </div>
 
 <div style="display:grid;gap:10px;margin-top:15px;">
   <button class="quick-button" data-option="conversar_ahora" style="background:#4CAF50;">💬 Conversar ahora</button>
   <button class="quick-button" data-option="tips_bienestar">🌸 Tips rápidos de bienestar</button>
-  <button class="quick-button" data-option="ejercicios_relajacion">🧘‍♀️ Ejercicios de relajación</button>
-  <button class="quick-button" data-option="recursos_autocuidado">💆‍♀️ Recursos de autocuidado</button>
-  <button class="quick-button" data-option="practicas_gratitud">🙏 Prácticas de gratitud</button>
+  <button class="quick-button" data-option="ejercicios_relajacion">🧘🏻‍♂️ Ejercicios de relajación</button>
+  <button class="quick-button" data-option="recursos_autocuidado">💆🏻‍♂️ Recursos de autocuidado</button>
+  <button class="quick-button" data-option="practicas_gratitud">🙏🏻 Prácticas de gratitud</button>
   <button class="quick-button" data-option="rutinas_energia">⚡ Rutinas de energía positiva</button>
   <button class="quick-button" data-option="preguntas_frecuentes">❓ Preguntas frecuentes</button>
 </div>`;
@@ -532,7 +532,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   </div>
   
   <div style="margin:15px 0;">
-    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">☀️ Muévete un Poco</h4>
+    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🏃🏻‍➡️ Muévete un Poco</h4>
     <p>Estira tus brazos, rota tus hombros, camina 5 minutos. El movimiento libera tensión.</p>
   </div>
   
@@ -556,7 +556,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   if (msg === "ejercicios_relajacion") {
     return `
 <div style="background:#fff8e7;padding:20px;border-radius:12px;margin:10px 0;">
-  <h3 style="color:#f57c00;margin-top:0;">🧘‍♀️ Ejercicios de Relajación</h3>
+  <h3 style="color:#f57c00;margin-top:0;">🧘🏻‍♂️ Ejercicios de Relajación</h3>
   
   <div style="margin:15px 0;">
     <h4 style="color:#ff6f00;margin:10px 0 5px 0;">🌬️ Respiración 4-7-8</h4>
@@ -567,7 +567,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   </div>
   
   <div style="margin:15px 0;">
-    <h4 style="color:#ff6f00;margin:10px 0 5px 0;">💆 Relajación Muscular Progresiva</h4>
+    <h4 style="color:#ff6f00;margin:10px 0 5px 0;">💆🏻‍♀️ Relajación Muscular Progresiva</h4>
     <p><strong>Paso 1:</strong> Tensa los músculos de los pies por 5 segundos<br>
     <strong>Paso 2:</strong> Suelta completamente y siente el alivio<br>
     <strong>Paso 3:</strong> Sube por piernas, abdomen, brazos, rostro<br>
@@ -592,7 +592,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   if (msg === "recursos_autocuidado") {
     return `
 <div style="background:#e7f3ff;padding:20px;border-radius:12px;margin:10px 0;">
-  <h3 style="color:#2196F3;margin-top:0;">💆‍♀️ Recursos de Autocuidado</h3>
+  <h3 style="color:#2196F3;margin-top:0;">💆🏻‍♂️ Recursos de Autocuidado</h3>
   
   <div style="margin:15px 0;">
     <h4 style="color:#1976D2;margin:10px 0 5px 0;">🛁 Rituales de Cuidado Diario</h4>
@@ -624,7 +624,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   if (msg === "practicas_gratitud") {
     return `
 <div style="background:#fff3e0;padding:20px;border-radius:12px;margin:10px 0;">
-  <h3 style="color:#F57C00;margin-top:0;">🙏 Prácticas de Gratitud</h3>
+  <h3 style="color:#F57C00;margin-top:0;">🙏🏻 Prácticas de Gratitud</h3>
   
   <div style="margin:15px 0;">
     <h4 style="color:#E65100;margin:10px 0 5px 0;">📝 Diario de Gratitud</h4>
@@ -643,7 +643,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   </div>
   
   <div style="margin:15px 0;">
-    <h4 style="color:#E65100;margin:10px 0 5px 0;">🌟 Momento de Apreciación</h4>
+    <h4 style="color:#E65100;margin:10px 0 5px 0;">🧏🏻‍♂️ Momento de Apreciación</h4>
     <p><strong>Pausa y observa:</strong><br>
     La luz del sol • El sonido de la lluvia • Tu respiración<br>
     <em>La belleza está en los detalles.</em></p>
@@ -670,7 +670,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   </div>
   
   <div style="margin:15px 0;">
-    <h4 style="color:#6A1B9A;margin:10px 0 5px 0;">💪 Pausas Activas</h4>
+    <h4 style="color:#6A1B9A;margin:10px 0 5px 0;">💪🏻 Pausas Activas</h4>
     <p><strong>Cada 2 horas:</strong><br>
     Levántate • Estira brazos y piernas • Respira profundo 5 veces<br>
     Camina 3 min • Toma agua<br>
@@ -721,7 +721,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
 <div style="display:flex;gap:10px;margin-top:15px;">
   <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
   <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
-  <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
+  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
 </div>`;
   }
 
@@ -771,7 +771,7 @@ FORMATO VISUAL OBLIGATORIO:
 
 - Si das lista de pasos, técnicas o puntos, SIEMPRE usa este formato:
   <div style="margin:15px 0;">
-    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌟 Título del Punto</h4>
+    <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🤳🏻 Título del Punto</h4>
     <p><strong>Paso 1:</strong> Descripción clara<br>
     <strong>Paso 2:</strong> Segunda acción<br>
     <em>Nota adicional en cursiva.</em></p>
@@ -824,14 +824,14 @@ ${userContext}`
     // Agregar opciones de continuación
     return `${aiResponse}<br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-  <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
-  <button class="quick-button" data-option="pregunta_especifica">✍️ Otra pregunta</button>
+  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
+  <button class="quick-button" data-option="pregunta_especifica">✍🏻  Otra pregunta</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar</button>
 </div>`;
 
   } catch (error) {
     console.error("Error con OpenAI:", error);
-    return `Gracias por tu mensaje. 😊 ¿En qué puedo ayudarte específicamente?<br><br>${getMainMenu()}`;
+    return `Gracias por tu mensaje. 💁🏻‍♂️ ¿En qué puedo ayudarte específicamente?<br><br>${getMainMenu()}`;
   }
 };
 
