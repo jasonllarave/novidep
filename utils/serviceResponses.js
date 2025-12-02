@@ -32,7 +32,7 @@ export function getMainMenu() {
   return `¡Perfecto! 😊 ¿Qué te interesa?<br><br>
 
 <div style="margin-bottom:15px;">
-  <button class="quick-button" data-option="momento_calma" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;width:100%;padding:12px;font-size:16px;">
+  <button class="quick-button" data-option="momento_calma" style="background:linear-gradient(135deg, #f0c58ead 0%, #55b5db 100%);color:white;width:100%;padding:12px;font-size:16px;">
     ✨ Tu Momento de Calma ✨
   </button>
 </div>
