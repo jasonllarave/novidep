@@ -403,12 +403,22 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   }
 
   if (msg.includes("horario") || msg.includes("abierto") || msg.includes("atiende")) {
-    return `🕐 Nuestro horario de atención es:<br>
-- <strong>Lunes a Viernes:</strong> 8:00 AM - 6:00 PM<br>
-- <strong>Sábados:</strong> 9:00 AM - 2:00 PM<br>
-- <strong>Domingos:</strong> Cerrado<br><br>
-💬 Este chat está disponible 24/7.<br><br>
-<div style="display:flex;gap:10px;">
+    return `
+<div style="background:#f0f8ff;padding:15px;border-radius:10px;margin:10px 0;">
+  <h3 style="color:#2196F3;margin-top:0;">🕐 Horario de Atención</h3>
+  
+  <div style="margin:10px 0;">
+    <p><strong>📅 Lunes a Viernes:</strong> 8:00 AM - 6:00 PM</p>
+    <p><strong>📅 Sábados:</strong> 9:00 AM - 2:00 PM</p>
+    <p><strong>📅 Domingos:</strong> Cerrado</p>
+  </div>
+  
+  <p style="margin-top:15px;padding:10px;background:#e3f2fd;border-radius:5px;">
+    💬 <strong>Este chat está disponible 24/7</strong> para ayudarte en cualquier momento.
+  </p>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:10px;">
   <button class="quick-button" data-option="explorar_servicios">🌟 Ver servicios</button>
   <button class="quick-button" data-option="pregunta_especifica">✍️ Hacer pregunta</button>
 </div>`;
@@ -458,13 +468,24 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   }
 
   if (msg.includes("redes") || msg.includes("social") || msg.includes("instagram") || msg.includes("facebook")) {
-    return `📱 Síguenos en nuestras redes:<br><br>
-<button class="quick-button" data-url="https://www.instagram.com/colombianoviolenta">📷 Instagram</button>
-<button class="quick-button" data-url="https://www.facebook.com/ColombiaNoviolenta">📘 Facebook</button>
-<button class="quick-button" data-url="https://www.tiktok.com/@colombianoviolenta">🎵 TikTok</button>
-<button class="quick-button" data-url="https://www.youtube.com/@parrapapandi">📺 YouTube</button><br><br>
-¿Deseas explorar nuestros servicios?<br><br>
-<div style="display:flex;gap:10px;">
+    return `
+<div style="background:#f0f8ff;padding:15px;border-radius:10px;margin:10px 0;">
+  <h3 style="color:#E91E63;margin-top:0;">📱 Nuestras Redes Sociales</h3>
+  <p>Síguenos para estar al día con nuestras actividades, eventos y contenido sobre cultura de paz:</p>
+</div>
+
+<div style="display:grid;gap:10px;margin:15px 0;">
+  <button class="quick-button" data-url="https://www.instagram.com/colombianoviolenta" style="background:#E1306C;color:white;">📷 Instagram</button>
+  <button class="quick-button" data-url="https://www.facebook.com/ColombiaNoviolenta" style="background:#1877F2;color:white;">📘 Facebook</button>
+  <button class="quick-button" data-url="https://www.tiktok.com/@colombianoviolenta" style="background:#000000;color:white;">🎵 TikTok</button>
+  <button class="quick-button" data-url="https://www.youtube.com/@parrapapandi" style="background:#FF0000;color:white;">📺 YouTube</button>
+</div>
+
+<div style="background:#fff8e7;padding:10px;border-radius:8px;margin:10px 0;">
+  <p style="margin:0;">¿Deseas explorar nuestros servicios?</p>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:10px;">
   <button class="quick-button" data-option="explorar_servicios">✅ Sí</button>
   <button class="quick-button" data-option="explorar_no">❌ No</button>
 </div>`;
@@ -477,7 +498,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   if (msg === "momento_calma") {
     const greeting = userName ? `${userName}, ` : "";
     return `
-<div style="background:linear-gradient(135deg, #1614a798 0%, #ebb64496 100%);padding:20px;border-radius:12px;color:white;margin:10px 0;">
+<div style="background:linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);padding:20px;border-radius:12px;color:white;margin:10px 0;">
   <h3 style="margin:0 0 10px 0;">✨ Tu Momento de Calma ✨</h3>
   <p style="margin:0;opacity:0.9;">Elige la opción que más resuene contigo en este momento:</p>
 </div>
@@ -741,8 +762,14 @@ REGLAS CRÍTICAS:
 - Sé empático, comprensivo y profesional
 - Responde en español, breve (máximo 3-4 líneas) y amigable
 
-FORMATO VISUAL:
-- Si das lista de pasos o puntos, usa este formato HTML:
+FORMATO VISUAL OBLIGATORIO:
+- SIEMPRE usa formato HTML visual bonito, incluso para respuestas cortas
+- Envuelve tu respuesta principal en un div con fondo:
+  <div style="background:#f0f8ff;padding:15px;border-radius:10px;margin:10px 0;">
+    Tu respuesta aquí
+  </div>
+
+- Si das lista de pasos, técnicas o puntos, SIEMPRE usa este formato:
   <div style="margin:15px 0;">
     <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌟 Título del Punto</h4>
     <p><strong>Paso 1:</strong> Descripción clara<br>
@@ -750,11 +777,29 @@ FORMATO VISUAL:
     <em>Nota adicional en cursiva.</em></p>
   </div>
 
-- NO uses "1.", "2." simple
-- USA títulos con emojis y colores
-- Separa cada punto en divs diferentes
-- Usa <strong> para resaltar
-- Usa <em> para notas
+- NUNCA uses formato simple como "1.", "2.", "3."
+- SIEMPRE usa títulos con emojis relevantes y colores
+- Separa cada punto/sección en divs diferentes
+- Usa <strong> para resaltar palabras clave
+- Usa <em> para notas importantes o consejos
+- Colores sugeridos: #4CAF50 (verde), #2196F3 (azul), #FF6F00 (naranja), #7B1FA2 (morado)
+
+Ejemplo de respuesta correcta:
+<div style="background:#f0f8ff;padding:15px;border-radius:10px;margin:10px 0;">
+  <p>[Tu respuesta empática aquí]</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌸 Primera Técnica</h4>
+  <p><strong>Cómo hacerlo:</strong> Descripción paso a paso<br>
+  <em>Beneficio: Por qué funciona</em></p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#2196F3;margin:10px 0 5px 0;">💡 Segunda Técnica</h4>
+  <p><strong>Cómo hacerlo:</strong> Descripción paso a paso<br>
+  <em>Beneficio: Por qué funciona</em></p>
+</div>
 - Si mencionas URLs, usa botones: <button class="quick-button" data-url="URL">TEXTO</button>
 - SIEMPRE ofrece opciones de continuación al final
 - Analiza el HISTORIAL COMPLETO antes de responder

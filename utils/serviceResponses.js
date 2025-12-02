@@ -29,7 +29,10 @@ export const serviceResponsesData = {
 
 // Menú principal con opciones enumeradas
 export function getMainMenu() {
-  return `¡Perfecto! 😊 ¿Qué te interesa?<br><br>
+  return `
+<div style="background:#f8f9fa;padding:15px;border-radius:10px;margin:10px 0;">
+  <h3 style="color:#333;margin-top:0;">¡Perfecto! 😊 ¿Qué te interesa?</h3>
+</div>
 
 <div style="margin-bottom:15px;">
   <button class="quick-button" data-option="momento_calma" style="background:linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);color:white;width:100%;padding:12px;font-size:16px;">
@@ -37,22 +40,25 @@ export function getMainMenu() {
   </button>
 </div>
 
-<strong>1.</strong> 🎵 Boletas concierto<br>
-<strong>2.</strong> 🛒 Tienda<br>
-<strong>3.</strong> 📋 Servicios<br>
-<strong>4.</strong> 📘 Facebook<br>
-<strong>5.</strong> 📖 Comprar cartilla<br>
-<strong>6.</strong> 📞 Contacto<br><br>
+<div style="background:white;padding:15px;border-radius:10px;border:1px solid #e0e0e0;">
+  <strong>1.</strong> 🎵 Boletas concierto<br>
+  <strong>2.</strong> 🛒 Tienda<br>
+  <strong>3.</strong> 📋 Servicios<br>
+  <strong>4.</strong> 📘 Facebook<br>
+  <strong>5.</strong> 📖 Comprar cartilla<br>
+  <strong>6.</strong> 📞 Contacto<br><br>
 
-<div style="display:flex;flex-wrap:wrap;gap:8px;">
-  <button class="quick-button" data-option="opcion_1">1️⃣ Boletas</button>
-  <button class="quick-button" data-option="opcion_2">2️⃣ Tienda</button>
-  <button class="quick-button" data-option="opcion_3">3️⃣ Servicios</button>
-  <button class="quick-button" data-option="opcion_4">4️⃣ Facebook</button>
-  <button class="quick-button" data-option="opcion_5">5️⃣ Cartilla</button>
-  <button class="quick-button" data-option="opcion_6">6️⃣ Contacto</button>
-</div><br>
-✍️ También puedes escribir el número de la opción.`;
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    <button class="quick-button" data-option="opcion_1">1️⃣ Boletas</button>
+    <button class="quick-button" data-option="opcion_2">2️⃣ Tienda</button>
+    <button class="quick-button" data-option="opcion_3">3️⃣ Servicios</button>
+    <button class="quick-button" data-option="opcion_4">4️⃣ Facebook</button>
+    <button class="quick-button" data-option="opcion_5">5️⃣ Cartilla</button>
+    <button class="quick-button" data-option="opcion_6">6️⃣ Contacto</button>
+  </div>
+  
+  <p style="margin:10px 0 0 0;font-size:14px;color:#666;">✍️ También puedes escribir el número de la opción.</p>
+</div>`;
 }
 
 // Función helper para generar respuesta con botón y opciones de continuación
