@@ -1,3 +1,5 @@
+//models/ConversatioSession.js
+
 import mongoose from 'mongoose';
 
 const conversationSessionSchema = new mongoose.Schema({
@@ -75,6 +77,7 @@ const conversationSessionSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
 
 // Índices para mejorar rendimiento
 conversationSessionSchema.index({ lastActivity: 1 });
