@@ -20,7 +20,7 @@ export const getChatbotResponse = async (
   const userName = sessionContext.name || "";
 
   // ===================================================
-  // 🚨 PRIORIDAD 1: DETECTAR NECESIDAD PSICOLÓGICA
+  //  PRIORIDAD 1: DETECTAR NECESIDAD PSICOLÓGICA
   // ===================================================
   
   const psychNeed = detectPsychologicalNeed(message);
@@ -225,7 +225,7 @@ Por favor, cuéntame más sobre tu situación. Escribe lo que sientes o lo que e
   // ===================================================
   
   if (msg === "finalizar_chat") {
-    return `¡Gracias por usar nuestro servicio! 👁‍🗨 <br><br>
+    return `¡Gracias por usar nuestro servicio! 👁‍🗨<br><br>
 La no violencia no es pasividad, es una fuerza activa que transforma sin destruir.<br><br>
 <strong>¿Cómo calificarías nuestra atención?</strong><br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -368,7 +368,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 
   if (msg.includes("voluntario") || msg.includes("ayudar") || msg.includes("colaborar")) {
     return generateServiceResponse(
-      "🤝🏼 ¡Nos encantaría contar contigo!",
+      "🤝 ¡Nos encantaría contar contigo!",
       `<button class="quick-button" data-url="https://www.colombianoviolenta.org/voluntariado/">🤝🏼 Inscribirme</button>`
     );
   }
@@ -439,7 +439,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
 
   if (msg.includes("gracias")) {
     const response = userName ? `¡De nada ${userName}!` : "¡De nada!";
-    return `${response} 💁🏻 Estoy aquí para ayudarte.<br><br>
+    return `${response} 🙋🏻 Estoy aquí para ayudarte.<br><br>
 <div style="display:flex;gap:10px;">
   <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar</button>
@@ -447,12 +447,12 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   }
 
   if (msg.includes("adiós") || msg.includes("adios") || msg.includes("chao") || msg.includes("hasta luego")) {
-    return `¡Hasta pronto! 👋🏻 Recuerda que siempre puedes volver si necesitas algo más.<br><br>
+    return `¡Hasta pronto! 💁🏻 Recuerda que siempre puedes volver si necesitas algo más.<br><br>
 <strong>¿Deseas calificar nuestra atención antes de irte?</strong><br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
-  <button class="quick-button" data-option="calificar_excelente">⭐⭐⭐⭐⭐</button>
-  <button class="quick-button" data-option="calificar_buena">⭐⭐⭐⭐</button>
-  <button class="quick-button" data-option="calificar_regular">⭐⭐⭐</button>
+  <button class="quick-button" data-option="calificar_excelente">🏅🏅🏅🏅🏅</button>
+  <button class="quick-button" data-option="calificar_buena">🏅🏅🏅🏅</button>
+  <button class="quick-button" data-option="calificar_regular">🏅🏅🏅</button>
   <button class="quick-button" data-option="cerrar_definitivo">🔴 No, gracias</button>
 </div>`;
   }
@@ -590,34 +590,55 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
   }
 
   if (msg === "recursos_autocuidado") {
+    const greeting = userName ? `¡Excelente decisión, ${userName}!` : "¡Excelente decisión!";
     return `
-<div style="background:#e7f3ff;padding:20px;border-radius:12px;margin:10px 0;">
-  <h3 style="color:#2196F3;margin-top:0;">💆🏻‍♂️ Recursos de Autocuidado</h3>
-  
-  <div style="margin:15px 0;">
-    <h4 style="color:#1976D2;margin:10px 0 5px 0;">🛁 Rituales de Cuidado Diario</h4>
-    <p><strong>Mañana:</strong> Despierta 10 min antes, estírate, hidrátate<br>
-    <strong>Tarde:</strong> Pausa activa cada 2 horas, respira profundo<br>
-    <strong>Noche:</strong> Desconecta pantallas 1 hora antes de dormir</p>
-  </div>
-  
-  <div style="margin:15px 0;">
-    <h4 style="color:#1976D2;margin:10px 0 5px 0;">📖 Journaling Terapéutico</h4>
-    <p><strong>Escribe 5 min cada día:</strong><br>
-    ¿Cómo me siento hoy? • ¿Qué agradezco? • ¿Qué necesito?<br>
-    <em>Escribir libera emociones guardadas.</em></p>
-  </div>
-  
-  <div style="margin:15px 0;">
-    <h4 style="color:#1976D2;margin:10px 0 5px 0;">🎨 Actividades que Nutren</h4>
-    <p>Leer • Dibujar • Cocinar • Caminar en naturaleza • Escuchar música<br>
-    <em>Dedica tiempo a lo que te hace sentir vivo.</em></p>
-  </div>
+<div style="background:#f0f8ff;padding:15px;border-radius:10px;margin:10px 0;">
+  <p>${greeting} Aquí te dejo algunas formas efectivas de autocuidado:</p>
 </div>
 
-<div style="display:flex;gap:10px;margin-top:15px;">
+<div style="margin:15px 0;">
+  <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌱 Autocuidado Emocional</h4>
+  <p><strong>Meditación:</strong> Dedica unos minutos al día para meditar y conectar contigo mismo.<br>
+  <strong>Diario Personal:</strong> Escribe tus pensamientos y emociones. Esto ayuda a liberar tensiones y a conocerte mejor.</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#2196F3;margin:10px 0 5px 0;">💪🏻 Autocuidado Físico</h4>
+  <p><strong>Ejercicio Regular:</strong> Realiza actividades físicas que disfrutes (caminatas, yoga, danza).<br>
+  <strong>Alimentación Saludable:</strong> Incorpora frutas y verduras en tu dieta. Esto aumenta tu energía y mejora tu estado de ánimo.</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#7B1FA2;margin:10px 0 5px 0;">🧘🏻 Autocuidado Mental</h4>
+  <p><strong>Leer un Libro:</strong> Dedica tiempo a la lectura de algo que te apasione.<br>
+  <strong>Aprender Nuevas Habilidades:</strong> Inscríbete en cursos que te interesen. Esto estimula tu mente y te mantiene activo.</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#FF6F00;margin:10px 0 5px 0;">🛁 Autocuidado de Rutina</h4>
+  <p><strong>Mañana:</strong> Despierta 10 min antes, estírate, hidrátate.<br>
+  <strong>Tarde:</strong> Pausa activa cada 2 horas, respira profundo.<br>
+  <strong>Noche:</strong> Desconecta pantallas 1 hora antes de dormir.<br>
+  <em>Los pequeños rituales diarios generan grandes cambios.</em></p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#E91E63;margin:10px 0 5px 0;">📖 Journaling Terapéutico</h4>
+  <p><strong>Escribe 5 min cada día:</strong><br>
+  ¿Cómo me siento hoy? • ¿Qué agradezco? • ¿Qué necesito?<br>
+  <em>Escribir libera emociones guardadas y te ayuda a conocerte mejor.</em></p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#00BCD4;margin:10px 0 5px 0;">🎨 Actividades que Nutren el Alma</h4>
+  <p>Leer • Dibujar • Cocinar • Caminar en naturaleza • Escuchar música • Ver una película<br>
+  <em>Dedica tiempo a lo que te hace sentir vivo y conectado contigo.</em></p>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
   <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
   <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
 </div>`;
   }
 
@@ -825,7 +846,7 @@ ${userContext}`
     return `${aiResponse}<br><br>
 <div style="display:flex;gap:10px;flex-wrap:wrap;">
   <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
-  <button class="quick-button" data-option="pregunta_especifica">✍🏻  Otra pregunta</button>
+  <button class="quick-button" data-option="pregunta_especifica">✍🏻 Otra pregunta</button>
   <button class="quick-button" data-option="finalizar_chat">🏁 Finalizar</button>
 </div>`;
 
