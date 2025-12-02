@@ -31,7 +31,7 @@ export const serviceResponsesData = {
 export function getMainMenu() {
   return `
 <div style="background:#f8f9fa;padding:15px;border-radius:10px;margin:10px 0;">
-  <h3 style="color:#333;margin-top:0;">¡Perfecto! 😊 ¿Qué te interesa?</h3>
+  <h4 style="color:#555;margin:0;font-weight:normal;font-size:16px;">¡Perfecto! 😊 ¿Qué te interesa?</h4>
 </div>
 
 <div style="margin-bottom:15px;">
