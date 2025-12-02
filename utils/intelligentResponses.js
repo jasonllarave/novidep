@@ -477,7 +477,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   if (msg === "momento_calma") {
     const greeting = userName ? `${userName}, ` : "";
     return `
-<div style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);padding:20px;border-radius:12px;color:white;margin:10px 0;">
+<div style="background:linear-gradient(135deg, #1614a798 0%, #ebb64496 100%);padding:20px;border-radius:12px;color:white;margin:10px 0;">
   <h3 style="margin:0 0 10px 0;">✨ Tu Momento de Calma ✨</h3>
   <p style="margin:0;opacity:0.9;">Elige la opción que más resuene contigo en este momento:</p>
 </div>
