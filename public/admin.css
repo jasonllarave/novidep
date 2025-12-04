@@ -26,7 +26,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: linear-gradient(135deg, #ffe4a5 0%, #fefdff 100%);
   min-height: 100vh;
   padding: 20px;
   line-height: 1.6;
@@ -67,7 +67,7 @@ body {
 
 #login-section h2 {
   text-align: center;
-  color: var(--primary-color);
+  color: #243ba2;
   margin-bottom: 30px;
   font-size: 24px;
 }
@@ -90,7 +90,7 @@ body {
 #login-section button {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: linear-gradient(135deg, #2f4ac4 0%, #f25976 100%);
   color: white;
   border: none;
   border-radius: 8px;
