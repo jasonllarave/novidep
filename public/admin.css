@@ -41,6 +41,20 @@ body {
    LOGIN SECTION
    ================================ */
 
+   /* Centrar el logo y dar espacio debajo */
+#login-section .logo-container {
+  text-align: center;
+  margin-bottom: 25px;   /* baja el formulario */
+}
+
+/* Tamaño del logo */
+#login-section .logo-container img {
+  width: 90px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
 #login-section {
   max-width: 400px;
   margin: 100px auto;
