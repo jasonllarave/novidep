@@ -23,7 +23,7 @@ export const serviceResponsesData = {
   },
   cartilla: {
     text: "📖 Nuestra cartilla es una herramienta educativa sobre noviolencia y resolución pacífica de conflictos. Descárgala y compártela.",
-    button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 Descargar cartilla</button>`
+    button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 adquirir cartilla</button>`
   }
 };
 

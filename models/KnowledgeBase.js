@@ -1,3 +1,5 @@
+// models/KnowledgeBase.js
+
 import mongoose from 'mongoose';
 
 const knowledgeSchema = new mongoose.Schema({

@@ -1,3 +1,5 @@
+//scripts/seedDatabase.js
+
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { KnowledgeBase } from '../models/KnowledgeBase.js';
