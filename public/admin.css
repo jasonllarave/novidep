@@ -215,6 +215,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
+  margin-top: 40px; /* MÁS SEPARACIÓN DEL TÍTULO */
 }
 
 .stat-card {
@@ -238,17 +239,20 @@ body {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center; /* CENTRADO DEL TÍTULO */
 }
 
 .stat-card .number {
   font-size: 36px;
   font-weight: bold;
   margin: 10px 0;
+  text-align: center; /* CENTRADO DEL NÚMERO */
 }
 
 .stat-card p {
   font-size: 13px;
   opacity: 0.8;
+  text-align: center; /* CENTRADO DEL TEXTO */
 }
 
 /* ================================
@@ -544,7 +548,7 @@ tbody tr:last-child td {
 }
 
 .close-modal:hover {
-  background: #c0392b;
+  background: #c4133f;
 }
 
 /* ================================
@@ -561,7 +565,7 @@ tbody tr:last-child td {
 .message-user {
   background: #e3f2fd;
   margin-left: 20%;
-  border-left: 4px solid #2196f3;
+  border-left: 4px solid #23148a;
 }
 
 .message-bot {

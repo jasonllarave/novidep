@@ -253,7 +253,7 @@ async function loadHistory(page = 1) {
             <small>📂 ${new Date(conv.lastActivity).toLocaleString('es-CO')}</small>
           </div>
           <button class="btn btn-primary" onclick="viewConversation('${conv.sessionId}')">
-            📬 Ver Detalle
+             Ver Detalle
           </button>
         </div>
       </div>
