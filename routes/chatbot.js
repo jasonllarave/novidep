@@ -12,8 +12,8 @@ const socialButtons = [
   { label: "Facebook", url: "https://www.facebook.com/ColombiaNoviolenta" },
   { label: "TikTok", url: "https://www.tiktok.com/@colombianoviolenta" },
   { label: "X", url: "https://x.com/colnoviolenta" },
-  { label: "YouTube", url: "https://www.youtube.com/@parrapapandi" },
-  { label: "Spotify", url: "https://open.spotify.com/show/1V6DxlGw5fIN52HhYG2flu" }
+  { label: "YouTube", url: "https://www.youtube.com/@colombia_noviolenta" },
+  { label: "Spotify", url: "https://open.spotify.com/album/6cMfkPJzfet8mdEt6d6u4p?si=SA_JTUXVQK2n0kCly50GMA" }
 ];
 
 // Función para generar HTML de botones
