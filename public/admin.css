@@ -225,6 +225,7 @@ body {
   border-radius: 12px;
   box-shadow: var(--shadow);
   transition: transform 0.3s, box-shadow 0.3s;
+  text-align: center; /* CENTRADO DE TODO EL CONTENIDO */
 }
 
 .stat-card:hover {
@@ -239,20 +240,17 @@ body {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  text-align: center; /* CENTRADO DEL TÍTULO */
 }
 
 .stat-card .number {
   font-size: 36px;
   font-weight: bold;
   margin: 10px 0;
-  text-align: center; /* CENTRADO DEL NÚMERO */
 }
 
 .stat-card p {
   font-size: 13px;
   opacity: 0.8;
-  text-align: center; /* CENTRADO DEL TEXTO */
 }
 
 /* ================================
@@ -747,4 +745,16 @@ tbody tr:last-child td {
 
 .shadow {
   box-shadow: var(--shadow);
+}
+
+/* ================================
+   TÍTULOS DE SECCIONES
+   ================================ */
+
+.tab-content h2 {
+  text-align: center;
+  color: var(--text-dark);
+  font-size: 24px;
+  margin-bottom: 40px; /* SEPARACIÓN DE LOS BOTONES/CONTENIDO */
+  font-weight: 600;
 }
