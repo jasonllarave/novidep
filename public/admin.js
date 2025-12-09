@@ -249,7 +249,7 @@ async function loadHistory(page = 1) {
           <div>
             <strong>🔵 ${conv.userId}</strong><br>
             <small>Session: ${conv.sessionId}</small><br>
-            <small>📥 ${conv.messageCount} mensajes | Estado: ${conv.status}</small><br>
+            <small>📨 ${conv.messageCount} mensajes | Estado: ${conv.status}</small><br>
             <small>📂 ${new Date(conv.lastActivity).toLocaleString('es-CO')}</small>
           </div>
           <button class="btn btn-primary" onclick="viewConversation('${conv.sessionId}')">
