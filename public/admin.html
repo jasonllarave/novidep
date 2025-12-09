@@ -91,6 +91,7 @@
     .panel-header h1 {
       color: #243ba2;
       font-size: 28px;
+      margin-left: 27rem;
     }
 
     .logout-btn {
@@ -363,7 +364,7 @@
   <div class="container">
     <div id="panel-section">
       <div class="panel-header">
-        <h1>📊 Panel Administrativo - Novi</h1>
+        <h1> Panel Administrativo - Novi</h1>
         <button class="logout-btn" onclick="location.reload()">Cerrar Sesión</button>
       </div>
 
@@ -378,16 +379,16 @@
 
       <!-- TAB: DASHBOARD -->
       <div id="tab-dashboard" class="tab-content active">
-        <h2>📈 Resumen General</h2>
+        <h2> Resumen General</h2>
         <div class="stats-grid" id="dashboard-stats"></div>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           <div>
-            <h3>🆕 Últimos Registros</h3>
+            <h3> Últimos Registros</h3>
             <div id="ultimos-registros"></div>
           </div>
           <div>
-            <h3>💬 Conversaciones Recientes</h3>
+            <h3> Conversaciones Recientes</h3>
             <div id="conversaciones-recientes"></div>
           </div>
         </div>
@@ -395,7 +396,7 @@
 
       <!-- TAB: MÉTRICAS -->
       <div id="tab-metricas" class="tab-content">
-        <h2>📊 Métricas Detalladas</h2>
+        <h2> Métricas Detalladas</h2>
         <div class="stats-grid" id="metricas-stats"></div>
         
         <div class="chart-container">
@@ -416,7 +417,7 @@
 
       <!-- TAB: HISTORIAL -->
       <div id="tab-historial" class="tab-content">
-        <h2>💬 Historial de Conversaciones</h2>
+        <h2>Historial de Conversaciones</h2>
         <div style="margin-bottom: 20px;">
           <button class="btn btn-primary" onclick="loadHistory()">🔄 Actualizar</button>
           <input type="text" id="search-session" placeholder="Buscar por Session ID" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-left: 10px;">
@@ -428,11 +429,11 @@
 
       <!-- TAB: REGISTROS -->
       <div id="tab-registros" class="tab-content">
-        <h2>👥 Registros de Usuarios</h2>
+        <h2>🗂 Registros de Usuarios</h2>
         <div style="margin-bottom: 20px;">
-          <button class="btn btn-primary" onclick="loadRegistrations()">🔄 Actualizar</button>
-          <button class="btn btn-success" onclick="window.open('/api/admin/registros/export/csv', '_blank')">📥 Exportar CSV</button>
-          <button class="btn btn-success" onclick="window.open('/api/admin/registros/export/excel', '_blank')">📊 Exportar Excel</button>
+          <button class="btn btn-primary" onclick="loadRegistrations()">🌐 Actualizar</button>
+          <button class="btn btn-success" onclick="window.open('/api/admin/registros/export/csv', '_blank')"> Exportar CSV</button>
+          <button class="btn btn-success" onclick="window.open('/api/admin/registros/export/excel', '_blank')"> Exportar Excel</button>
         </div>
         <p><strong>Total registros:</strong> <span id="reg-count">0</span></p>
         <table id="reg-table">
@@ -452,7 +453,7 @@
 
       <!-- TAB: ENLACES -->
       <div id="tab-links" class="tab-content">
-        <h2>🔗 Gestión de Enlaces</h2>
+        <h2>👉🏻 Gestión de Enlaces</h2>
         <div class="input-group">
           <input type="text" id="new-title" placeholder="Título del enlace">
           <input type="text" id="new-url" placeholder="URL del enlace">
@@ -469,7 +470,7 @@
   <div id="conversation-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>💬 Detalle de Conversación</h2>
+        <h2>🙋🏻‍♂️ Detalle de Conversación</h2>
         <button class="close-modal" onclick="closeModal()">✖ Cerrar</button>
       </div>
       <div id="modal-conversation-content"></div>
