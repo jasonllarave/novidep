@@ -308,7 +308,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
     },
     "5": {
       text: "📖 Nuestra cartilla educativa sobre noviolencia está disponible para descarga gratuita. Es una herramienta valiosa para el aprendizaje.",
-      button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 Descargar cartilla</button>`
+      button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 ver cartilla</button>`
     },
     "6": {
       text: "📞 Puedes contactarnos a través de cualquiera de estos medios:",
@@ -383,7 +383,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   if (msg.includes("cartilla") || msg.includes("material") || msg.includes("guía")) {
     return generateServiceResponse(
       "📖 Nuestra cartilla educativa está disponible:",
-      `<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 Descargar</button>`
+      `<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 ver cartilla</button>`
     );
   }
 
