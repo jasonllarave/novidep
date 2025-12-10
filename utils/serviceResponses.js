@@ -1,4 +1,5 @@
 // utils/serviceResponses.js
+import styles from '../public/index.css';
 
 export const serviceResponsesData = {
   boletas_concierto: {
