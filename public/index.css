@@ -271,7 +271,7 @@ body::before {
 }
 
 .quick-button:hover {
-  background-color: #1241fc41;
+  background-color: #1241fc83;
 }
 
 .input-wrapper {
@@ -478,8 +478,33 @@ body::before {
   text-decoration: none !important;
 }
 
-/*esfecto escritura*/
+/*boton de tu momento de calma para dar clic*/
 
+.momento-calma-btn {
+  background: linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);
+  color: white !important;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.3s ease;
+}
+
+/* HOVER */
+.momento-calma-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+  background: linear-gradient(135deg, #e24754 0%, #30a7d3 100%);
+}
+
+/* CUANDO SE PRESIONA */
+.momento-calma-btn:active {
+  transform: scale(0.98);
+}
 
 
   
