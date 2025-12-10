@@ -34,9 +34,9 @@ export function getMainMenu() {
   <h4 style="color:#555;margin:0;font-weight:normal;font-size:16px;">¡Perfecto! 👦🏻 ¿Qué te interesa?</h4>
 </div>
 
-<div style="margin-bottom:15px;">
+<div style="margin-bottom:15px;" class="momento_calma">
   <button class="quick-button" data-option="momento_calma" style="background:linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);color:white;width:100%;padding:12px;font-size:16px;">
-    👫🏻 Tu Momento de Calma 🧑🏻‍🤝‍🧑🏻
+    0️⃣ Tu Momento de Calma 🧑🏻‍🤝‍🧑🏻
   </button>
 </div>
 
