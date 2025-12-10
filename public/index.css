@@ -481,7 +481,7 @@ body::before {
 /*boton de tu momento de calma para dar clic*/
 
 /* ---- ESTILOS DEL BOTÓN "MOMENTO DE CALMA" ---- */
-.momento_calma-btn {
+.quick-button[data-option="momento_calma"] {
   background: linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);
   color: white !important;
   width: 100%;
@@ -492,7 +492,6 @@ body::before {
   border-radius: 14px;
   cursor: pointer;
 
-  /* Para ver la animación dentro */
   position: relative;
   overflow: hidden;
 
@@ -500,8 +499,8 @@ body::before {
   box-shadow: 0 5px 15px rgba(0,0,0,0.25);
 }
 
-/* Franja animada (shimmer) */
-.momento_calma-btn::after {
+/* Franja animada */
+.quick-button[data-option="momento_calma"]::after {
   content: "";
   position: absolute;
   top: 0;
@@ -511,11 +510,9 @@ body::before {
   background: linear-gradient(
     120deg,
     transparent,
-    rgba(255, 255, 255, 0.664),
-    rgba(216, 6, 104, 0.137) 0%,
-    rgba(255, 255, 255, 0.829),
-    
-    
+    rgba(255, 255, 255, 0.7),
+    rgba(216, 6, 104, 0.2),
+    rgba(255, 255, 255, 0.85),
     transparent
   );
   animation: shimmer 2.8s infinite;
@@ -528,15 +525,14 @@ body::before {
   100% { left: 120%; }
 }
 
-.momento_calma-btn:hover {
+.quick-button[data-option="momento_calma"]:hover {
   transform: translateY(-2px);
   box-shadow: 0 7px 20px rgba(0,0,0,0.35);
 }
 
-.momento_calma-btn:active {
+.quick-button[data-option="momento_calma"]:active {
   transform: scale(0.97);
 }
-
 
 
 
