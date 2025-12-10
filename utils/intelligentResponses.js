@@ -307,7 +307,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
       button: `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">📘 Ir a Donaciones</button>`
     },
     "5": {
-      text: "📖 Nuestra cartilla educativa sobre noviolencia está disponible para descarga gratuita. Es una herramienta valiosa para el aprendizaje.",
+      text: "📖 Nuestra cartilla educativa sobre noviolencia está disponible para consulta. Es una herramienta valiosa para el aprendizaje.",
       button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/cartilla/">📖 ver cartilla</button>`
     },
     "6": {
