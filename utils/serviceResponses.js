@@ -44,7 +44,7 @@ export function getMainMenu() {
   <strong>1.</strong> 🎵 Boletas concierto<br>
   <strong>2.</strong> 🛒 Tienda<br>
   <strong>3.</strong> 📋 Servicios<br>
-  <strong>4.</strong> 📘 Facebook<br>
+  <strong>4.</strong> 📘 Donaciones<br>
   <strong>5.</strong> 📖 Comprar cartilla<br>
   <strong>6.</strong> 📞 Contacto<br><br>
 
@@ -52,7 +52,7 @@ export function getMainMenu() {
     <button class="quick-button" data-option="opcion_1">1️⃣ Boletas</button>
     <button class="quick-button" data-option="opcion_2">2️⃣ Tienda</button>
     <button class="quick-button" data-option="opcion_3">3️⃣ Servicios</button>
-    <button class="quick-button" data-option="opcion_4">4️⃣ Facebook</button>
+    <button class="quick-button" data-option="opcion_4">4️⃣ Donaciones</button>
     <button class="quick-button" data-option="opcion_5">5️⃣ Cartilla</button>
     <button class="quick-button" data-option="opcion_6">6️⃣ Contacto</button>
   </div>
