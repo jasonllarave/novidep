@@ -304,7 +304,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
     },
     "4": {
       text: "📘 ¡Síguenos en Facebook para mantenerte al día con nuestras actividades, eventos y contenido sobre cultura de paz!",
-      button: `<button class="quick-button" data-url="https://www.facebook.com/ColombiaNoviolenta">📘 Ir a Facebook</button>`
+      button: `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">📘 Ir a Donaciones</button>`
     },
     "5": {
       text: "📖 Nuestra cartilla educativa sobre noviolencia está disponible para descarga gratuita. Es una herramienta valiosa para el aprendizaje.",
