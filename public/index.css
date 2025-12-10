@@ -513,9 +513,10 @@ body::before {
     transparent,
     rgba(255, 255, 255, 0.664),
     rgba(216, 6, 104, 0.137) 0%,
+    rgba(255, 255, 255, 0.829),
     transparent
   );
-  animation: shimmer 3.0s infinite;
+  animation: shimmer 2.7s infinite;
 }
 
 /* Animación */
