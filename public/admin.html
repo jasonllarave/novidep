@@ -178,6 +178,13 @@
       margin-bottom: 15px;
     }
 
+    /* AJUSTE ESPECÍFICO PARA EL GRÁFICO CIRCULAR */
+    .chart-container.doughnut-chart {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -401,17 +408,17 @@
         
         <div class="chart-container">
           <h3>Conversaciones por Día (Últimos 7 días)</h3>
-          <canvas id="conversationsChart" width="400" height="150"></canvas>
+          <canvas id="conversationsChart" width="400" height="120"></canvas>
         </div>
 
         <div class="chart-container">
           <h3>Registros por Día (Últimos 7 días)</h3>
-          <canvas id="registrationsChart" width="400" height="150"></canvas>
+          <canvas id="registrationsChart" width="400" height="120"></canvas>
         </div>
 
-        <div class="chart-container">
-          <h3>Estado de Conversaciones</h3>
-          <canvas id="statusChart" width="400" height="200"></canvas>
+        <div class="chart-container doughnut-chart">
+          <h3 style="text-align: center;">Estado de Conversaciones</h3>
+          <canvas id="statusChart"></canvas>
         </div>
       </div>
 
