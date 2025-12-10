@@ -392,6 +392,35 @@ router.get("/registros/export/excel", async (req, res) => {
 });
 
 // =======================
+//   ELIMINAR CONVERSACIÓN
+// =======================
+
+router.delete("/conversation/:sessionId", async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    // Eliminar la conversación
+    const conversation = await ConversationSession.findOneAndDelete({ sessionId });
+    
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversación no encontrada" });
+    }
+
+    // Opcionalmente también eliminar el registro asociado
+    await Registration.findOneAndDelete({ sessionId });
+
+    res.json({ 
+      success: true, 
+      message: "Conversación eliminada correctamente",
+      sessionId 
+    });
+  } catch (err) {
+    console.error("Error eliminando conversación:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// =======================
 //   RESUMEN DEL DASHBOARD
 // =======================
 

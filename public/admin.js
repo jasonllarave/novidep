@@ -105,7 +105,7 @@ async function loadDashboard() {
     const regHTML = data.ultimosRegistros.map(r => `
       <div style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin: 5px 0;">
         <strong>${r.nombre || 'N/A'}</strong> - ${r.telefono || 'N/A'}<br>
-        <small>${r.autorizado ? '🟢 Autorizado' : '🕑 Pendiente'} - ${new Date(r.fecha).toLocaleString('es-CO')}</small>
+        <small>${r.autorizado ? '✅ Autorizado' : '⏳ Pendiente'} - ${new Date(r.fecha).toLocaleString('es-CO')}</small>
       </div>
     `).join('');
     document.getElementById('ultimos-registros').innerHTML = regHTML || '<p>No hay registros recientes</p>';
@@ -247,14 +247,19 @@ async function loadHistory(page = 1) {
       <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong>🔵 ${conv.userId}</strong><br>
+            <strong>👤 ${conv.userId}</strong><br>
             <small>Session: ${conv.sessionId}</small><br>
-            <small>📨 ${conv.messageCount} mensajes | Estado: ${conv.status}</small><br>
-            <small>📂 ${new Date(conv.lastActivity).toLocaleString('es-CO')}</small>
+            <small>💬 ${conv.messageCount} mensajes | Estado: ${conv.status}</small><br>
+            <small>📅 ${new Date(conv.lastActivity).toLocaleString('es-CO')}</small>
           </div>
-          <button class="btn btn-primary" onclick="viewConversation('${conv.sessionId}')">
-             Ver Detalle
-          </button>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="viewConversation('${conv.sessionId}')">
+              👁️ Ver Detalle
+            </button>
+            <button class="btn btn-danger" onclick="deleteConversation('${conv.sessionId}')">
+              🗑️ Eliminar
+            </button>
+          </div>
         </div>
       </div>
     `).join('');
@@ -346,7 +351,7 @@ async function viewConversation(sessionId) {
           <h3>Datos del Usuario</h3>
           <p><strong>Nombre:</strong> ${reg.name || 'N/A'}</p>
           <p><strong>Teléfono:</strong> ${reg.phone || 'N/A'}</p>
-          <p><strong>Autorizado:</strong> ${reg.authorized ? '🟢 Sí' : '🔴 No'}</p>
+          <p><strong>Autorizado:</strong> ${reg.authorized ? '✅ Sí' : '❌ No'}</p>
           <p><strong>Paso Actual:</strong> ${reg.step}</p>
         </div>
       `;
@@ -358,7 +363,7 @@ async function viewConversation(sessionId) {
       const isUser = msg.role === 'user';
       html += `
         <div class="message-item ${isUser ? 'message-user' : 'message-bot'}">
-          <strong>${isUser ? '👤 Usuario' : '🧿 Novi'}:</strong><br>
+          <strong>${isUser ? '👤 Usuario' : '🤖 Novi'}:</strong><br>
           ${msg.content}<br>
           <small style="opacity: 0.7;">${new Date(msg.timestamp).toLocaleString('es-CO')}</small>
         </div>
@@ -416,7 +421,7 @@ async function loadRegistrations(page = 1) {
       tr.innerHTML = `
         <td>${r.name || 'N/A'}</td>
         <td>${r.phone || 'N/A'}</td>
-        <td>${r.authorized ? '🟢Sí' : '🔴 No'}</td>
+        <td>${r.authorized ? '✅ Sí' : '❌ No'}</td>
         <td>${r.step || 'N/A'}</td>
         <td>${new Date(r.createdAt).toLocaleString('es-CO')}</td>
       `;
@@ -539,3 +544,31 @@ document.getElementById("password").addEventListener("keypress", (e) => {
     document.getElementById("login-btn").click();
   }
 });
+
+// ===============================
+//   ELIMINAR CONVERSACIÓN
+// ===============================
+
+async function deleteConversation(sessionId) {
+  if (!confirm(`¿Estás seguro de eliminar esta conversación?\n\nSession ID: ${sessionId}\n\nEsta acción no se puede deshacer.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/conversation/${sessionId}`, {
+      method: "DELETE"
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("✅ Conversación eliminada correctamente");
+      loadHistory(currentPage); // Recargar la lista
+    } else {
+      alert("❌ Error: " + (data.error || "No se pudo eliminar"));
+    }
+  } catch (err) {
+    console.error("Error eliminando conversación:", err);
+    alert("❌ Error al eliminar la conversación");
+  }
+}
