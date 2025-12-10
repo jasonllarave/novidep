@@ -303,7 +303,7 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
       button: `<button class="quick-button" data-url="https://www.colombianoviolenta.org/servicios/">📋 Ver servicios</button>`
     },
     "4": {
-      text: "📘 ¡Síguenos en Facebook para mantenerte al día con nuestras actividades, eventos y contenido sobre cultura de paz!",
+      text: "📘 ¡Apóyanos con tu donación y ayúdanos a seguir impulsando nuestras iniciativas por la cultura de paz! Cada aporte, por pequeño que sea, fortalece nuestros proyectos y nos permite llegar a más comunidades. ¡Tu solidaridad hace la diferencia!",
       button: `<button class="quick-button" data-url="https://donorbox.org/colombianoviolenta">📘 Ir a Donaciones</button>`
     },
     "5": {
