@@ -513,6 +513,58 @@ Recuerda que siempre estamos aquí cuando nos necesites.<br><br>
   <button class="quick-button" data-option="preguntas_frecuentes">❓ Preguntas frecuentes</button>
 </div>`;
   }
+  if (msg === "recursos_autocuidado") {
+    const greeting = userName ? `¡Excelente decisión, ${userName}!` : "¡Excelente decisión!";
+    return `
+<div style="background:#f0f8ff;padding:15px;border-radius:10px;margin:10px 0;">
+  <p>${greeting} Aquí te dejo algunas formas efectivas de autocuidado:</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌱 Autocuidado Emocional</h4>
+  <p><strong>Meditación:</strong> Dedica unos minutos al día para meditar y conectar contigo mismo.<br>
+  <strong>Diario Personal:</strong> Escribe tus pensamientos y emociones. Esto ayuda a liberar tensiones y a conocerte mejor.</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#2196F3;margin:10px 0 5px 0;">💪🏻 Autocuidado Físico</h4>
+  <p><strong>Ejercicio Regular:</strong> Realiza actividades físicas que disfrutes (caminatas, yoga, danza).<br>
+  <strong>Alimentación Saludable:</strong> Incorpora frutas y verduras en tu dieta. Esto aumenta tu energía y mejora tu estado de ánimo.</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#7B1FA2;margin:10px 0 5px 0;">🧘🏻 Autocuidado Mental</h4>
+  <p><strong>Leer un Libro:</strong> Dedica tiempo a la lectura de algo que te apasione.<br>
+  <strong>Aprender Nuevas Habilidades:</strong> Inscríbete en cursos que te interesen. Esto estimula tu mente y te mantiene activo.</p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#FF6F00;margin:10px 0 5px 0;">🛁 Autocuidado de Rutina</h4>
+  <p><strong>Mañana:</strong> Despierta 10 min antes, estírate, hidrátate.<br>
+  <strong>Tarde:</strong> Pausa activa cada 2 horas, respira profundo.<br>
+  <strong>Noche:</strong> Desconecta pantallas 1 hora antes de dormir.<br>
+  <em>Los pequeños rituales diarios generan grandes cambios.</em></p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#E91E63;margin:10px 0 5px 0;">📖 Journaling Terapéutico</h4>
+  <p><strong>Escribe 5 min cada día:</strong><br>
+  ¿Cómo me siento hoy? • ¿Qué agradezco? • ¿Qué necesito?<br>
+  <em>Escribir libera emociones guardadas y te ayuda a conocerte mejor.</em></p>
+</div>
+
+<div style="margin:15px 0;">
+  <h4 style="color:#00BCD4;margin:10px 0 5px 0;">🎨 Actividades que Nutren el Alma</h4>
+  <p>Leer • Dibujar • Cocinar • Caminar en naturaleza • Escuchar música • Ver una película<br>
+  <em>Dedica tiempo a lo que te hace sentir vivo y conectado contigo.</em></p>
+</div>
+
+<div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
+  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
+  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
+  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
+</div>`;
+  }
 
   // Manejo de opciones del momento de calma
   if (msg === "conversar_ahora") {
@@ -589,58 +641,7 @@ Este es un espacio seguro donde puedes expresar lo que sientes sin juicio. ¿Qu�
 </div>`;
   }
 
-  if (msg === "recursos_autocuidado") {
-    const greeting = userName ? `¡Excelente decisión, ${userName}!` : "¡Excelente decisión!";
-    return `
-<div style="background:#f0f8ff;padding:15px;border-radius:10px;margin:10px 0;">
-  <p>${greeting} Aquí te dejo algunas formas efectivas de autocuidado:</p>
-</div>
-
-<div style="margin:15px 0;">
-  <h4 style="color:#4CAF50;margin:10px 0 5px 0;">🌱 Autocuidado Emocional</h4>
-  <p><strong>Meditación:</strong> Dedica unos minutos al día para meditar y conectar contigo mismo.<br>
-  <strong>Diario Personal:</strong> Escribe tus pensamientos y emociones. Esto ayuda a liberar tensiones y a conocerte mejor.</p>
-</div>
-
-<div style="margin:15px 0;">
-  <h4 style="color:#2196F3;margin:10px 0 5px 0;">💪🏻 Autocuidado Físico</h4>
-  <p><strong>Ejercicio Regular:</strong> Realiza actividades físicas que disfrutes (caminatas, yoga, danza).<br>
-  <strong>Alimentación Saludable:</strong> Incorpora frutas y verduras en tu dieta. Esto aumenta tu energía y mejora tu estado de ánimo.</p>
-</div>
-
-<div style="margin:15px 0;">
-  <h4 style="color:#7B1FA2;margin:10px 0 5px 0;">🧘🏻 Autocuidado Mental</h4>
-  <p><strong>Leer un Libro:</strong> Dedica tiempo a la lectura de algo que te apasione.<br>
-  <strong>Aprender Nuevas Habilidades:</strong> Inscríbete en cursos que te interesen. Esto estimula tu mente y te mantiene activo.</p>
-</div>
-
-<div style="margin:15px 0;">
-  <h4 style="color:#FF6F00;margin:10px 0 5px 0;">🛁 Autocuidado de Rutina</h4>
-  <p><strong>Mañana:</strong> Despierta 10 min antes, estírate, hidrátate.<br>
-  <strong>Tarde:</strong> Pausa activa cada 2 horas, respira profundo.<br>
-  <strong>Noche:</strong> Desconecta pantallas 1 hora antes de dormir.<br>
-  <em>Los pequeños rituales diarios generan grandes cambios.</em></p>
-</div>
-
-<div style="margin:15px 0;">
-  <h4 style="color:#E91E63;margin:10px 0 5px 0;">📖 Journaling Terapéutico</h4>
-  <p><strong>Escribe 5 min cada día:</strong><br>
-  ¿Cómo me siento hoy? • ¿Qué agradezco? • ¿Qué necesito?<br>
-  <em>Escribir libera emociones guardadas y te ayuda a conocerte mejor.</em></p>
-</div>
-
-<div style="margin:15px 0;">
-  <h4 style="color:#00BCD4;margin:10px 0 5px 0;">🎨 Actividades que Nutren el Alma</h4>
-  <p>Leer • Dibujar • Cocinar • Caminar en naturaleza • Escuchar música • Ver una película<br>
-  <em>Dedica tiempo a lo que te hace sentir vivo y conectado contigo.</em></p>
-</div>
-
-<div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
-  <button class="quick-button" data-option="momento_calma">🔙 Volver al menú</button>
-  <button class="quick-button" data-option="conversar_ahora">💬 Conversar</button>
-  <button class="quick-button" data-option="explorar_servicios">👁‍🗨 Ver servicios</button>
-</div>`;
-  }
+  
 
   if (msg === "practicas_gratitud") {
     return `
