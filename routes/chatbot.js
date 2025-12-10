@@ -69,7 +69,7 @@ router.post("/chatbot", async (req, res) => {
       session.step = "ask_participation";
       await session.save();
 
-      const botReply = `¡Hola! Soy <strong>Novi</strong>, tu asistente ciberemocional de Colombia Noviolenta. 🌱<br><br>
+      const botReply = `<strong>¡Hola! Soy Novi, tu asistente ciberemocional de Colombia Noviolenta.</strong>, 🌱<br><br>
 ¿Te gustaría conocer nuestros servicios, participar en nuestros talleres o recibir acompañamiento emocional ahora?<br><br>
 <div style="display:flex;gap:10px;">
 <button class="quick-button" data-option="participar">🟢 Sí, quiero </button>
