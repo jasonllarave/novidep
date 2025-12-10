@@ -481,7 +481,7 @@ body::before {
 /*boton de tu momento de calma para dar clic*/
 
 /* ---- ESTILOS DEL BOTÓN "MOMENTO DE CALMA" ---- */
-.momento-calma-btn {
+.momento_calma-btn {
   background: linear-gradient(135deg, #e15461ad 0%, #55b5db 100%);
   color: white !important;
   width: 100%;
@@ -501,7 +501,7 @@ body::before {
 }
 
 /* Franja animada (shimmer) */
-.momento-calma-btn::after {
+.momento_calma-btn::after {
   content: "";
   position: absolute;
   top: 0;
@@ -528,12 +528,12 @@ body::before {
   100% { left: 120%; }
 }
 
-.momento-calma-btn:hover {
+.momento_calma-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 7px 20px rgba(0,0,0,0.35);
 }
 
-.momento-calma-btn:active {
+.momento_calma-btn:active {
   transform: scale(0.97);
 }
 
